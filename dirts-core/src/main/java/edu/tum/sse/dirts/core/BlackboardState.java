@@ -35,7 +35,6 @@ public enum BlackboardState {
 
     /* semi-terminal state */
     READY_TO_CALCULATE_AFFECTED_TESTS,
-    ABORTING_NO_TESTS,
 
     /* terminal states */
     DONE,
@@ -56,7 +55,6 @@ public enum BlackboardState {
             case PARSED:
                 return "Parsing";
             case TESTS_FOUND:
-            case ABORTING_NO_TESTS:
                 return "Finding tests";
             case NODES_CHANGES_SET:
                 return "Calculating changes";
@@ -79,7 +77,6 @@ public enum BlackboardState {
         switch(this) {
             case DONE:
             case FAILED:
-            case ABORTING_NO_TESTS:
                 return true;
             default:
                 return false;

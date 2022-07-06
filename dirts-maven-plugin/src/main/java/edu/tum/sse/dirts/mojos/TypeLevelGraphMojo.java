@@ -1,6 +1,8 @@
 package edu.tum.sse.dirts.mojos;
 
+import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.control.Control;
+import edu.tum.sse.dirts.core.control.TypeLevelControl;
 import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -27,6 +29,7 @@ public class TypeLevelGraphMojo extends AbstractGraphMojo {
 
     @Override
     protected Control getControl() {
-        return getTypeLevelControl(false);
+        Blackboard typeLevelBlackboard = getTypeLevelBlackboard();
+        return new TypeLevelControl(typeLevelBlackboard, false);
     }
 }

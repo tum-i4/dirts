@@ -49,7 +49,7 @@ public class Blackboard {
     private final Path rootPath;
     private final Path subPath;
 
-    private final TestFilter<String, String> testFilter;
+    private TestFilter<String, String> testFilter;
 
     private Map<String, Integer> checksumsNodes;
 
@@ -78,10 +78,9 @@ public class Blackboard {
     //##################################################################################################################
     // Constructors
 
-    public Blackboard(Path rootPath, Path subPath, TestFilter<String, String> testFilter) {
+    public Blackboard(Path rootPath, Path subPath) {
         this.rootPath = rootPath;
         this.subPath = subPath;
-        this.testFilter = testFilter;
 
         this.state = BlackboardState.CLEAN;
         knowledgeSources = new ArrayList<>();
@@ -130,6 +129,10 @@ public class Blackboard {
 
     public TestFilter<String, String> getTestFilter() {
         return testFilter;
+    }
+
+    public void setTestFilter(TestFilter<String, String> testFilter) {
+        this.testFilter = testFilter;
     }
 
     // _________________________________________________________________________________________________________________

@@ -26,16 +26,14 @@ public class TestFinder extends KnowledgeSource {
 
     @Override
     public BlackboardState updateBlackboard() {
-        Collection<CompilationUnit> compilationUnits = blackboard.getCompilationUnits();
-        List<String> tests = new ArrayList<>();
-        compilationUnits.forEach(cu -> cu.accept(finderVisitor, tests));
+        if (blackboard.getTestFilter() != null) {
+            Collection<CompilationUnit> compilationUnits = blackboard.getCompilationUnits();
+            List<String> tests = new ArrayList<>();
+            compilationUnits.forEach(cu -> cu.accept(finderVisitor, tests));
 
-        if (tests.isEmpty()) {
-            return ABORTING_NO_TESTS;
-        } else {
             blackboard.setTests(tests);
-            return TESTS_FOUND;
         }
+        return TESTS_FOUND;
     }
 
     @Override

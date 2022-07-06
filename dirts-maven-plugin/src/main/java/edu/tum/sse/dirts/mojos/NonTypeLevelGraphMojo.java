@@ -1,6 +1,8 @@
 package edu.tum.sse.dirts.mojos;
 
+import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.control.Control;
+import edu.tum.sse.dirts.core.control.NonTypeLevelControl;
 import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -27,6 +29,7 @@ public class NonTypeLevelGraphMojo extends AbstractGraphMojo {
 
     @Override
     protected Control getControl() {
-        return getNonTypeLevelControl(false);
+        Blackboard nontypeLevelBlackboard = getNonTypeLevelBlackboard();
+        return new NonTypeLevelControl(nontypeLevelBlackboard, false);
     }
 }
