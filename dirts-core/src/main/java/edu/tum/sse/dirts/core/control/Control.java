@@ -21,9 +21,12 @@ import edu.tum.sse.dirts.core.BlackboardState;
 import edu.tum.sse.dirts.core.KnowledgeSource;
 import edu.tum.sse.dirts.core.knowledgesources.*;
 import edu.tum.sse.dirts.graph.EdgeType;
+import edu.tum.sse.dirts.util.Log;
 
 import java.util.*;
 import java.util.function.Predicate;
+
+import static java.util.logging.Level.INFO;
 
 /**
  * Abstract base class for either type-level or nontype-level RTS
@@ -167,21 +170,19 @@ public abstract class Control {
                 BlackboardState newState = candidate.updateBlackboard();
                 blackboard.setState(newState);
 
-                if (TIME)
-                    System.out.printf(Locale.US,
-                            "[TIME] %s took %.3f seconds\n",
-                            newState,
-                            ((System.currentTimeMillis() - unitTime) * 0.001));
+                Log.log(INFO, "TIME",
+                        String.format(Locale.US,
+                                "%s took %.3f seconds",
+                                newState,
+                                ((System.currentTimeMillis() - unitTime) * 0.001)));
 
             } else {
-                System.out.println("[TIME END]");
                 throw new RuntimeException("Terminated unexpectedly at state " + blackboard.getState().name());
             }
         }
 
         // check if failed
         if (blackboard.getState().isFailedState()) {
-            System.out.println("[TIME END]");
             throw new RuntimeException("Failed to compute affected tests.");
         }
     }
@@ -193,11 +194,7 @@ public abstract class Control {
      * @return (changedNode, affectedTest)
      */
     public Map<String, Set<String>> getSelectedTests(Set<EdgeType> filterByEdgeType) {
-        long startTime;
-        if (TIME) {
-            startTime = System.currentTimeMillis();
-            System.out.println("[TIME START]");
-        }
+        long startTime = System.currentTimeMillis();
 
         if (!blackboard.getState().isTerminalState())
             applyKnowledgeSources();
@@ -220,12 +217,11 @@ public abstract class Control {
             });
             impactedNodes.put(null, new HashSet<>(tests));
 
-            if (TIME) {
-                System.out.printf(Locale.US,
-                        "[TIME] Selecting tests altogether took %.3f seconds\n",
-                        ((System.currentTimeMillis() - startTime) * 0.001));
-                System.out.println("[TIME END]");
-            }
+
+            Log.log(INFO, "TIME",
+                    String.format(Locale.US,
+                            "Selecting tests altogether took %.3f seconds",
+                            ((System.currentTimeMillis() - startTime) * 0.001)));
 
             return impactedNodes;
         } else {

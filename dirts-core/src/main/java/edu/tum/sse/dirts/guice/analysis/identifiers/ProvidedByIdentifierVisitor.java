@@ -12,14 +12,16 @@ import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import edu.tum.sse.dirts.analysis.AbstractIdentifierVisitor;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.guice.util.GuiceBinding;
 import edu.tum.sse.dirts.guice.util.GuiceUtil;
 import edu.tum.sse.dirts.util.JavaParserUtils;
+import edu.tum.sse.dirts.util.Log;
 
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
+
+import static java.util.logging.Level.FINE;
 
 /**
  * Identifies just-in-time bindings
@@ -62,9 +64,7 @@ public class ProvidedByIdentifierVisitor extends AbstractIdentifierVisitor<BeanS
                 implementedType = n.resolve();
 
             } catch (RuntimeException e) {
-                if (Control.DEBUG) {
-                    System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
-                }
+                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
 
             //**********************************************************************************************************
@@ -78,8 +78,7 @@ public class ProvidedByIdentifierVisitor extends AbstractIdentifierVisitor<BeanS
                         type = JavaParserUtils.extractClassType(resolvedType.asReferenceType(), Set.of("java.lang.Class"));
                     }
                 } catch (RuntimeException e) {
-                    if (Control.DEBUG)
-                        System.out.println("Exception in " + JavaParserUtils.class.getSimpleName() + ": " + e.getMessage());
+                    Log.log(FINE, "Exception in " + JavaParserUtils.class.getSimpleName() + ": " + e.getMessage());
                 }
             } else if (annotationExpr.isNormalAnnotationExpr()) {
                 NormalAnnotationExpr normalAnnotationExpr = annotationExpr.asNormalAnnotationExpr();
@@ -91,8 +90,7 @@ public class ProvidedByIdentifierVisitor extends AbstractIdentifierVisitor<BeanS
                                 type = JavaParserUtils.extractClassType(resolvedType.asReferenceType(), Set.of("java.lang.Class"));
                             }
                         } catch (RuntimeException e) {
-                            if (Control.DEBUG)
-                                System.out.println("Exception in " + JavaParserUtils.class.getSimpleName() + ": " + e.getMessage());
+                            Log.log(FINE, "Exception in " + JavaParserUtils.class.getSimpleName() + ": " + e.getMessage());
                         }
                     }
                 }

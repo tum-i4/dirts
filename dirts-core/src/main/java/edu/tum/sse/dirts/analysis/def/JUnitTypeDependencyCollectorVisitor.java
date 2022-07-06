@@ -12,7 +12,6 @@
  */
 package edu.tum.sse.dirts.analysis.def;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -24,30 +23,42 @@ import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclar
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import edu.tum.sse.dirts.analysis.FinderVisitor;
 import edu.tum.sse.dirts.analysis.TypeDependencyCollector;
-import edu.tum.sse.dirts.analysis.def.finders.TypeTestFinderVisitor;
 import edu.tum.sse.dirts.analysis.def.identifiers.JUnit4BeforeMethodIdentifierVisitor;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.graph.EdgeType;
 import edu.tum.sse.dirts.util.JavaParserUtils;
+import edu.tum.sse.dirts.util.Log;
+import org.apache.maven.surefire.api.testset.TestFilter;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static edu.tum.sse.dirts.analysis.def.finders.TypeNameFinderVisitor.recursiveMemberTest;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupNode;
+import static java.util.logging.Level.FINE;
 
 /**
  * Collects dependencies related to JUnit4 for Type-nodes
  */
-public class JUnit4TypeDependencyCollectorVisitor
-        extends JUnit4DependencyCollectorVisitor
+public class JUnitTypeDependencyCollectorVisitor
+        extends JUnitDependencyCollectorVisitor
         implements TypeDependencyCollector {
 
     //##################################################################################################################
-    // Methods inherited from JUnit4DependencyCollectorVisitor
+    // Attributes
+
+    private final TestFilter<String, String> testFilter;
+
+    //##################################################################################################################
+    // Constructors
+
+    public JUnitTypeDependencyCollectorVisitor(TestFilter<String, String> testFilter) {
+        this.testFilter = testFilter;
+    }
+
+    //##################################################################################################################
+    // Methods inherited from JUnitDependencyCollectorVisitor
 
     protected void processBeforeMethods(DependencyGraph dependencyGraph,
                                         String node,
@@ -59,19 +70,20 @@ public class JUnit4TypeDependencyCollectorVisitor
     }
 
     //##################################################################################################################
-    // Visirot pattern - Methods inherited from TypeDependencyCollector
+    // Visitor pattern - Methods inherited from TypeDependencyCollector
 
     @Override
     public void visit(ClassOrInterfaceDeclaration n, DependencyGraph dependencyGraph) {
 
         // ## Account for tests in inner classes
-        // if this class has members that contain tests, add edge to this class
-        if (FinderVisitor.recursiveMemberTest(n)) {
+        // If an inner class has members that contain tests, add edge to inner class
+        // Outer class is considered as test by NonTypeTestFinderVisitor
+        if (FinderVisitor.recursiveMemberTest(n, testFilter)) {
             for (BodyDeclaration<?> member : n.getMembers()) {
                 if (member.isClassOrInterfaceDeclaration()) {
                     ClassOrInterfaceDeclaration classOrInterfaceDeclaration = member.asClassOrInterfaceDeclaration();
-                    if (TypeTestFinderVisitor.testClassDeclaration.test(classOrInterfaceDeclaration)
-                            || FinderVisitor.recursiveMemberTest(classOrInterfaceDeclaration)) {
+                    if (FinderVisitor.testClassDeclaration(classOrInterfaceDeclaration, testFilter)
+                            || FinderVisitor.recursiveMemberTest(classOrInterfaceDeclaration, testFilter)) {
                         String toNode = lookupNode(member, dependencyGraph);
                         String fromNode = lookupNode(n, dependencyGraph);
                         dependencyGraph.addEdge(fromNode, toNode, EdgeType.JUNIT);
@@ -81,6 +93,8 @@ public class JUnit4TypeDependencyCollectorVisitor
         }
 
         // ## Account for tests in extended class
+        // If this class extends a test class, it inherits its methods as test methods
+        // Class is considered as test by NonTypeTestFinderVisitor
         try {
             ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration = n.resolve();
             List<ResolvedReferenceType> allAncestors = resolvedReferenceTypeDeclaration
@@ -91,28 +105,22 @@ public class JUnit4TypeDependencyCollectorVisitor
                     ResolvedReferenceTypeDeclaration resolvedAncestorTypeDeclaration = maybeTypeDeclaration.get();
                     if (resolvedAncestorTypeDeclaration.isClass()) {
                         ResolvedClassDeclaration resolvedClassDeclaration = resolvedAncestorTypeDeclaration.asClass();
-                        Optional<Node> maybeClassDeclaration = resolvedClassDeclaration.toAst();
-                        if (maybeClassDeclaration.isPresent()) {
-                            Node node = maybeClassDeclaration.get();
-                            if (node instanceof ClassOrInterfaceDeclaration) {
-                                ClassOrInterfaceDeclaration ancestorDeclaration = (ClassOrInterfaceDeclaration) node;
-                                if (TypeTestFinderVisitor.testClassDeclaration.test(ancestorDeclaration)) {
-                                    // If class extends a test class, it can be executed as test as well
-                                    String toNode = lookup(resolvedAncestorTypeDeclaration);
-                                    String fromNode = lookupNode(n, dependencyGraph);
-                                    dependencyGraph.addEdge(fromNode, toNode, EdgeType.JUNIT);
-                                }
+                        for (ResolvedMethodDeclaration declaredMethod : resolvedClassDeclaration.getDeclaredMethods()) {
+                            if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration), declaredMethod.getName())) {
+                                // If the class extends a test class, we have to add an edge to this class
+                                String fromNode = lookupNode(n, dependencyGraph);
+                                String toNode = lookup(resolvedAncestorTypeDeclaration);
+                                dependencyGraph.addEdge(fromNode, toNode, EdgeType.INHERITANCE);
                             }
                         }
                     }
                 }
             }
         } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
 
-        if (TypeTestFinderVisitor.testClassDeclaration.test(n)) {
+        if (FinderVisitor.testClassDeclaration(n, testFilter)) {
 
             JUnit4BeforeMethodIdentifierVisitor identifierVisitor = new JUnit4BeforeMethodIdentifierVisitor(n);
 

@@ -17,7 +17,7 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.analysis.DependencyCollector;
 import edu.tum.sse.dirts.analysis.def.DefaultNonTypeDependencyCollectorVisitor;
-import edu.tum.sse.dirts.analysis.def.JUnit4NonTypeDependencyCollectorVisitor;
+import edu.tum.sse.dirts.analysis.def.JUnitNonTypeDependencyCollectorVisitor;
 import edu.tum.sse.dirts.analysis.def.checksum.NonTypeChecksumVisitor;
 import edu.tum.sse.dirts.analysis.def.finders.NonTypeNameFinderVisitor;
 import edu.tum.sse.dirts.analysis.def.finders.NonTypeTestFinderVisitor;
@@ -42,7 +42,6 @@ public class NonTypeLevelControl extends Control {
 
     private static final NonTypeChecksumVisitor NONTYPE_CHECKSUM_VISITOR = new NonTypeChecksumVisitor();
     private static final NonTypeNameFinderVisitor NONTYPE_NAME_FINDER_VISITOR = new NonTypeNameFinderVisitor();
-    private static final NonTypeTestFinderVisitor NONTYPE_TEST_FINDER_VISITOR = new NonTypeTestFinderVisitor();
 
     private static final Predicate<Node> NONTYPES_IN_GRAPH =
             n -> !(n instanceof CompilationUnit || n instanceof TypeDeclaration);
@@ -61,7 +60,7 @@ public class NonTypeLevelControl extends Control {
                 SUFFIX,
                 NONTYPE_CHECKSUM_VISITOR,
                 NONTYPE_NAME_FINDER_VISITOR,
-                NONTYPE_TEST_FINDER_VISITOR,
+                new NonTypeTestFinderVisitor(blackboard.getTestFilter()),
                 NONTYPES_IN_GRAPH,
                 PRIMARY_DEPENDENCY_COLLECTOR,
                 AFFECTED_EDGES);
@@ -74,7 +73,7 @@ public class NonTypeLevelControl extends Control {
     public void init() {
         super.init();
         blackboard.addDependencyStrategy(new CachingDependencyStrategy(
-                Set.of(new JUnit4NonTypeDependencyCollectorVisitor()),
+                Set.of(new JUnitNonTypeDependencyCollectorVisitor(blackboard.getTestFilter())),
                 Set.of(JUNIT)));
     }
 }

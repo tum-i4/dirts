@@ -21,13 +21,15 @@ import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclar
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import edu.tum.sse.dirts.analysis.AbstractTruncatedVisitor;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.spring.analysis.bean.SpringBean;
 import edu.tum.sse.dirts.spring.util.SpringUtil;
 import edu.tum.sse.dirts.util.JavaParserUtils;
+import edu.tum.sse.dirts.util.Log;
 
 import java.util.Collection;
 import java.util.Set;
+
+import static java.util.logging.Level.FINE;
 
 /**
  * Identifies classes annotated with @Component
@@ -88,8 +90,7 @@ public class SpringComponentIdentifierVisitor extends AbstractTruncatedVisitor<
                     }
 
                 } catch (RuntimeException e) {
-                    if (Control.DEBUG)
-                        System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                    Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                 }
             }
         }

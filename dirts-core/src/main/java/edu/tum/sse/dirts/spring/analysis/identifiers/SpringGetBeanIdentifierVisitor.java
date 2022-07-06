@@ -18,12 +18,14 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
 import edu.tum.sse.dirts.analysis.AbstractIdentifierVisitor;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.util.JavaParserUtils;
+import edu.tum.sse.dirts.util.Log;
 import edu.tum.sse.dirts.util.tuples.Pair;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import static java.util.logging.Level.FINE;
 
 /**
  * Identifies method calls to .getBean() supposedly invoked on a BeanFactory or ApplicationContext
@@ -85,8 +87,7 @@ public class SpringGetBeanIdentifierVisitor extends AbstractIdentifierVisitor<
                             resolvedType = JavaParserUtils.extractClassType(argumentResolvedType.asReferenceType(), Set.of("java.lang.Class"));
                         }
                     } catch (RuntimeException e) {
-                        if (Control.DEBUG)
-                            System.out.println("Exception in " + JavaParserUtils.class.getSimpleName() + ": " + e.getMessage());
+                        Log.log(FINE, "Exception in " + JavaParserUtils.class.getSimpleName() + ": " + e.getMessage());
                     }
                 }
             }

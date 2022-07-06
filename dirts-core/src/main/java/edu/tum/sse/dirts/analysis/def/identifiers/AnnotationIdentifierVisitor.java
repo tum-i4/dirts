@@ -19,10 +19,12 @@ import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 import com.github.javaparser.resolution.declarations.ResolvedAnnotationDeclaration;
 import edu.tum.sse.dirts.analysis.AbstractIdentifierVisitor;
-import edu.tum.sse.dirts.core.control.Control;
+import edu.tum.sse.dirts.util.Log;
 
 import java.util.Collection;
 import java.util.HashSet;
+
+import static java.util.logging.Level.FINE;
 
 /**
  * Identifies Annotations present on nodes in the AST
@@ -66,8 +68,7 @@ public class AnnotationIdentifierVisitor extends AbstractIdentifierVisitor<
             ResolvedAnnotationDeclaration resolvedAnnotationDeclaration = n.resolve();
             arg.add(resolvedAnnotationDeclaration);
         } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -79,8 +80,7 @@ public class AnnotationIdentifierVisitor extends AbstractIdentifierVisitor<
             ResolvedAnnotationDeclaration resolvedAnnotationDeclaration = n.resolve();
             arg.add(resolvedAnnotationDeclaration);
         } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -92,8 +92,7 @@ public class AnnotationIdentifierVisitor extends AbstractIdentifierVisitor<
             ResolvedAnnotationDeclaration resolvedAnnotationDeclaration = n.resolve();
             arg.add(resolvedAnnotationDeclaration);
         } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 }

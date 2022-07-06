@@ -7,15 +7,16 @@ import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import edu.tum.sse.dirts.analysis.FinderVisitor;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.util.JavaParserUtils;
+import edu.tum.sse.dirts.util.Log;
+import org.apache.maven.surefire.api.testset.TestFilter;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
+import static java.util.logging.Level.FINE;
 
 /**
  * Collects all NonType-nodes that may represent tests and their names
@@ -24,16 +25,16 @@ import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 public class NonTypeTestFinderVisitor extends FinderVisitor<Collection<String>> {
 
     //##################################################################################################################
-    // Constants
+    // Attributes
 
-    public static final Predicate<MethodDeclaration> testMethodDeclaration =
-            n -> n.isAnnotationPresent("Test")
-                    || n.isAnnotationPresent("ParameterizedTest")
-                    || n.isAnnotationPresent("RepeatedTest");
-    ;
+    private final TestFilter<String, String> testFilter;
 
-    public static final Predicate<ClassOrInterfaceDeclaration> testClassDeclaration =
-            n -> n.getExtendedTypes().stream().anyMatch(e -> e.getNameAsString().equals("TestCase"));
+    //##################################################################################################################
+    // Constructors
+
+    public NonTypeTestFinderVisitor(TestFilter<String, String> testFilter) {
+        this.testFilter = testFilter;
+    }
 
     //##################################################################################################################
     // Visitor Pattern
@@ -45,19 +46,21 @@ public class NonTypeTestFinderVisitor extends FinderVisitor<Collection<String>> 
         // ## Tests in inner classes
         // If this class has members that contain tests, add one of the constructor of this class as tests as well
         // since there is at least one constructor this ensures that this class is treated as test class
-        if (recursiveMemberTest(n)) {
+        // Edges are set by JUnitNonTypeDependencyCollectorVisitor
+        if (recursiveMemberTest(n, testFilter)) {
             try {
                 ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration = n.resolve();
                 List<ResolvedConstructorDeclaration> constructors = resolvedReferenceTypeDeclaration.getConstructors();
                 ResolvedConstructorDeclaration resolvedConstructorDeclaration = constructors.get(0);
                 arg.add(lookup(resolvedConstructorDeclaration));
             } catch (RuntimeException e) {
-                if (Control.DEBUG)
-                    System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
 
-        // ## Tests in extended classes
+        // ## Account for test methods from extended test classes
+        // If this class extends a test class, it inherits its methods as test methods
+        // Edges are set by JUnitNonTypeDependencyCollectorVisitor
         try {
             ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration = n.resolve();
             List<ResolvedReferenceType> allAncestors = resolvedReferenceTypeDeclaration
@@ -69,30 +72,15 @@ public class NonTypeTestFinderVisitor extends FinderVisitor<Collection<String>> 
                     if (resolvedAncestorTypeDeclaration.isClass()) {
                         ResolvedClassDeclaration resolvedClassDeclaration = resolvedAncestorTypeDeclaration.asClass();
                         for (ResolvedMethodDeclaration declaredMethod : resolvedClassDeclaration.getDeclaredMethods()) {
-                            Optional<MethodDeclaration> maybeMethodDeclaration = declaredMethod.toAst();
-                            if (maybeMethodDeclaration.isPresent()) {
-                                MethodDeclaration methodDeclaration = maybeMethodDeclaration.get();
-                                if (testMethodDeclaration.test(methodDeclaration)) {
-                                    // If the class extends a test class, we have to add a node for inherited test methods
-                                    arg.add(lookup(resolvedReferenceTypeDeclaration) + "." + declaredMethod.getSignature());
-                                }
-                            }
+                            if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration), declaredMethod.getName()))
+                                // Consider this method as a test
+                                arg.add(lookup(resolvedReferenceTypeDeclaration) + "." + declaredMethod.getSignature());
                         }
                     }
                 }
             }
         } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
-        }
-
-        // ## Tests from extending TestCase
-        if (testClassDeclaration.test(n)) {
-            for (MethodDeclaration method : n.getMethods()) {
-                if (!method.getNameAsString().equals("setUp") && !method.getNameAsString().equals("tearDown")) {
-                    arg.add(lookup(method).getFirst());
-                }
-            }
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -104,7 +92,7 @@ public class NonTypeTestFinderVisitor extends FinderVisitor<Collection<String>> 
     @Override
     public void visit(MethodDeclaration n, Collection<String> arg) {
         //super.visit(n, arg);
-        if (testMethodDeclaration.test(n)) {
+        if (FinderVisitor.testMethodDeclaration(n, testFilter)) {
             arg.add(lookup(n).getFirst());
         }
     }

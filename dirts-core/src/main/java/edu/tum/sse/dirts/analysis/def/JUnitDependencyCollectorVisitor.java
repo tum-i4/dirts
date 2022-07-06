@@ -24,7 +24,7 @@ import java.util.Collection;
  * <p>
  * Considers methods annotated with @Before and @BeforeClass as dependencies of methods annotated with @Test
  */
-public abstract class JUnit4DependencyCollectorVisitor
+public abstract class JUnitDependencyCollectorVisitor
         extends AbstractTruncatedVisitor<DependencyGraph>
         implements DependencyCollector {
 

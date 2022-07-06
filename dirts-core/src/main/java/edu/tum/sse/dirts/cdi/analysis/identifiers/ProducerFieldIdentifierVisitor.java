@@ -22,12 +22,14 @@ import edu.tum.sse.dirts.analysis.AbstractIdentifierVisitor;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
 import edu.tum.sse.dirts.cdi.util.CDIBean;
 import edu.tum.sse.dirts.cdi.util.CDIUtil;
-import edu.tum.sse.dirts.core.control.Control;
+import edu.tum.sse.dirts.util.Log;
 import edu.tum.sse.dirts.util.tuples.Triple;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import static java.util.logging.Level.FINE;
 
 
 /**
@@ -83,8 +85,7 @@ public class ProducerFieldIdentifierVisitor extends AbstractIdentifierVisitor<
                             arg.addBeanByType(beanType, newBean);
                         }
                     } catch (RuntimeException e) {
-                        if (Control.DEBUG)
-                            System.out.println("Exception in " + this.getClass().getSimpleName() + ": " +
+                        Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " +
                                     e.getMessage());
                     }
 
@@ -102,8 +103,7 @@ public class ProducerFieldIdentifierVisitor extends AbstractIdentifierVisitor<
                     }
 
                 } catch (RuntimeException e) {
-                    if (Control.DEBUG)
-                        System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                    Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                 }
             } else {
                 Set<String> qualifiers = CDIUtil.findQualifiers(n);
@@ -167,8 +167,7 @@ public class ProducerFieldIdentifierVisitor extends AbstractIdentifierVisitor<
                             beanStorage.addBeanByType(beanType, newBean);
                         }
                     } catch (RuntimeException e) {
-                        if (Control.DEBUG)
-                            System.out.println("Exception in " + this.getClass().getSimpleName() + ": " +
+                        Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " +
                                     e.getMessage());
                     }
 
@@ -187,8 +186,7 @@ public class ProducerFieldIdentifierVisitor extends AbstractIdentifierVisitor<
                     // unreachable
                 }
             } catch (RuntimeException e) {
-                if (Control.DEBUG)
-                    System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
     }

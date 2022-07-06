@@ -21,15 +21,16 @@ import edu.tum.sse.dirts.analysis.def.identifiers.AnnotationIdentifierVisitor;
 import edu.tum.sse.dirts.analysis.def.identifiers.nontype.DelegationIdentifierVisitor;
 import edu.tum.sse.dirts.analysis.def.identifiers.nontype.FieldAccessIdentifierVisitor;
 import edu.tum.sse.dirts.analysis.def.identifiers.nontype.InheritanceIdentifierVisitor;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.graph.EdgeType;
+import edu.tum.sse.dirts.util.Log;
 import edu.tum.sse.dirts.util.tuples.Pair;
 
 import java.util.*;
 
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupNode;
+import static java.util.logging.Level.FINE;
 
 /**
  * Collects dependencies based on Delegation, MemberAccess and Inheritance for NonType-nodes
@@ -69,8 +70,7 @@ public class DefaultNonTypeDependencyCollectorVisitor
                     processDelegation(dependencyGraph, node, new HashSet<>(parentConstructors));
                 }
             } catch (RuntimeException e) {
-                if (Control.DEBUG)
-                    System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
     }

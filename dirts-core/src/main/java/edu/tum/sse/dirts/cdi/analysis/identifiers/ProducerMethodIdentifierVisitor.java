@@ -21,12 +21,13 @@ import edu.tum.sse.dirts.analysis.AbstractIdentifierVisitor;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
 import edu.tum.sse.dirts.cdi.util.CDIBean;
 import edu.tum.sse.dirts.cdi.util.CDIUtil;
-import edu.tum.sse.dirts.core.control.Control;
+import edu.tum.sse.dirts.util.Log;
 import edu.tum.sse.dirts.util.tuples.Pair;
 
 import java.util.*;
 
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
+import static java.util.logging.Level.FINE;
 
 /**
  * Identifies methods annotated with @Produces and @Disposes
@@ -89,8 +90,7 @@ public class ProducerMethodIdentifierVisitor extends AbstractIdentifierVisitor<
                     }
 
                 } catch (RuntimeException e) {
-                    if (Control.DEBUG)
-                        System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                    Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                 }
 
                 //******************************************************************************************************
@@ -106,8 +106,7 @@ public class ProducerMethodIdentifierVisitor extends AbstractIdentifierVisitor<
                     beanStorage.addBeanByQualifier(qualifier, newBean);
                 }
             } catch (RuntimeException e) {
-                if (Control.DEBUG)
-                    System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
     }
@@ -131,8 +130,7 @@ public class ProducerMethodIdentifierVisitor extends AbstractIdentifierVisitor<
                                 arg.put(disposedTypeName, new HashSet<>());
                             arg.get(disposedTypeName).add(n.resolve());
                         } catch (RuntimeException e) {
-                            if (Control.DEBUG)
-                                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                         }
                     }
                 }

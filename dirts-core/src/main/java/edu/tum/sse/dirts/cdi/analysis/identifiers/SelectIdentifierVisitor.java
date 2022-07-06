@@ -20,8 +20,8 @@ import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclar
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import edu.tum.sse.dirts.analysis.AbstractIdentifierVisitor;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.util.JavaParserUtils;
+import edu.tum.sse.dirts.util.Log;
 import edu.tum.sse.dirts.util.tuples.Pair;
 
 import java.util.HashSet;
@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
+import static java.util.logging.Level.FINE;
 
 /**
  * Identifies calls to select(...) to retrieve beans
@@ -87,8 +88,7 @@ public class SelectIdentifierVisitor extends AbstractIdentifierVisitor<
                             requestedType = JavaParserUtils.extractClassType(resolvedReferenceType,
                                     Set.of("java.lang.Class", "javax.enterprise.util.TypeLiteral"));
                         } catch (RuntimeException e) {
-                            if (Control.DEBUG)
-                                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                         }
 
                         //**************************************************************************************************
@@ -108,8 +108,7 @@ public class SelectIdentifierVisitor extends AbstractIdentifierVisitor<
                         }
                     }
                 } catch (RuntimeException e) {
-                    if (Control.DEBUG)
-                        System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                    Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                 }
             }
             if (requestedType != null || !qualifiers.isEmpty()) {

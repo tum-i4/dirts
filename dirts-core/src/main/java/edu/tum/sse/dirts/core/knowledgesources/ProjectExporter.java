@@ -47,7 +47,7 @@ public class ProjectExporter<T extends BodyDeclaration<?>> extends KnowledgeSour
     public BlackboardState updateBlackboard() {
         if (overwrite) {
 
-            Path tmpPath = blackboard.getRootPath().resolve(blackboard.getSubPath()).resolve(Path.of(".edu.tum.sse.dirts"));
+            Path tmpPath = blackboard.getRootPath().resolve(blackboard.getSubPath()).resolve(Path.of(".dirts"));
 
             // DependencyGraph
             DependencyGraph dependencyGraphNewRevision = blackboard.getDependencyGraphNewRevision();

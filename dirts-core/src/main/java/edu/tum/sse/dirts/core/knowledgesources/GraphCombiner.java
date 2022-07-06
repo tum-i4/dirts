@@ -9,7 +9,8 @@ import edu.tum.sse.dirts.graph.ModificationGraph;
 
 import java.util.Map;
 
-import static edu.tum.sse.dirts.core.BlackboardState.*;
+import static edu.tum.sse.dirts.core.BlackboardState.DEPENDENCIES_UPDATED;
+import static edu.tum.sse.dirts.core.BlackboardState.READY_TO_CALCULATE_AFFECTED_TESTS;
 
 /**
  * Combines the graphs of the old and the new revision into a single modificationGraph

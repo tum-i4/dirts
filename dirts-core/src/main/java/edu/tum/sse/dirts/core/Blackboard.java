@@ -19,6 +19,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import edu.tum.sse.dirts.core.strategies.DependencyStrategy;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.graph.ModificationGraph;
+import org.apache.maven.surefire.api.testset.TestFilter;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -47,6 +48,8 @@ public class Blackboard {
 
     private final Path rootPath;
     private final Path subPath;
+
+    private TestFilter<String, String> testFilter;
 
     private Map<String, Integer> checksumsNodes;
 
@@ -120,6 +123,16 @@ public class Blackboard {
 
     public Path getSubPath() {
         return subPath;
+    }
+
+    // _________________________________________________________________________________________________________________
+
+    public TestFilter<String, String> getTestFilter() {
+        return testFilter;
+    }
+
+    public void setTestFilter(TestFilter<String, String> testFilter) {
+        this.testFilter = testFilter;
     }
 
     // _________________________________________________________________________________________________________________

@@ -18,6 +18,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.BlackboardState;
 import edu.tum.sse.dirts.core.KnowledgeSource;
+import edu.tum.sse.dirts.util.Log;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,6 +26,7 @@ import java.nio.file.Path;
 
 import static edu.tum.sse.dirts.core.BlackboardState.IMPORTED;
 import static edu.tum.sse.dirts.core.BlackboardState.TYPE_SOLVER_SET;
+import static java.util.logging.Level.WARNING;
 
 /**
  * Adds a ReflectionTypeSolver and a JarTypeSolver for jars of maven dependencies
@@ -49,7 +51,7 @@ public class TypeSolverInitializer extends KnowledgeSource {
         Path mavenDependenciesPath = blackboard.getRootPath()
                 .toAbsolutePath()
                 .resolve(blackboard.getSubPath())
-                .resolve(Path.of(".edu.tum.sse.dirts"))
+                .resolve(Path.of(".dirts"))
                 .resolve(Path.of("libraries"));
 
         if (Files.exists(mavenDependenciesPath)) {
@@ -63,23 +65,23 @@ public class TypeSolverInitializer extends KnowledgeSource {
                         Path dependencyPath = Path.of(mavenDependency);
                         typeSolver.add(new JarTypeSolver(dependencyPath));
                     } catch (IOException e) {
-                        System.err.println("Failed to add resolver for jar:" + mavenDependency);
+                        Log.errLog(WARNING, "Failed to add resolver for jar:" + mavenDependency);
                     }
                 }
                 try {
                     Files.delete(mavenDependenciesPath);
                 } catch (IOException e) {
-                    System.err.println("Failed to delete file containing dependencies: " + e.getMessage());
+                    Log.errLog(WARNING, "Failed to delete file containing dependencies: " + e.getMessage());
                 }
             } catch (IOException e) {
-                System.err.println("Failed to read maven dependencies - " +
+                Log.errLog(WARNING, "Failed to read maven dependencies - " +
                         "we will not be able to resolve code from libraries");
                 e.printStackTrace();
             }
         } else {
-            System.err.println("Failed to read maven dependencies - " +
+            Log.errLog(WARNING,"Failed to read maven dependencies - " +
                     "we will not be able to resolve code from libraries");
-            System.err.println("File does not exist: " + mavenDependenciesPath);
+            Log.errLog(WARNING,"File does not exist: " + mavenDependenciesPath);
         }
 
         blackboard.setTypeSolver(typeSolver);

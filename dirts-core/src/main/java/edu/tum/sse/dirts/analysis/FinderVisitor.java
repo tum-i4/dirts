@@ -14,9 +14,12 @@ package edu.tum.sse.dirts.analysis;
 
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import edu.tum.sse.dirts.analysis.def.finders.TypeNameFinderVisitor;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
+import org.apache.maven.surefire.api.testset.TestFilter;
 
-import static edu.tum.sse.dirts.analysis.def.finders.TypeTestFinderVisitor.testClassDeclaration;
+import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 
 /**
  * A generic FinderVisitor that can be extended to collect specific Nodes in the AST
@@ -26,15 +29,36 @@ import static edu.tum.sse.dirts.analysis.def.finders.TypeTestFinderVisitor.testC
  */
 public abstract class FinderVisitor<T> extends AbstractTruncatedVisitor<T> {
 
-    public static boolean recursiveMemberTest(ClassOrInterfaceDeclaration n) {
+    //##################################################################################################################
+    // Static methods
+
+    public static boolean testClassDeclaration(ClassOrInterfaceDeclaration n, TestFilter<String, String> testFilter) {
+        return n.getMethods().stream().anyMatch(m -> FinderVisitor.testMethodDeclaration(m, testFilter));
+    }
+
+    public static boolean testMethodDeclaration(MethodDeclaration n, TestFilter<String, String> testFilter) {
+        try {
+            ResolvedMethodDeclaration resolvedMethodDeclaration = n.resolve();
+
+            ResolvedReferenceTypeDeclaration declaringType = resolvedMethodDeclaration.declaringType();
+            String declaringTypeName = lookup(declaringType);
+            String methodName = resolvedMethodDeclaration.getName();
+
+            return testFilter.shouldRun(declaringTypeName.replaceAll("\\.", "/") + ".class", methodName);
+        } catch (RuntimeException ignored) {
+        }
+        return false;
+    }
+
+    public static boolean recursiveMemberTest(ClassOrInterfaceDeclaration n, TestFilter<String, String> testFilter) {
         boolean memberTest = n.getMembers().stream()
                 .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
                 .map(BodyDeclaration::asClassOrInterfaceDeclaration)
-                .anyMatch(testClassDeclaration);
+                .anyMatch(classOrInterfaceDeclaration -> testClassDeclaration(classOrInterfaceDeclaration, testFilter));
         return memberTest
                 || n.getMembers().stream()
                 .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
                 .map(BodyDeclaration::asClassOrInterfaceDeclaration)
-                .anyMatch(TypeNameFinderVisitor::recursiveMemberTest);
+                .anyMatch(classOrInterfaceDeclaration -> recursiveMemberTest(classOrInterfaceDeclaration, testFilter));
     }
 }

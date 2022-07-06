@@ -1,0 +1,21 @@
+<lifecycles>
+    <lifecycle>
+        <id>dirts</id>
+        <phases>
+            <phase>
+                <id>initialize</id>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>dependency:build-classpath</goal>
+                        </goals>
+                        <configuration>
+                            <outputFile>${project.basedir}/.dirts/libraries</outputFile>
+                            <includeTypes>jar</includeTypes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </phase>
+        </phases>
+    </lifecycle>
+</lifecycles>

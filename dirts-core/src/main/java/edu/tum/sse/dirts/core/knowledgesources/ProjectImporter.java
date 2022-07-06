@@ -52,7 +52,7 @@ public class ProjectImporter extends KnowledgeSource {
 
     @Override
     public BlackboardState updateBlackboard() {
-        Path tmpPath = blackboard.getRootPath().resolve(blackboard.getSubPath().resolve(".edu.tum.sse.dirts"));
+        Path tmpPath = blackboard.getRootPath().resolve(blackboard.getSubPath().resolve(".dirts"));
 
         try {
             // DependencyGraph

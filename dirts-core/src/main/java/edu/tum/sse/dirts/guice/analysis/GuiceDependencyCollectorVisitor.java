@@ -21,18 +21,20 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import edu.tum.sse.dirts.analysis.AbstractTruncatedVisitor;
 import edu.tum.sse.dirts.analysis.DependencyCollector;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.guice.analysis.identifiers.*;
 import edu.tum.sse.dirts.guice.util.GuiceBinding;
 import edu.tum.sse.dirts.guice.util.GuiceUtil;
 import edu.tum.sse.dirts.util.JavaParserUtils;
+import edu.tum.sse.dirts.util.Log;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.logging.Level.FINER;
 
 public abstract class GuiceDependencyCollectorVisitor<T> extends AbstractTruncatedVisitor<DependencyGraph>
         implements DependencyCollector {
@@ -63,10 +65,7 @@ public abstract class GuiceDependencyCollectorVisitor<T> extends AbstractTruncat
             t.accept(this, dependencyGraph);
         }
 
-        if (Control.PRINT_BEANS) {
-            System.out.println("[BEANS]\n");
-            System.out.println(bindingsStorage.toString());;
-        }
+        Log.log(FINER, "BEANS", "\n" + bindingsStorage.toString());
     }
 
     //##################################################################################################################

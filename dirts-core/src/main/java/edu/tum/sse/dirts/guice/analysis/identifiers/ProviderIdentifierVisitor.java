@@ -22,11 +22,13 @@ import com.github.javaparser.resolution.declarations.ResolvedMethodLikeDeclarati
 import com.github.javaparser.resolution.types.ResolvedType;
 import edu.tum.sse.dirts.analysis.AbstractTruncatedVisitor;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.guice.util.GuiceBinding;
 import edu.tum.sse.dirts.guice.util.GuiceUtil;
+import edu.tum.sse.dirts.util.Log;
 
 import java.util.*;
+
+import static java.util.logging.Level.FINE;
 
 /**
  * Identifies bindings created in classes extending Provider<T>
@@ -79,8 +81,7 @@ public class ProviderIdentifierVisitor extends AbstractTruncatedVisitor<
                         try {
                             resolvedInjectableType = injectableType.resolve();
                         } catch (RuntimeException e) {
-                            if (Control.DEBUG)
-                                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                         }
                     }
 
@@ -93,8 +94,7 @@ public class ProviderIdentifierVisitor extends AbstractTruncatedVisitor<
                         try {
                             resolvedMethodLikeDeclarations.add(getMethod.resolve());
                         } catch (RuntimeException e) {
-                            if (Control.DEBUG)
-                                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                         }
                     }
 
