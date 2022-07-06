@@ -43,8 +43,7 @@ public class NonTypeChecksumVisitor implements ChecksumVisitor {
      */
 
     public Integer visit(final CompilationUnit n, final Void arg) {
-        // this purposefully excludes types TODO: check if this is correct - perhaps we need to include types here
-        return n.getImports().accept(this, arg) * 31 + (n.getModule().isPresent() ? n.getModule().get().accept(this, arg) : 0) * 31 + (n.getPackageDeclaration().isPresent() ? n.getPackageDeclaration().get().accept(this, arg) : 0) * 31 /* +  n.getTypes().accept(this, arg)*/;
+        return n.getImports().accept(this, arg) * 31 + (n.getModule().isPresent() ? n.getModule().get().accept(this, arg) : 0) * 31 + (n.getPackageDeclaration().isPresent() ? n.getPackageDeclaration().get().accept(this, arg) : 0) * 31 +  n.getTypes().accept(this, arg);
     }
 
     public Integer visit(final ClassOrInterfaceDeclaration n, final Void arg) {

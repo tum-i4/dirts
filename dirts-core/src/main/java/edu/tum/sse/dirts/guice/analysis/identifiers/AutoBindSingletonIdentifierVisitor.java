@@ -24,13 +24,15 @@ import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclar
 import com.github.javaparser.resolution.types.ResolvedType;
 import edu.tum.sse.dirts.analysis.AbstractTruncatedVisitor;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.guice.util.GuiceBinding;
 import edu.tum.sse.dirts.guice.util.GuiceUtil;
 import edu.tum.sse.dirts.util.JavaParserUtils;
+import edu.tum.sse.dirts.util.Log;
 
 import java.util.Collection;
 import java.util.Set;
+
+import static java.util.logging.Level.FINE;
 
 
 /**
@@ -79,8 +81,7 @@ public class AutoBindSingletonIdentifierVisitor extends AbstractTruncatedVisitor
                         bindType = JavaParserUtils.extractClassType(resolvedType.asReferenceType(), Set.of("java.lang.Class"));
                     }
                 } catch (RuntimeException e) {
-                    if (Control.DEBUG)
-                        System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                    Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                 }
             } else if (annotationExpr.isNormalAnnotationExpr()) {
                 // the member baseClass contains the type
@@ -94,8 +95,7 @@ public class AutoBindSingletonIdentifierVisitor extends AbstractTruncatedVisitor
                                 bindType = JavaParserUtils.extractClassType(resolvedType.asReferenceType(), Set.of("java.lang.Class"));
                             }
                         } catch (RuntimeException e) {
-                            if (Control.DEBUG)
-                                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                         }
                     }
                 }
@@ -111,8 +111,7 @@ public class AutoBindSingletonIdentifierVisitor extends AbstractTruncatedVisitor
                             new GuiceBinding(resolvedReferenceTypeDeclaration));
                 }
             } catch (RuntimeException e) {
-                if (Control.DEBUG)
-                    System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
 

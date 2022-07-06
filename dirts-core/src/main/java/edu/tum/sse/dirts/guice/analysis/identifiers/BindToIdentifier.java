@@ -24,15 +24,17 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import edu.tum.sse.dirts.analysis.AbstractIdentifierVisitor;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
 import edu.tum.sse.dirts.analysis.di.NameIdentifierVisitor;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.guice.util.GuiceBinding;
 import edu.tum.sse.dirts.util.Container;
 import edu.tum.sse.dirts.util.JavaParserUtils;
+import edu.tum.sse.dirts.util.Log;
 import edu.tum.sse.dirts.util.naming_scheme.Names;
 import edu.tum.sse.dirts.util.tuples.Pair;
 import edu.tum.sse.dirts.util.tuples.Triple;
 
 import java.util.*;
+
+import static java.util.logging.Level.FINE;
 
 /**
  * Identifies bindings created with bind(..).to(...)
@@ -78,8 +80,7 @@ public class BindToIdentifier extends AbstractIdentifierVisitor<
             try {
                 resolvedMethodDeclaration = n.resolve();
             } catch (RuntimeException e) {
-                if (Control.DEBUG)
-                    System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
             if (resolvedMethodDeclaration != null) {
                 ResolvedMethodDeclaration finalResolvedMethodDeclaration = resolvedMethodDeclaration;
@@ -133,8 +134,7 @@ public class BindToIdentifier extends AbstractIdentifierVisitor<
                                     Set.of("java.lang.Class", "com.google.inject.TypeLiteral", "com.google.inject.Key")), name, annotation);
                         }
                     } catch (RuntimeException e) {
-                        if (Control.DEBUG)
-                            System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                        Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                     }
 
                 }
@@ -190,8 +190,7 @@ public class BindToIdentifier extends AbstractIdentifierVisitor<
                             }
 
                         } catch (RuntimeException e) {
-                            if (Control.DEBUG)
-                                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " +
+                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " +
                                         e.getMessage());
                         }
                     }
@@ -199,8 +198,7 @@ public class BindToIdentifier extends AbstractIdentifierVisitor<
                         try {
                             resolvedType = toExpr.calculateResolvedType();
                         } catch (RuntimeException e) {
-                            if (Control.DEBUG)
-                                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " +
+                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " +
                                         e.getMessage());
                         }
                     }
@@ -223,8 +221,7 @@ public class BindToIdentifier extends AbstractIdentifierVisitor<
                     try {
                         maybeScope.get().accept(bindIdentifier, container);
                     } catch (RuntimeException e) {
-                        if (Control.DEBUG)
-                            System.out.println("Exception in " + this.getClass().getSimpleName() + ": " +
+                        Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " +
                                     e.getMessage());
                     }
                 }

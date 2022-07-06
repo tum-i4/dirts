@@ -17,11 +17,13 @@ import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import edu.tum.sse.dirts.analysis.AbstractIdentifierVisitor;
-import edu.tum.sse.dirts.core.control.Control;
+import edu.tum.sse.dirts.util.Log;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
+
+import static java.util.logging.Level.FINE;
 
 public class NewIdentifierVisitor extends AbstractIdentifierVisitor<
         Collection<ResolvedReferenceTypeDeclaration>
@@ -59,8 +61,7 @@ public class NewIdentifierVisitor extends AbstractIdentifierVisitor<
             Optional<ResolvedReferenceTypeDeclaration> typeDeclaration = resolvedReferenceType.getTypeDeclaration();
             typeDeclaration.ifPresent(arg::add);
         } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 }

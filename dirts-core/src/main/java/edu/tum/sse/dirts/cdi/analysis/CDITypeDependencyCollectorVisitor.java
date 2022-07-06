@@ -21,9 +21,9 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import edu.tum.sse.dirts.analysis.TypeDependencyCollector;
 import edu.tum.sse.dirts.cdi.util.CDIBean;
 import edu.tum.sse.dirts.cdi.util.CDIUtil;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.graph.EdgeType;
+import edu.tum.sse.dirts.util.Log;
 import edu.tum.sse.dirts.util.alternatives.QuadAlternative;
 
 import java.util.Collection;
@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupNode;
+import static java.util.logging.Level.FINE;
 
 public class CDITypeDependencyCollectorVisitor extends CDIDependencyCollectorVisitor
         implements TypeDependencyCollector {
@@ -90,8 +91,7 @@ public class CDITypeDependencyCollectorVisitor extends CDIDependencyCollectorVis
                     dependencyGraph.addEdge(fromNode, toNode, EdgeType.DI_CDI);
                 }
             } catch (RuntimeException e) {
-                if (Control.DEBUG)
-                    System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
         collectDependencies(n, dependencyGraph);
@@ -123,8 +123,7 @@ public class CDITypeDependencyCollectorVisitor extends CDIDependencyCollectorVis
                     ResolvedType resolvedType = injectedField.getCommonType().resolve();
                     getCandidates(candidates, injectedField, resolvedType);
                 } catch (RuntimeException e) {
-                    if (Control.DEBUG)
-                        System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                    Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                 }
 
             } else if (injectedBodyDeclaration.isConstructorDeclaration() || injectedBodyDeclaration.isMethodDeclaration()) {
@@ -135,8 +134,7 @@ public class CDITypeDependencyCollectorVisitor extends CDIDependencyCollectorVis
                         ResolvedType resolvedType = parameter.getType().resolve();
                         getCandidates(candidates, parameter, resolvedType);
                     } catch (RuntimeException e) {
-                        if (Control.DEBUG)
-                            System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                        Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                     }
                 }
             }

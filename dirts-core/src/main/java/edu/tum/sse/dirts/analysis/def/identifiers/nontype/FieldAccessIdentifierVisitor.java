@@ -20,12 +20,14 @@ import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import edu.tum.sse.dirts.analysis.AbstractIdentifierVisitor;
-import edu.tum.sse.dirts.core.control.Control;
+import edu.tum.sse.dirts.util.Log;
 import edu.tum.sse.dirts.util.tuples.Pair;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
+
+import static java.util.logging.Level.FINE;
 
 /**
  * Identifies accessed and assigned member variables
@@ -80,8 +82,7 @@ public class FieldAccessIdentifierVisitor extends AbstractIdentifierVisitor<
                 }
             }
         } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
 
 
@@ -106,8 +107,7 @@ public class FieldAccessIdentifierVisitor extends AbstractIdentifierVisitor<
                 resolvedAccessedFields.add(resolvedValueDeclaration);
             }
         } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 

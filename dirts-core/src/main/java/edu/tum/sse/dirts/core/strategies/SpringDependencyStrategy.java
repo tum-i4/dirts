@@ -17,6 +17,7 @@ import edu.tum.sse.dirts.spring.analysis.bean.SpringBean;
 import edu.tum.sse.dirts.spring.analysis.bean.XMLBeanDefinition;
 import edu.tum.sse.dirts.spring.analysis.identifiers.SpringXMLBeanIdentifier;
 import edu.tum.sse.dirts.util.JavaParserUtils;
+import edu.tum.sse.dirts.util.Log;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,6 +28,8 @@ import java.util.stream.Collectors;
 
 import static edu.tum.sse.dirts.graph.EdgeType.DI_SPRING;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupTypeDeclaration;
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 
 /**
  * Contains tasks required by the dependency-analyzing extension for CDI
@@ -71,7 +74,7 @@ public class SpringDependencyStrategy implements DependencyStrategy {
             xmlBeansNewRevision = springXMLBeanIdentifier.getBeans();
 
         } catch (IOException e) {
-            System.err.println("Failed to read xml files, that may contain spring beans");
+            Log.log(WARNING, "Failed to read xml files, that may contain spring beans");
         }
 
         // import Nodes
@@ -109,7 +112,7 @@ public class SpringDependencyStrategy implements DependencyStrategy {
                     objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(checksumsXMLBeansNewRevision), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
         } catch (IOException ignored) {
-            System.err.println("Failed to export checksums of SpringXMLBeans");
+            Log.log(SEVERE, "Failed to export checksums of SpringXMLBeans");
         }
     }
 

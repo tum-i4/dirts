@@ -17,33 +17,42 @@ import com.github.javaparser.resolution.declarations.*;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import edu.tum.sse.dirts.analysis.FinderVisitor;
 import edu.tum.sse.dirts.analysis.NonTypeDependencyCollector;
-import edu.tum.sse.dirts.analysis.def.finders.NonTypeTestFinderVisitor;
 import edu.tum.sse.dirts.analysis.def.finders.TypeNameFinderVisitor;
-import edu.tum.sse.dirts.analysis.def.finders.TypeTestFinderVisitor;
 import edu.tum.sse.dirts.analysis.def.identifiers.JUnit4BeforeMethodIdentifierVisitor;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.graph.EdgeType;
 import edu.tum.sse.dirts.util.JavaParserUtils;
+import edu.tum.sse.dirts.util.Log;
 import edu.tum.sse.dirts.util.naming_scheme.Names;
 import edu.tum.sse.dirts.util.tuples.Pair;
+import org.apache.maven.surefire.api.testset.TestFilter;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static edu.tum.sse.dirts.analysis.def.finders.TypeNameFinderVisitor.recursiveMemberTest;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
-import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupNode;
+import static java.util.logging.Level.FINE;
 
 /**
  * Collects dependencies related to JUnit4 for NonType-nodes
  */
-public class JUnit4NonTypeDependencyCollectorVisitor
-        extends JUnit4DependencyCollectorVisitor
+public class JUnitNonTypeDependencyCollectorVisitor
+        extends JUnitDependencyCollectorVisitor
         implements NonTypeDependencyCollector {
 
+    //##################################################################################################################
+    // Attributes
+
+    private final TestFilter<String, String> testFilter;
     private Collection<ResolvedMethodDeclaration> resolvedBeforeMethods = null;
+
+    //##################################################################################################################
+    // Constructors
+
+    public JUnitNonTypeDependencyCollectorVisitor(TestFilter<String, String> testFilter) {
+        this.testFilter = testFilter;
+    }
 
     //##################################################################################################################
     // Visitor pattern - Auxiliary methods (used to set up things before)
@@ -53,63 +62,48 @@ public class JUnit4NonTypeDependencyCollectorVisitor
 
         // ## Account for tests in inner classes
         // if this class has members that contain tests,
-        // put node from all constructors to the test methods and constructors of this class
-        if (FinderVisitor.recursiveMemberTest(n)) {
+        // put edge from first constructor to the test methods and first constructor of this class
+        // Constructor of outer class is considered as test by NonTypeTestFinderVisitor
+        if (FinderVisitor.recursiveMemberTest(n, testFilter)) {
             for (BodyDeclaration<?> member : n.getMembers()) {
                 if (member.isClassOrInterfaceDeclaration()) {
                     ClassOrInterfaceDeclaration innerClassOrInterfaceDeclaration = member.asClassOrInterfaceDeclaration();
 
-                    // This has to be a method call on TypeTestFinderVisitor
-                    if (TypeTestFinderVisitor.testClassDeclaration.test(innerClassOrInterfaceDeclaration)
-                            || TypeNameFinderVisitor.recursiveMemberTest(innerClassOrInterfaceDeclaration)) {
+                    if (FinderVisitor.testClassDeclaration(innerClassOrInterfaceDeclaration, testFilter)
+                            || TypeNameFinderVisitor.recursiveMemberTest(innerClassOrInterfaceDeclaration, testFilter)) {
                         try {
+                            ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration = n.resolve();
                             ResolvedReferenceTypeDeclaration resolvedInnerClassDeclaration = innerClassOrInterfaceDeclaration.resolve();
-                            List<ResolvedConstructorDeclaration> constructors = resolvedInnerClassDeclaration.getConstructors();
-                            for (ResolvedConstructorDeclaration constructor : constructors) {
-                                String toNode = lookup(constructor);
-                                String fromNode = lookupNode(n, dependencyGraph);
+
+                            String fromNode = lookup(resolvedReferenceTypeDeclaration.getConstructors().get(0));
+
+                            // Create edges from constructor of outer class to constructor of inner class
+                            {
+                                List<ResolvedConstructorDeclaration> constructors = resolvedInnerClassDeclaration.getConstructors();
+                                String toNode = lookup(constructors.get(0));
                                 dependencyGraph.addEdge(fromNode, toNode, EdgeType.JUNIT);
                             }
 
-                            // This has to be a method call on TypeTestFinderVisitor
-                            if (TypeTestFinderVisitor.testClassDeclaration.test(innerClassOrInterfaceDeclaration)) {
-                                ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration = n.resolve();
+                            // Create edges from constructor of outer class to test methods
+                            if (FinderVisitor.testClassDeclaration(innerClassOrInterfaceDeclaration, testFilter)) {
                                 for (ResolvedMethodDeclaration declaredMethod : resolvedInnerClassDeclaration.getDeclaredMethods()) {
-                                    Optional<MethodDeclaration> maybeMethodDeclaration = declaredMethod.toAst();
-                                    if (maybeMethodDeclaration.isPresent()) {
-                                        MethodDeclaration methodDeclaration = maybeMethodDeclaration.get();
-                                        if (!methodDeclaration.getNameAsString().equals("setUp") &&
-                                                !methodDeclaration.getNameAsString().equals("tearDown")) {
-                                            String toNode = lookup(declaredMethod);
-                                            String fromNode = lookup(resolvedReferenceTypeDeclaration.getConstructors().get(0));
-                                            dependencyGraph.addEdge(fromNode, toNode, EdgeType.JUNIT);
-                                        }
-                                    }
-                                }
-                            } else {
-                                ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration = n.resolve();
-                                for (ResolvedMethodDeclaration declaredMethod : resolvedInnerClassDeclaration.getDeclaredMethods()) {
-                                    Optional<MethodDeclaration> maybeMethodDeclaration = declaredMethod.toAst();
-                                    if (maybeMethodDeclaration.isPresent()) {
-                                        MethodDeclaration methodDeclaration = maybeMethodDeclaration.get();
-                                        if (NonTypeTestFinderVisitor.testMethodDeclaration.test(methodDeclaration)) {
-                                            String toNode = lookup(declaredMethod);
-                                            String fromNode = lookup(resolvedReferenceTypeDeclaration.getConstructors().get(0));
-                                            dependencyGraph.addEdge(fromNode, toNode, EdgeType.JUNIT);
-                                        }
+                                    if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration), declaredMethod.getName())) {
+                                        String toNode = lookup(declaredMethod);
+                                        dependencyGraph.addEdge(fromNode, toNode, EdgeType.JUNIT);
                                     }
                                 }
                             }
                         } catch (RuntimeException e) {
-                            if (Control.DEBUG)
-                                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                         }
                     }
                 }
             }
         }
 
-        // ## Account for tests from extended test classes
+        // ## Account for test methods from extended test classes
+        // If this class extends a test class, it inherits its methods as test methods
+        // Method is considered as test by NonTypeTestFinderVisitor
         try {
             ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration = n.resolve();
             List<ResolvedReferenceType> allAncestors = resolvedReferenceTypeDeclaration
@@ -121,27 +115,22 @@ public class JUnit4NonTypeDependencyCollectorVisitor
                     if (resolvedAncestorTypeDeclaration.isClass()) {
                         ResolvedClassDeclaration resolvedClassDeclaration = resolvedAncestorTypeDeclaration.asClass();
                         for (ResolvedMethodDeclaration declaredMethod : resolvedClassDeclaration.getDeclaredMethods()) {
-                            Optional<MethodDeclaration> maybeMethodDeclaration = declaredMethod.toAst();
-                            if (maybeMethodDeclaration.isPresent()) {
-                                MethodDeclaration methodDeclaration = maybeMethodDeclaration.get();
-                                if (NonTypeTestFinderVisitor.testMethodDeclaration.test(methodDeclaration)) {
-                                    // If the class extends a test class, we have to add an edge to inherited Methods
-                                    String fromNode = Names.lookup(resolvedReferenceTypeDeclaration) + "." + declaredMethod.getSignature();
-                                    String toNode = Names.lookup(declaredMethod);
-                                    dependencyGraph.addEdge(fromNode, toNode, EdgeType.INHERITANCE);
-                                }
+                            if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration), declaredMethod.getName())) {
+                                // If the class extends a test class, we have to add an edge to inherited test methods
+                                String fromNode = Names.lookup(resolvedReferenceTypeDeclaration) + "." + declaredMethod.getSignature();
+                                String toNode = Names.lookup(declaredMethod);
+                                dependencyGraph.addEdge(fromNode, toNode, EdgeType.INHERITANCE);
                             }
                         }
                     }
                 }
             }
-        } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (
+                RuntimeException e) {
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
 
-        // This has to be a method call on TypeTestFinderVisitor
-        if (TypeTestFinderVisitor.testClassDeclaration.test(n)) {
+        if (FinderVisitor.testClassDeclaration(n, testFilter)) {
             JUnit4BeforeMethodIdentifierVisitor identifierVisitor = new JUnit4BeforeMethodIdentifierVisitor(n);
 
             this.resolvedBeforeMethods = identifierVisitor.getResolvedBeforeMethods();
@@ -152,6 +141,7 @@ public class JUnit4NonTypeDependencyCollectorVisitor
             n.getMembers().stream().filter(m -> !m.isTypeDeclaration())
                     .forEach(m -> m.accept(this, dependencyGraph));
         }
+
     }
 
     @Override
@@ -189,7 +179,7 @@ public class JUnit4NonTypeDependencyCollectorVisitor
 
     @Override
     public void visit(MethodDeclaration n, DependencyGraph dependencyGraph) {
-        if (NonTypeTestFinderVisitor.testMethodDeclaration.test(n)) {
+        if (FinderVisitor.testMethodDeclaration(n, testFilter)) {
             Pair<String, Optional<String>> lookup = lookup(n);
             String node = lookup.getFirst();
             lookup.getSecond().ifPresent(e -> dependencyGraph.addMessage(node, e));

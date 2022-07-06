@@ -26,12 +26,14 @@ import edu.tum.sse.dirts.cdi.analysis.identifiers.ProducerMethodIdentifierVisito
 import edu.tum.sse.dirts.cdi.analysis.identifiers.SelectIdentifierVisitor;
 import edu.tum.sse.dirts.cdi.util.CDIBean;
 import edu.tum.sse.dirts.cdi.util.CDIUtil;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.graph.DependencyGraph;
+import edu.tum.sse.dirts.util.Log;
 import edu.tum.sse.dirts.util.tuples.Pair;
 
 import java.util.Collection;
 import java.util.Set;
+
+import static java.util.logging.Level.FINER;
 
 public abstract class CDIDependencyCollectorVisitor extends AbstractTruncatedVisitor<DependencyGraph>
         implements DependencyCollector {
@@ -66,10 +68,7 @@ public abstract class CDIDependencyCollectorVisitor extends AbstractTruncatedVis
             t.accept(this, dependencyGraph);
         }
 
-        if (Control.PRINT_BEANS) {
-            System.out.println("[BEANS]\n");
-            System.out.println(beanStorage.toString());;
-        }
+        Log.log(FINER, "BEANS", "\n" + beanStorage.toString());
     }
 
 

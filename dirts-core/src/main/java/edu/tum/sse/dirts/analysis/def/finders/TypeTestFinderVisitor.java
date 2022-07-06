@@ -3,17 +3,21 @@ package edu.tum.sse.dirts.analysis.def.finders;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.resolution.declarations.ResolvedClassDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import edu.tum.sse.dirts.analysis.FinderVisitor;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.util.JavaParserUtils;
+import edu.tum.sse.dirts.util.Log;
 import edu.tum.sse.dirts.util.naming_scheme.Names;
+import org.apache.maven.surefire.api.testset.TestFilter;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
+
+import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
+import static java.util.logging.Level.FINE;
 
 /**
  * Collects all Type-nodes that may represent tests and their names
@@ -21,17 +25,16 @@ import java.util.function.Predicate;
 public class TypeTestFinderVisitor extends FinderVisitor<Collection<String>> {
 
     //##################################################################################################################
-    // Constants
+    // Attributes
 
-    public static final Predicate<BodyDeclaration<?>> testMethodDeclaration =
-            n -> n.isAnnotationPresent("Test")
-                    || n.isAnnotationPresent("ParameterizedTest")
-                    || n.isAnnotationPresent("RepeatedTest");
+    private final TestFilter<String, String> testFilter;
 
-    // Also accounts for tests from extending TestCase
-    public static final Predicate<ClassOrInterfaceDeclaration> testClassDeclaration =
-            n -> n.getMethods().stream().anyMatch(testMethodDeclaration)
-                    || n.getExtendedTypes().stream().anyMatch(e -> e.getNameAsString().equals("TestCase"));
+    //##################################################################################################################
+    // Constructors
+
+    public TypeTestFinderVisitor(TestFilter<String, String> testFilter) {
+        this.testFilter = testFilter;
+    }
 
     //##################################################################################################################
     // Visitor Pattern
@@ -40,13 +43,16 @@ public class TypeTestFinderVisitor extends FinderVisitor<Collection<String>> {
     public void visit(ClassOrInterfaceDeclaration n, Collection<String> arg) {
         super.visit(n, arg);
 
-        // ## Tests from inner classes
-        // if this class has members that contain tests, add this class as test class as well
-        if (recursiveMemberTest(n)) {
+        // ## ## Account for tests in inner classes
+        // If this class has members that contain tests, add this class as test class as well
+        // Edges are set by JUnitTypeDependencyCollectorVisitor
+        if (recursiveMemberTest(n, testFilter)) {
             arg.add(Names.lookup(n).getFirst());
         }
 
         // ## Tests from extended classes
+        // If this class extends a test class, it inherits its methods as test methods
+        // Edges are set by JUnitTypeDependencyCollectorVisitor
         try {
             ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration = n.resolve();
             List<ResolvedReferenceType> allAncestors = resolvedReferenceTypeDeclaration
@@ -57,26 +63,19 @@ public class TypeTestFinderVisitor extends FinderVisitor<Collection<String>> {
                     ResolvedReferenceTypeDeclaration resolvedAncestorTypeDeclaration = maybeTypeDeclaration.get();
                     if (resolvedAncestorTypeDeclaration.isClass()) {
                         ResolvedClassDeclaration resolvedClassDeclaration = resolvedAncestorTypeDeclaration.asClass();
-                        Optional<Node> maybeClassDeclaration = resolvedClassDeclaration.toAst();
-                        if (maybeClassDeclaration.isPresent()) {
-                            Node node = maybeClassDeclaration.get();
-                            if (node instanceof ClassOrInterfaceDeclaration) {
-                                ClassOrInterfaceDeclaration ancestorDeclaration = (ClassOrInterfaceDeclaration) node;
-                                if (testClassDeclaration.test(ancestorDeclaration)) {
-                                    // If class extends a test class, it can be executed as test as well
-                                    arg.add(Names.lookup(n).getFirst());
-                                }
-                            }
+                        for (ResolvedMethodDeclaration declaredMethod : resolvedClassDeclaration.getDeclaredMethods()) {
+                            if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration), declaredMethod.getName()))
+                                // Consider this class as a test
+                                arg.add(Names.lookup(n).getFirst());
                         }
                     }
                 }
             }
         } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
 
-        if (testClassDeclaration.test(n)) {
+        if (FinderVisitor.testClassDeclaration(n, testFilter)) {
             arg.add(Names.lookup(n).getFirst());
         }
     }
@@ -87,7 +86,7 @@ public class TypeTestFinderVisitor extends FinderVisitor<Collection<String>> {
     }
 
     @Override
-    public void visit(AnnotationDeclaration n,Collection<String> arg) {
+    public void visit(AnnotationDeclaration n, Collection<String> arg) {
         super.visit(n, arg);
     }
 

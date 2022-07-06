@@ -16,11 +16,12 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import edu.tum.sse.dirts.analysis.DependencyCollector;
 import edu.tum.sse.dirts.analysis.def.DefaultTypeDependencyCollectorVisitor;
+import edu.tum.sse.dirts.analysis.def.JUnitTypeDependencyCollectorVisitor;
 import edu.tum.sse.dirts.analysis.def.checksum.TypeChecksumVisitor;
 import edu.tum.sse.dirts.analysis.def.finders.TypeNameFinderVisitor;
 import edu.tum.sse.dirts.analysis.def.finders.TypeTestFinderVisitor;
 import edu.tum.sse.dirts.core.Blackboard;
-import edu.tum.sse.dirts.core.knowledgesources.*;
+import edu.tum.sse.dirts.core.strategies.CachingDependencyStrategy;
 import edu.tum.sse.dirts.graph.EdgeType;
 
 import java.util.Set;
@@ -40,7 +41,6 @@ public class TypeLevelControl extends Control {
 
     private static final TypeChecksumVisitor TYPE_CHECKSUM_VISITOR = new TypeChecksumVisitor();
     private static final TypeNameFinderVisitor TYPE_NAME_FINDER_VISITOR = new TypeNameFinderVisitor();
-    private static final TypeTestFinderVisitor TYPE_TEST_FINDER_VISITOR = new TypeTestFinderVisitor();
 
     private static final Predicate<Node> TYPES_IN_GRAPH =
             n -> !(n instanceof CompilationUnit);
@@ -59,9 +59,20 @@ public class TypeLevelControl extends Control {
                 SUFFIX,
                 TYPE_CHECKSUM_VISITOR,
                 TYPE_NAME_FINDER_VISITOR,
-                TYPE_TEST_FINDER_VISITOR,
+                new TypeTestFinderVisitor(blackboard.getTestFilter()),
                 TYPES_IN_GRAPH,
                 PRIMARY_DEPENDENCY_COLLECTOR,
                 AFFECTED_EDGES);
+    }
+
+    //##################################################################################################################
+    // Methods
+
+    @Override
+    public void init() {
+        super.init();
+        blackboard.addDependencyStrategy(new CachingDependencyStrategy(
+                Set.of(new JUnitTypeDependencyCollectorVisitor(blackboard.getTestFilter())),
+                Set.of(JUNIT)));
     }
 }

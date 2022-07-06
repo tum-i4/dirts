@@ -22,10 +22,12 @@ import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclarat
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedMethodLikeDeclaration;
 import edu.tum.sse.dirts.analysis.AbstractIdentifierVisitor;
-import edu.tum.sse.dirts.core.control.Control;
+import edu.tum.sse.dirts.util.Log;
 
 import java.util.Collection;
 import java.util.HashSet;
+
+import static java.util.logging.Level.FINE;
 
 
 /**
@@ -69,8 +71,7 @@ public class DelegationIdentifierVisitor extends AbstractIdentifierVisitor<
             ResolvedMethodDeclaration methodDecl = n.resolve();
             arg.add(methodDecl);
         } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -82,8 +83,7 @@ public class DelegationIdentifierVisitor extends AbstractIdentifierVisitor<
             ResolvedMethodDeclaration methodDecl = n.resolve();
             arg.add(methodDecl);
         } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -95,8 +95,7 @@ public class DelegationIdentifierVisitor extends AbstractIdentifierVisitor<
             ResolvedConstructorDeclaration constructorDecl = n.resolve();
             arg.add(constructorDecl);
         } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -108,8 +107,7 @@ public class DelegationIdentifierVisitor extends AbstractIdentifierVisitor<
             ResolvedConstructorDeclaration constructorDecl = n.resolve();
             arg.add(constructorDecl);
         } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 }

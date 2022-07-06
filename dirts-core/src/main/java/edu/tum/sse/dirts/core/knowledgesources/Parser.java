@@ -21,12 +21,15 @@ import com.github.javaparser.utils.SourceRoot;
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.BlackboardState;
 import edu.tum.sse.dirts.core.KnowledgeSource;
+import edu.tum.sse.dirts.util.Log;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.util.logging.Level.WARNING;
 
 /**
  * Parses all compilation units
@@ -79,7 +82,7 @@ public class Parser extends KnowledgeSource {
                 sourceRoot.tryToParse()
                         .forEach(result -> result.ifSuccessful(compilationUnits::add));
             } catch (IOException e) {
-                System.err.println("Failed to parse SourceRoot " + sourceRoot);
+                Log.log(WARNING, "Failed to parse SourceRoot " + sourceRoot);
                 e.printStackTrace();
             }
         });

@@ -18,13 +18,15 @@ import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import edu.tum.sse.dirts.analysis.AbstractIdentifierVisitor;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.guice.util.GuiceBinding;
 import edu.tum.sse.dirts.guice.util.GuiceUtil;
+import edu.tum.sse.dirts.util.Log;
 
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
+
+import static java.util.logging.Level.FINE;
 
 /**
  * Identifies bindings created in methods annotated with @Provides
@@ -88,8 +90,7 @@ public class ProvidesIdentifierVisitor extends AbstractIdentifierVisitor<
                 name.ifPresent(s -> arg.addBeanByName(s, guiceBinding));
 
             } catch (RuntimeException e) {
-                if (Control.DEBUG)
-                    System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
     }

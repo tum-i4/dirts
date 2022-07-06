@@ -18,11 +18,13 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import edu.tum.sse.dirts.analysis.AbstractIdentifierVisitor;
-import edu.tum.sse.dirts.core.control.Control;
+import edu.tum.sse.dirts.util.Log;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static java.util.logging.Level.FINE;
 
 /**
  * Identifies MethodDeclarations that are annotated with @Before or @BeforeClass
@@ -91,8 +93,7 @@ public class JUnit4BeforeMethodIdentifierVisitor extends AbstractIdentifierVisit
                 ResolvedMethodDeclaration methodDecl = n.resolve();
                 arg.add(methodDecl);
             } catch (RuntimeException e) {
-                if (Control.DEBUG)
-                    System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
     }

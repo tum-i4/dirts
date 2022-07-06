@@ -20,10 +20,12 @@ import edu.tum.sse.dirts.analysis.AbstractIdentifierVisitor;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
 import edu.tum.sse.dirts.cdi.util.CDIBean;
 import edu.tum.sse.dirts.cdi.util.CDIUtil;
-import edu.tum.sse.dirts.core.control.Control;
+import edu.tum.sse.dirts.util.Log;
 
 import java.util.Collection;
 import java.util.Set;
+
+import static java.util.logging.Level.FINE;
 
 /**
  * Identifies methods annotated with @Bean
@@ -81,8 +83,7 @@ public class ManagedBeanIdentifierVisitor extends AbstractIdentifierVisitor<
                 }
 
             } catch (RuntimeException e) {
-                if (Control.DEBUG)
-                    System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
     }

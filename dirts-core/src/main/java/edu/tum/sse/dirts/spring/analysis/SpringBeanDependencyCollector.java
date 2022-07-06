@@ -25,7 +25,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static edu.tum.sse.dirts.util.naming_scheme.Names.*;
+import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupMethods;
+import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupTypeDeclaration;
 
 /**
  * Collects dependencies from beans to beans/code entities

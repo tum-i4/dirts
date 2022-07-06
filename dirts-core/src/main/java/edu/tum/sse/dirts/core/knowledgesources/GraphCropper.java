@@ -22,6 +22,7 @@ import static edu.tum.sse.dirts.core.BlackboardState.NODES_CHANGES_SET;
 
 /**
  * Prepares the graph before analyzing dependencies
+ *
  * @param <T>
  */
 public class GraphCropper<T extends BodyDeclaration<?>> extends KnowledgeSource {
@@ -93,13 +94,10 @@ public class GraphCropper<T extends BodyDeclaration<?>> extends KnowledgeSource 
                 .collect(Collectors.toSet()));
 
 
-        impactedCompilationUnits.addAll(blackboard.getAllNodes().values().stream()
-                .map(Node::findCompilationUnit)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+        impactedCompilationUnits.addAll(blackboard.getCompilationUnits().stream()
                 .filter(cu -> cu.getPackageDeclaration()
-                        .filter(declaration ->
-                                affectedPackagesNodes.contains(declaration.getNameAsString())).isPresent())
+                        .filter(declaration -> affectedPackagesNodes.contains(declaration.getNameAsString()))
+                        .isPresent())
                 .collect(Collectors.toSet()));
 
         List<TypeDeclaration<?>> typeDeclarations = new ArrayList<>();

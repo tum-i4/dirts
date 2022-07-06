@@ -125,7 +125,7 @@ public class CodeChangeAnalyzer extends KnowledgeSource {
 
             // We might have entries with no T (in this case T is MethodDeclaration) coming from extended test classes
             // See NonTypeNameFinderVisitor.visit(ClassOrInterfaceDeclaration n, ...)
-            // and JUnit4NonTypeDependencyCollectorVisitor.visit(ClassOrInterfaceDeclaration n, ...)
+            // and JUnitNonTypeDependencyCollectorVisitor.visit(ClassOrInterfaceDeclaration n, ...)
 
             filterNonNull(objectsAdded, objectsSame);
             filterNonNull(objectsRemoved, objectsSame);

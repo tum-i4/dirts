@@ -19,11 +19,13 @@ import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclarat
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import edu.tum.sse.dirts.analysis.AbstractIdentifierVisitor;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.guice.util.GuiceBinding;
 import edu.tum.sse.dirts.guice.util.GuiceUtil;
+import edu.tum.sse.dirts.util.Log;
 
 import java.util.Collection;
+
+import static java.util.logging.Level.FINE;
 
 /**
  * Identifies just-in-time bindings
@@ -69,9 +71,7 @@ public class JustInTimeIdentifierVisitor extends AbstractIdentifierVisitor<
                     arg.addBeanByTypeDeclaration(resolvedReturnTypeDeclaration, new GuiceBinding(constructor));
                 }
             } catch (RuntimeException e) {
-                if (Control.DEBUG) {
-                    System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
-                }
+                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
     }
@@ -90,9 +90,7 @@ public class JustInTimeIdentifierVisitor extends AbstractIdentifierVisitor<
                 arg.addBeanByTypeDeclaration(resolvedReferenceTypeDeclaration,
                         new GuiceBinding(resolvedConstructorDeclaration));
             } catch (RuntimeException e) {
-                if (Control.DEBUG) {
-                    System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
-                }
+                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
     }

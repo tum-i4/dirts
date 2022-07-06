@@ -18,11 +18,13 @@ import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.resolution.declarations.*;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import edu.tum.sse.dirts.analysis.AbstractIdentifierVisitor;
-import edu.tum.sse.dirts.core.control.Control;
+import edu.tum.sse.dirts.util.Log;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
+
+import static java.util.logging.Level.FINE;
 
 public class StaticIdentifierVisitor extends AbstractIdentifierVisitor<
         Collection<ResolvedTypeDeclaration>
@@ -61,8 +63,7 @@ public class StaticIdentifierVisitor extends AbstractIdentifierVisitor<
                 arg.add(resolvedMethodDeclaration.declaringType());
             }
         } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -80,8 +81,7 @@ public class StaticIdentifierVisitor extends AbstractIdentifierVisitor<
                 }
             }
         } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -104,8 +104,7 @@ public class StaticIdentifierVisitor extends AbstractIdentifierVisitor<
                 enumTypeDeclaration.ifPresent(arg::add);
             }
         } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 

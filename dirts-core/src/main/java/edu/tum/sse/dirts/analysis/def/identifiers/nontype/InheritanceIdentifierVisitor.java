@@ -23,11 +23,13 @@ import com.github.javaparser.resolution.declarations.ResolvedMethodLikeDeclarati
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import edu.tum.sse.dirts.analysis.AbstractIdentifierVisitor;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.util.JavaParserUtils;
+import edu.tum.sse.dirts.util.Log;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.logging.Level.FINE;
 
 /**
  * Identifies inherited methods
@@ -67,8 +69,7 @@ public class InheritanceIdentifierVisitor extends AbstractIdentifierVisitor<
                         parentZeroArgConstructors.addAll(zeroArgConstructors);
                     }
                 } catch (RuntimeException e) {
-                    if (Control.DEBUG)
-                        System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                    Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                 }
             }
         }
@@ -93,8 +94,7 @@ public class InheritanceIdentifierVisitor extends AbstractIdentifierVisitor<
                         }
                     });
         } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -123,8 +123,7 @@ public class InheritanceIdentifierVisitor extends AbstractIdentifierVisitor<
             arg.addAll(overriddenMethods);
             inheritedMethods.remove(thisSignature);
         } catch (RuntimeException e) {
-            if (Control.DEBUG)
-                System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 

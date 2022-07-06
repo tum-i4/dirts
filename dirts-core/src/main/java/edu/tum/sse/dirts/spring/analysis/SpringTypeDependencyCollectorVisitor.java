@@ -17,12 +17,12 @@ import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import edu.tum.sse.dirts.analysis.TypeDependencyCollector;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.graph.EdgeType;
 import edu.tum.sse.dirts.spring.analysis.bean.SpringBean;
 import edu.tum.sse.dirts.spring.analysis.bean.XMLBeanDefinition;
 import edu.tum.sse.dirts.spring.util.SpringNames;
+import edu.tum.sse.dirts.util.Log;
 import edu.tum.sse.dirts.util.alternatives.TriAlternative;
 
 import java.util.Collection;
@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import static edu.tum.sse.dirts.analysis.di.NameIdentifierVisitor.getNameFromQualifier;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupNode;
+import static java.util.logging.Level.FINE;
 
 public class SpringTypeDependencyCollectorVisitor
         extends SpringDependencyCollectorVisitor
@@ -102,8 +103,7 @@ public class SpringTypeDependencyCollectorVisitor
                     ResolvedType elementType = injectedField.getCommonType().resolve();
                     getBeanCandidates(elementType, name, candidates);
                 } catch (RuntimeException e) {
-                    if (Control.DEBUG)
-                        System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                    Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                 }
             } else if (injectedBodyDeclaration.isConstructorDeclaration() || injectedBodyDeclaration.isMethodDeclaration()) {
                 // constructor or method injection
@@ -114,8 +114,7 @@ public class SpringTypeDependencyCollectorVisitor
                         ResolvedType elementType = parameter.getType().resolve();
                         getBeanCandidates(elementType, name, candidates);
                     } catch (RuntimeException e) {
-                        if (Control.DEBUG)
-                            System.out.println("Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                        Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                     }
                 }
             }

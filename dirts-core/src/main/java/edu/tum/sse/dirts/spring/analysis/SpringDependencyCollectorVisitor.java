@@ -21,7 +21,6 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import edu.tum.sse.dirts.analysis.AbstractTruncatedVisitor;
 import edu.tum.sse.dirts.analysis.DependencyCollector;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
-import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.spring.analysis.bean.SpringBean;
 import edu.tum.sse.dirts.spring.analysis.identifiers.SpringBeanMethodIdentifierVisitor;
@@ -29,6 +28,7 @@ import edu.tum.sse.dirts.spring.analysis.identifiers.SpringComponentIdentifierVi
 import edu.tum.sse.dirts.spring.analysis.identifiers.SpringGetBeanIdentifierVisitor;
 import edu.tum.sse.dirts.spring.util.SpringUtil;
 import edu.tum.sse.dirts.util.JavaParserUtils;
+import edu.tum.sse.dirts.util.Log;
 import edu.tum.sse.dirts.util.tuples.Pair;
 
 import java.util.Collection;
@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.logging.Level.FINER;
 
 /**
  * Collects dependencies from beans/code entities to code entities based on @Bean, @Configuration, xml beans @Autowire and getBean(...)
@@ -71,10 +73,7 @@ public abstract class SpringDependencyCollectorVisitor
             t.accept(this, dependencyGraph);
         }
 
-        if (Control.PRINT_BEANS) {
-            System.out.println("[BEANS]");
-            System.out.println(beanStorage.toString());
-        }
+        Log.log(FINER, "BEANS", "\n" + beanStorage.toString());
     }
 
     //##################################################################################################################
