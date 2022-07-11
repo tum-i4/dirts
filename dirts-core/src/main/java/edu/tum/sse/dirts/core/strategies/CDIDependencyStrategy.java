@@ -1,5 +1,6 @@
 package edu.tum.sse.dirts.core.strategies;
 
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.analysis.def.finders.TypeFinderVisitor;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
@@ -30,18 +31,18 @@ import static edu.tum.sse.dirts.graph.EdgeType.DI_CDI;
 /**
  * Contains tasks required by the dependency-analyzing extension for CDI
  */
-public class CDIDependencyStrategy implements DependencyStrategy {
+public class CDIDependencyStrategy<T extends BodyDeclaration<?>> implements DependencyStrategy<T> {
 
     private Set<String> xmlAlternativesNewRevision;
 
-    private final CDIDependencyCollectorVisitor dependencyCollector;
+    private final CDIDependencyCollectorVisitor<T> dependencyCollector;
 
-    public CDIDependencyStrategy(CDIDependencyCollectorVisitor dependencyCollector) {
+    public CDIDependencyStrategy(CDIDependencyCollectorVisitor<T> dependencyCollector) {
         this.dependencyCollector = dependencyCollector;
     }
 
     @Override
-    public void doImport(Path tmpPath, Blackboard blackboard, String suffix) {
+    public void doImport(Path tmpPath, Blackboard<T> blackboard, String suffix) {
         Path rootPath = blackboard.getRootPath();
         Path subPath = blackboard.getSubPath();
         Set<Path> beansXMLPaths = findBeansXMLFiles(rootPath.resolve(subPath));
@@ -93,16 +94,16 @@ public class CDIDependencyStrategy implements DependencyStrategy {
     }
 
     @Override
-    public void doExport(Path tmpPath, Blackboard blackboard, String suffix) {
+    public void doExport(Path tmpPath, Blackboard<T> blackboard, String suffix) {
     }
 
     @Override
-    public void doChangeAnalysis(Blackboard blackboard) {
+    public void doChangeAnalysis(Blackboard<T> blackboard) {
 
     }
 
     @Override
-    public void doGraphCropping(Blackboard blackboard) {
+    public void doGraphCropping(Blackboard<T> blackboard) {
         DependencyGraph dependencyGraph = blackboard.getDependencyGraphNewRevision();
 
         // remove all edges of Type CDI
@@ -110,7 +111,7 @@ public class CDIDependencyStrategy implements DependencyStrategy {
     }
 
     @Override
-    public void doDependencyAnalysis(Blackboard blackboard) {
+    public void doDependencyAnalysis(Blackboard<T> blackboard) {
         dependencyCollector.setBeanStorage(new BeanStorage<>());
         dependencyCollector.setAlternatives(xmlAlternativesNewRevision);
 
@@ -121,5 +122,6 @@ public class CDIDependencyStrategy implements DependencyStrategy {
     }
 
     @Override
-    public void combineGraphs(Blackboard blackboard) {}
+    public void combineGraphs(Blackboard<T> blackboard) {
+    }
 }

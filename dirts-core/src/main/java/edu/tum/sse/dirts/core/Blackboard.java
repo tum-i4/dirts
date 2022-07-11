@@ -14,6 +14,7 @@ package edu.tum.sse.dirts.core;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import edu.tum.sse.dirts.core.strategies.DependencyStrategy;
@@ -27,7 +28,7 @@ import java.util.*;
 /**
  * Used to store all available knowledge
  */
-public class Blackboard {
+public class Blackboard<T extends BodyDeclaration<?>> {
 
     /*
      * Central class of the blackboard pattern
@@ -37,11 +38,15 @@ public class Blackboard {
      */
 
     //##################################################################################################################
+    // Phantom Data to allow compiletime checks
+    private T phantom;
+
+    //##################################################################################################################
     // Attributes
 
     private BlackboardState state;
-    private final List<KnowledgeSource> knowledgeSources;
-    private final List<DependencyStrategy> dependencyStrategies;
+    private final List<KnowledgeSource<T>> knowledgeSources;
+    private final List<DependencyStrategy<T>> dependencyStrategies;
 
     // #################################################################################################################
     // ## Content of blackboard, actual knowledge
@@ -52,6 +57,7 @@ public class Blackboard {
     private TestFilter<String, String> testFilter;
 
     private Map<String, Integer> checksumsNodes;
+    private Map<String, String> compilationUnitMapping;
 
     private CombinedTypeSolver typeSolver;
 
@@ -98,20 +104,20 @@ public class Blackboard {
         this.state = state;
     }
 
-    public List<KnowledgeSource> getKnowledgeSources() {
+    public List<KnowledgeSource<T>> getKnowledgeSources() {
         return Collections.unmodifiableList(knowledgeSources);
     }
 
-    public void addKnowledgeSource(KnowledgeSource knowledgeSource) {
+    public void addKnowledgeSource(KnowledgeSource<T> knowledgeSource) {
         if (knowledgeSource != null)
             knowledgeSources.add(knowledgeSource);
     }
 
-    public List<DependencyStrategy> getDependencyStrategies() {
+    public List<DependencyStrategy<T>> getDependencyStrategies() {
         return Collections.unmodifiableList(dependencyStrategies);
     }
 
-    public void addDependencyStrategy(DependencyStrategy dependencyStrategy) {
+    public void addDependencyStrategy(DependencyStrategy<T> dependencyStrategy) {
         dependencyStrategies.add(dependencyStrategy);
     }
 
@@ -143,6 +149,14 @@ public class Blackboard {
 
     public void setChecksumsNodes(Map<String, Integer> checksumsNodes) {
         this.checksumsNodes = checksumsNodes;
+    }
+
+    public Map<String, String> getCompilationUnitMapping() {
+        return Collections.unmodifiableMap(compilationUnitMapping);
+    }
+
+    public void setCompilationUnitMapping(Map<String, String> compilationUnitMapping) {
+        this.compilationUnitMapping = compilationUnitMapping;
     }
 
     // _________________________________________________________________________________________________________________
@@ -259,13 +273,4 @@ public class Blackboard {
         this.modificationGraph = modificationGraph;
     }
 
-    //##################################################################################################################
-    // Auxiliary methods
-
-    public Collection<Node> getNodesImpacted() {
-        HashSet<Node> impactedNodes = new HashSet<>();
-        impactedNodes.addAll(nodesDifferent.values());
-        impactedNodes.addAll(nodesAdded.values());
-        return impactedNodes;
-    }
 }

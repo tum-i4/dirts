@@ -31,7 +31,7 @@ import static edu.tum.sse.dirts.util.naming_scheme.Names.*;
 import static java.util.logging.Level.FINE;
 
 public class CDINonTypeDependencyCollectorVisitor
-        extends CDIDependencyCollectorVisitor
+        extends CDIDependencyCollectorVisitor<BodyDeclaration<?>>
         implements NonTypeDependencyCollector {
 
 

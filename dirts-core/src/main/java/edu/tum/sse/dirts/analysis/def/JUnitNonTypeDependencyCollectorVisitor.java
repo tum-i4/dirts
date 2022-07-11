@@ -38,7 +38,7 @@ import static java.util.logging.Level.FINE;
  * Collects dependencies related to JUnit4 for NonType-nodes
  */
 public class JUnitNonTypeDependencyCollectorVisitor
-        extends JUnitDependencyCollectorVisitor
+        extends JUnitDependencyCollectorVisitor<BodyDeclaration<?>>
         implements NonTypeDependencyCollector {
 
     //##################################################################################################################

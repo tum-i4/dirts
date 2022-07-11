@@ -1,5 +1,6 @@
 package edu.tum.sse.dirts.mojos;
 
+import com.github.javaparser.ast.body.BodyDeclaration;
 import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.util.Log;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -11,7 +12,7 @@ import java.nio.file.Path;
 
 import static java.util.logging.Level.INFO;
 
-public abstract class AbstractGraphMojo extends AbstractDirtsMojo{
+public abstract class AbstractGraphMojo<P extends BodyDeclaration<?>> extends AbstractDirtsMojo<P>{
 
     @Parameter(property = "toFile", defaultValue = "false")
     protected boolean toFile;
@@ -32,7 +33,7 @@ public abstract class AbstractGraphMojo extends AbstractDirtsMojo{
             return;
         }
 
-        Control control = getControl();
+        Control<P> control = getControl();
 
         String fileName = getOutputFilePath();
         if (fileName.equals(getDefaultOutputFilePath()))

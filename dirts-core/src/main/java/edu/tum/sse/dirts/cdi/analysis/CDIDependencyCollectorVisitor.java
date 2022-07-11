@@ -35,8 +35,8 @@ import java.util.Set;
 
 import static java.util.logging.Level.FINER;
 
-public abstract class CDIDependencyCollectorVisitor extends AbstractTruncatedVisitor<DependencyGraph>
-        implements DependencyCollector {
+public abstract class CDIDependencyCollectorVisitor<P extends BodyDeclaration<?>> extends AbstractTruncatedVisitor<DependencyGraph>
+        implements DependencyCollector<P> {
 
 
     //##################################################################################################################

@@ -1,5 +1,6 @@
 package edu.tum.sse.dirts.core.knowledgesources;
 
+import com.github.javaparser.ast.body.BodyDeclaration;
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.BlackboardState;
 import edu.tum.sse.dirts.core.KnowledgeSource;
@@ -15,9 +16,9 @@ import static edu.tum.sse.dirts.core.BlackboardState.READY_TO_CALCULATE_AFFECTED
 /**
  * Combines the graphs of the old and the new revision into a single modificationGraph
  */
-public class GraphCombiner extends KnowledgeSource {
+public class GraphCombiner<T extends BodyDeclaration<?>> extends KnowledgeSource<T> {
 
-    public GraphCombiner(Blackboard blackboard) {
+    public GraphCombiner(Blackboard<T> blackboard) {
         super(blackboard);
     }
 
@@ -32,14 +33,16 @@ public class GraphCombiner extends KnowledgeSource {
                 dependencyGraphNewRevision,
                 nameMapper);
 
-        modificationGraph.setModificationByStatus(blackboard.getNodesSame().keySet(),
+        modificationGraph.setModificationByStatus(
+                blackboard.getNodesSame().keySet(),
                 blackboard.getNodesDifferent().keySet(),
                 blackboard.getNodesAdded().keySet(),
-                blackboard.getNodesRemoved().keySet());
+                blackboard.getNodesRemoved().keySet()
+        );
 
         blackboard.setCombinedGraph(modificationGraph);
 
-        for (DependencyStrategy dependencyStrategy : blackboard.getDependencyStrategies()) {
+        for (DependencyStrategy<T> dependencyStrategy : blackboard.getDependencyStrategies()) {
             dependencyStrategy.combineGraphs(blackboard);
         }
 

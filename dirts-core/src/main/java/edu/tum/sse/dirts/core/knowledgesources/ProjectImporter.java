@@ -14,6 +14,7 @@ package edu.tum.sse.dirts.core.knowledgesources;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.javaparser.ast.body.BodyDeclaration;
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.BlackboardState;
 import edu.tum.sse.dirts.core.KnowledgeSource;
@@ -28,10 +29,13 @@ import java.util.HashMap;
 /**
  * Imports cached information from the previous run
  */
-public class ProjectImporter extends KnowledgeSource {
+public class ProjectImporter<T extends BodyDeclaration<?>> extends KnowledgeSource<T> {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
-    private static final TypeReference<HashMap<String, Integer>> typeRefNodes = new TypeReference<>() {};
+    private static final TypeReference<HashMap<String, Integer>> typeRefNodes = new TypeReference<>() {
+    };
+    private static final TypeReference<HashMap<String, String>> typeRefCUMapping = new TypeReference<>() {
+    };
 
     private final String suffix;
 
@@ -39,11 +43,9 @@ public class ProjectImporter extends KnowledgeSource {
     //##################################################################################################################
     // Constructors
 
-    public ProjectImporter(Blackboard blackboard, String suffix) {
+    public ProjectImporter(Blackboard<T> blackboard, String suffix) {
         super(blackboard);
 
-        // only for debugging
-        //Log.setAdapter(new Log.StandardOutStandardErrorAdapter());
         this.suffix = suffix;
     }
 
@@ -52,7 +54,10 @@ public class ProjectImporter extends KnowledgeSource {
 
     @Override
     public BlackboardState updateBlackboard() {
-        Path tmpPath = blackboard.getRootPath().resolve(blackboard.getSubPath().resolve(".dirts"));
+        Path rootPath = blackboard.getRootPath();
+        Path subPath = blackboard.getSubPath();
+
+        Path tmpPath = rootPath.resolve(subPath.resolve(".dirts"));
 
         try {
             // DependencyGraph
@@ -60,18 +65,24 @@ public class ProjectImporter extends KnowledgeSource {
             blackboard.setGraphOldRevision(DependencyGraph.deserializeGraph(graph));
             blackboard.setGraphNewRevision(DependencyGraph.deserializeGraph(graph));
 
-            // import Nodes
+            // import Checksums
             String checksumsNodes = Files.readString(tmpPath.resolve(Path.of("checksums_" + suffix)));
             blackboard.setChecksumsNodes(objectMapper.readValue(checksumsNodes, typeRefNodes));
+
+            // import CompilationUnits mapping
+            String compilationUnitsMapping = Files.readString(tmpPath.resolve(Path.of("cuMapping_" + suffix)));
+            blackboard.setCompilationUnitMapping(objectMapper.readValue(compilationUnitsMapping, typeRefCUMapping));
+
         } catch (IOException ignored) {
 
             blackboard.setGraphNewRevision(new DependencyGraph());
             blackboard.setGraphOldRevision(null);
 
             blackboard.setChecksumsNodes(new HashMap<>());
+            blackboard.setCompilationUnitMapping(new HashMap<>());
         }
 
-        for (DependencyStrategy dependencyStrategy : blackboard.getDependencyStrategies()) {
+        for (DependencyStrategy<T> dependencyStrategy : blackboard.getDependencyStrategies()) {
             dependencyStrategy.doImport(tmpPath, blackboard, suffix);
         }
 

@@ -36,7 +36,8 @@ import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupNode;
 import static java.util.logging.Level.FINE;
 
-public class CDITypeDependencyCollectorVisitor extends CDIDependencyCollectorVisitor
+public class CDITypeDependencyCollectorVisitor
+        extends CDIDependencyCollectorVisitor<TypeDeclaration<?>>
         implements TypeDependencyCollector {
 
     //##################################################################################################################

@@ -80,6 +80,7 @@ public class DependencyGraph {
 
     /**
      * Removes a node
+     *
      * @param name
      */
     public void removeNode(String name) {
@@ -177,6 +178,7 @@ public class DependencyGraph {
 
     /**
      * Entirely removes all edges of certain types
+     *
      * @param affectedEdges
      */
     public void removeAllEdgesByType(Set<EdgeType> affectedEdges) {
@@ -199,12 +201,14 @@ public class DependencyGraph {
 
     /**
      * Removes all outgoing edges on a certain node of certain types
+     *
      * @param from
      * @param affectedEdges
+     * @return names of the nodes that are pointed to by removed edges
      */
-    public void removeAllEdgesFrom(String from, Set<EdgeType> affectedEdges) {
+    public Set<String> removeAllEdgesFrom(String from, Set<EdgeType> affectedEdges) {
+        Set<String> ret = new HashSet<>();
         if (forwardsEdges.containsKey(from)) {
-            Set<String> ret = new HashSet<>();
 
             Map<String, Set<EdgeType>> forwardsNodes = forwardsEdges.get(from);
             forwardsNodes.forEach((to, type) -> {
@@ -215,14 +219,32 @@ public class DependencyGraph {
                 }
             });
             ret.forEach(forwardsNodes::remove);
-
-            // TODO: not sure about that :)
-            // if the node at the other end has no ingoing and outgoing edges, we can safely remove it
-            //ret.forEach(to -> {
-            //    if (forwardsEdges.get(to).isEmpty() && backwardsEdges.get(to).isEmpty())
-            //        removeNode(to);
-            //});
         }
+        return ret;
+    }
+
+    /**
+     * Removes all ingoing edges on a certain node of certain types
+     *
+     * @param to
+     * @param affectedEdges
+     * @return names of the nodes that are at the start of removed edges
+     */
+    public Set<String> removeAllEdgesTo(String to, Set<EdgeType> affectedEdges) {
+        Set<String> ret = new HashSet<>();
+        if (backwardsEdges.containsKey(to)) {
+
+            Map<String, Set<EdgeType>> backwardsNodes = backwardsEdges.get(to);
+            backwardsNodes.forEach((from, type) -> {
+                type.removeAll(affectedEdges);
+                if (type.isEmpty()) {
+                    forwardsEdges.get(from).remove(to);
+                    ret.add(from);
+                }
+            });
+            ret.forEach(backwardsNodes::remove);
+        }
+        return ret;
     }
 
     //##################################################################################################################

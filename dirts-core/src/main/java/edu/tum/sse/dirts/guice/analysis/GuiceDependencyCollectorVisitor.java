@@ -36,8 +36,8 @@ import java.util.stream.Collectors;
 
 import static java.util.logging.Level.FINER;
 
-public abstract class GuiceDependencyCollectorVisitor<T> extends AbstractTruncatedVisitor<DependencyGraph>
-        implements DependencyCollector {
+public abstract class GuiceDependencyCollectorVisitor<P extends BodyDeclaration<?>> extends AbstractTruncatedVisitor<DependencyGraph>
+        implements DependencyCollector<P> {
 
     //##################################################################################################################
     // Attributes

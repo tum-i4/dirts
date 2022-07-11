@@ -12,6 +12,7 @@
  */
 package edu.tum.sse.dirts.analysis.def;
 
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.analysis.AbstractTruncatedVisitor;
 import edu.tum.sse.dirts.analysis.DependencyCollector;
@@ -24,9 +25,9 @@ import java.util.Collection;
  * <p>
  * Considers methods annotated with @Before and @BeforeClass as dependencies of methods annotated with @Test
  */
-public abstract class JUnitDependencyCollectorVisitor
+public abstract class JUnitDependencyCollectorVisitor<P extends BodyDeclaration<?>>
         extends AbstractTruncatedVisitor<DependencyGraph>
-        implements DependencyCollector {
+        implements DependencyCollector<P> {
 
     public void calculateDependencies(Collection<TypeDeclaration<?>> ts, DependencyGraph dependencyGraph) {
         for (TypeDeclaration<?> t : ts) {

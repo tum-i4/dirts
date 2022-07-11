@@ -17,7 +17,7 @@ import java.util.Iterator;
 /**
  * Enables to calculate the checksum of nontype nodes
  */
-public class TypeChecksumVisitor implements ChecksumVisitor {
+public class TypeChecksumVisitor implements ChecksumVisitor<TypeDeclaration<?>> {
 
     /**
      * The code in this class has been taken from NoCommentsHashCodeVisitor and slightly modified

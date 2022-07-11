@@ -26,7 +26,7 @@ import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
  * (ConstructorDeclaration, MethodDeclaration, EnumConstantDeclaration, FieldDeclaration,
  * AnnotationMemberDeclaration, InitializerDeclaration)
  */
-public class NonTypeNameFinderVisitor extends FinderVisitor<Map<String, Node>> {
+public class NonTypeNameFinderVisitor extends FinderVisitor<Map<String, Node>, BodyDeclaration<?>> {
 
     //##################################################################################################################
     // Visitor Pattern

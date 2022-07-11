@@ -12,10 +12,7 @@
  */
 package edu.tum.sse.dirts.analysis.def;
 
-import com.github.javaparser.ast.body.AnnotationDeclaration;
-import com.github.javaparser.ast.body.BodyDeclaration;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.body.EnumDeclaration;
+import com.github.javaparser.ast.body.*;
 import com.github.javaparser.resolution.declarations.ResolvedClassDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedMethodLikeDeclaration;
@@ -30,6 +27,7 @@ import edu.tum.sse.dirts.util.JavaParserUtils;
 import edu.tum.sse.dirts.util.Log;
 import org.apache.maven.surefire.api.testset.TestFilter;
 
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +40,7 @@ import static java.util.logging.Level.FINE;
  * Collects dependencies related to JUnit4 for Type-nodes
  */
 public class JUnitTypeDependencyCollectorVisitor
-        extends JUnitDependencyCollectorVisitor
+        extends JUnitDependencyCollectorVisitor<TypeDeclaration<?>>
         implements TypeDependencyCollector {
 
     //##################################################################################################################

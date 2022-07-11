@@ -14,6 +14,7 @@ package edu.tum.sse.dirts.core.knowledgesources;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.BodyDeclaration;
 import edu.tum.sse.dirts.analysis.FinderVisitor;
 import edu.tum.sse.dirts.analysis.def.checksum.ChecksumVisitor;
 import edu.tum.sse.dirts.core.Blackboard;
@@ -34,23 +35,23 @@ import static edu.tum.sse.dirts.core.BlackboardState.TESTS_FOUND;
 /**
  * Partitions code objects into four categories: same, added, removed, changed
  */
-public class CodeChangeAnalyzer extends KnowledgeSource {
+public class CodeChangeAnalyzer<T extends BodyDeclaration<?>> extends KnowledgeSource<T> {
 
     //##################################################################################################################
     // Attributes
 
-    private final Blackboard blackboard;
+    private final Blackboard<T> blackboard;
 
 
     private final ChecksumVisitor checksumVisitor;
-    private final FinderVisitor<Map<String, Node>> nameFinderVisitor;
+    private final FinderVisitor<Map<String, Node>, T> nameFinderVisitor;
 
 
     //##################################################################################################################
     // Constructors
 
-    public CodeChangeAnalyzer(Blackboard blackboard,
-                              FinderVisitor<Map<String, Node>> nameFinderVisitor,
+    public CodeChangeAnalyzer(Blackboard<T> blackboard,
+                              FinderVisitor<Map<String, Node>, T> nameFinderVisitor,
                               ChecksumVisitor checksumVisitor
     ) {
         super(blackboard);
@@ -79,7 +80,7 @@ public class CodeChangeAnalyzer extends KnowledgeSource {
 
         calculateChange(
                 blackboard.getChecksumsNodes(),
-                this::calculateChecksum,
+                checksumVisitor::hashCode,
                 allObjects,
                 sameCode,
                 differentCode,
@@ -100,10 +101,6 @@ public class CodeChangeAnalyzer extends KnowledgeSource {
     @Override
     public boolean executeCondition() {
         return blackboard.getState() == TESTS_FOUND;
-    }
-
-    protected int calculateChecksum(Node node) {
-        return checksumVisitor.hashCode(node);
     }
 
     public static <T> void calculateChange(

@@ -12,20 +12,22 @@
  */
 package edu.tum.sse.dirts.core;
 
+import com.github.javaparser.ast.body.BodyDeclaration;
+
 /**
  * Can be extended to define a processing step
  */
-public abstract class KnowledgeSource {
+public abstract class KnowledgeSource<T extends BodyDeclaration<?>> {
 
     //##################################################################################################################
     // Attributes
 
-    protected final Blackboard blackboard;
+    protected final Blackboard<T> blackboard;
 
     //##################################################################################################################
     // Constructors
 
-    public KnowledgeSource(Blackboard blackboard) {
+    public KnowledgeSource(Blackboard<T> blackboard) {
         this.blackboard = blackboard;
     }
 

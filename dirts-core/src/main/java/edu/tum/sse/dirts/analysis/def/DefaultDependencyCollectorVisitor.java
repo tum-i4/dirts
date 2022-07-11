@@ -12,6 +12,7 @@
  */
 package edu.tum.sse.dirts.analysis.def;
 
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.analysis.AbstractTruncatedVisitor;
 import edu.tum.sse.dirts.analysis.DependencyCollector;
@@ -22,9 +23,9 @@ import java.util.Collection;
 /**
  * Collects dependencies based on Delegation, accessed and assigned fields, Inheritance and Annotations (not critical)
  */
-public abstract class DefaultDependencyCollectorVisitor
+public abstract class DefaultDependencyCollectorVisitor<P extends BodyDeclaration<?>>
         extends AbstractTruncatedVisitor<DependencyGraph>
-        implements DependencyCollector {
+        implements DependencyCollector<P> {
 
     @Override
     public void calculateDependencies(Collection<TypeDeclaration<?>> ts, DependencyGraph dependencyGraph) {

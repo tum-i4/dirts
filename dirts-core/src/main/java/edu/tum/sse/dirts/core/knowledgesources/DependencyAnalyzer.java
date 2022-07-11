@@ -12,6 +12,7 @@
  */
 package edu.tum.sse.dirts.core.knowledgesources;
 
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.analysis.DependencyCollector;
 import edu.tum.sse.dirts.core.Blackboard;
@@ -31,14 +32,14 @@ import static java.util.logging.Level.INFO;
 /**
  * Analyzes the dependencies of code objects and adds corresponding edges in the DependencyGraph
  */
-public class DependencyAnalyzer extends KnowledgeSource {
+public class DependencyAnalyzer<T extends BodyDeclaration<?>> extends KnowledgeSource<T> {
 
-    private final DependencyCollector primaryDependencyCollector;
+    private final DependencyCollector<T> primaryDependencyCollector;
 
     //##################################################################################################################
     // Constructors
 
-    public DependencyAnalyzer(Blackboard blackboard, DependencyCollector primaryDependencyCollector) {
+    public DependencyAnalyzer(Blackboard<T> blackboard, DependencyCollector<T> primaryDependencyCollector) {
         super(blackboard);
         this.primaryDependencyCollector = primaryDependencyCollector;
     }
@@ -57,7 +58,7 @@ public class DependencyAnalyzer extends KnowledgeSource {
         Log.log(INFO, "Recalculated primary dependencies of "
                 + impactedTypes.stream().map(Names::lookup).map(Pair::getFirst).collect(Collectors.toList()));
 
-        for (DependencyStrategy dependencyStrategy : blackboard.getDependencyStrategies()) {
+        for (DependencyStrategy<T> dependencyStrategy : blackboard.getDependencyStrategies()) {
             dependencyStrategy.doDependencyAnalysis(blackboard);
         }
         return BlackboardState.DEPENDENCIES_UPDATED;

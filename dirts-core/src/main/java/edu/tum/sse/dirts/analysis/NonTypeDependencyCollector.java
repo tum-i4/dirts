@@ -21,7 +21,7 @@ import edu.tum.sse.dirts.graph.DependencyGraph;
  * Has to consider MethodDeclaration, ConstructorDeclaration, FieldDeclaration, EnumConstantDeclaration,
  * AnnotationMemberDeclaration, InitializerDeclaration
  */
-public interface NonTypeDependencyCollector extends DependencyCollector {
+public interface NonTypeDependencyCollector extends DependencyCollector<BodyDeclaration<?>> {
 
     /*
     Since generally all subclasses extend VoidVisitor, it is unfortunately not a compilation error

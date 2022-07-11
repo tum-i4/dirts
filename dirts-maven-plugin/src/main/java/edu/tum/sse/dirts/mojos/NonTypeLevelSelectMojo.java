@@ -1,7 +1,9 @@
 package edu.tum.sse.dirts.mojos;
 
+import com.github.javaparser.ast.body.BodyDeclaration;
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.control.Control;
+import edu.tum.sse.dirts.core.control.NonTypeLevelControl;
 import edu.tum.sse.dirts.core.control.TypeLevelControl;
 import edu.tum.sse.dirts.util.Log;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -17,7 +19,7 @@ import static java.util.logging.Level.FINE;
 
 @Mojo(name = "nontypeL_select")
 @Execute(goal = "nontypeL_select", phase = LifecyclePhase.INITIALIZE, lifecycle = "dirts")
-public class NonTypeLevelSelectMojo extends AbstractSelectMojo {
+public class NonTypeLevelSelectMojo extends AbstractSelectMojo<BodyDeclaration<?>> {
 
     private final Function<String, String> toContainingClass = t -> {
         String ret = t;
@@ -32,14 +34,14 @@ public class NonTypeLevelSelectMojo extends AbstractSelectMojo {
 
 
     @Override
-    protected Control getControl() {
+    protected Control<BodyDeclaration<?>> getControl() {
         TestFilter<String, String> testFilter = getTestFilter();
         if (testFilter != null)
             Log.log(FINE, "Using test filter: " + testFilter);
 
-        Blackboard typeLevelBlackboard = getTypeLevelBlackboard();
-        typeLevelBlackboard.setTestFilter(testFilter);
-        return new TypeLevelControl(typeLevelBlackboard, true);
+        Blackboard<BodyDeclaration<?>> nontypeLevelBlackboard = getNonTypeLevelBlackboard();
+        nontypeLevelBlackboard.setTestFilter(testFilter);
+        return new NonTypeLevelControl(nontypeLevelBlackboard, true);
     }
 
     @Override

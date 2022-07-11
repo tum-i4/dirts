@@ -22,7 +22,7 @@ import static java.util.logging.Level.FINE;
 /**
  * Collects all Type-nodes that may represent tests and their names
  */
-public class TypeTestFinderVisitor extends FinderVisitor<Collection<String>> {
+public class TypeTestFinderVisitor extends FinderVisitor<Collection<String>, TypeDeclaration<?>> {
 
     //##################################################################################################################
     // Attributes

@@ -13,6 +13,7 @@
 package edu.tum.sse.dirts.analysis;
 
 import com.github.javaparser.ast.body.AnnotationDeclaration;
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.EnumDeclaration;
 
@@ -22,6 +23,7 @@ import com.github.javaparser.ast.body.EnumDeclaration;
  *
  * @param <T> accumulator
  */
+@SuppressWarnings("unused")
 public abstract class AbstractIdentifierVisitor<T> extends AbstractTruncatedVisitor<T> {
 
     //##################################################################################################################

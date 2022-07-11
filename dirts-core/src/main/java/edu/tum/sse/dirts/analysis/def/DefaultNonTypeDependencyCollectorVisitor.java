@@ -36,7 +36,7 @@ import static java.util.logging.Level.FINE;
  * Collects dependencies based on Delegation, MemberAccess and Inheritance for NonType-nodes
  */
 public class DefaultNonTypeDependencyCollectorVisitor
-        extends DefaultDependencyCollectorVisitor
+        extends DefaultDependencyCollectorVisitor<BodyDeclaration<?>>
         implements NonTypeDependencyCollector {
 
     private final Map<TypeDeclaration<?>, InheritanceIdentifierVisitor> inheritanceIdentifierVisitorMap =

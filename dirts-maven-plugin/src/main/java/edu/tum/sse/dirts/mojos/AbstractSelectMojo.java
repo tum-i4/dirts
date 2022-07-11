@@ -1,5 +1,6 @@
 package edu.tum.sse.dirts.mojos;
 
+import com.github.javaparser.ast.body.BodyDeclaration;
 import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.graph.EdgeType;
 import edu.tum.sse.dirts.util.Log;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 
 import static java.util.logging.Level.*;
 
-public abstract class AbstractSelectMojo extends AbstractDirtsMojo {
+public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends AbstractDirtsMojo<P> {
 
     private final static String DIRTS_EXCLUDES_PREFIX = "# DIRTS excluded";
 
@@ -43,7 +44,7 @@ public abstract class AbstractSelectMojo extends AbstractDirtsMojo {
             Log.log(INFO, "Running in standalone mode");
         }
 
-        Control control = getControl();
+        Control<P> control = getControl();
 
         Set<EdgeType> edgeTypes = new HashSet<>();
 
@@ -108,31 +109,33 @@ public abstract class AbstractSelectMojo extends AbstractDirtsMojo {
         Plugin surefirePlugin = lookupPlugin(SUREFIRE_PLUGIN_KEY);
         Xpp3Dom configuration = (Xpp3Dom) surefirePlugin.getConfiguration();
 
-        Xpp3Dom includesFileChild = configuration.getChild("includesFile");
-        Xpp3Dom excludesChild = configuration.getChild("excludes");
-        Xpp3Dom includesChild = configuration.getChild("includes");
+        if (configuration != null) {
+            Xpp3Dom includesFileChild = configuration.getChild("includesFile");
+            Xpp3Dom excludesChild = configuration.getChild("excludes");
+            Xpp3Dom includesChild = configuration.getChild("includes");
 
-        try {
-            Class<?> abstractSurefireMojoClass = Class.forName("org.apache.maven.plugin.surefire.AbstractSurefireMojo");
-            Class<?> surefirePluginClass = Class.forName("org.apache.maven.plugin.surefire.SurefirePlugin");
+            try {
+                Class<?> abstractSurefireMojoClass = Class.forName("org.apache.maven.plugin.surefire.AbstractSurefireMojo");
+                Class<?> surefirePluginClass = Class.forName("org.apache.maven.plugin.surefire.SurefirePlugin");
 
-            if (includesFileChild != null)
-                setField(surefirePluginClass, "includesFile", Path.of(includesFileChild.getValue()).toFile());
+                if (includesFileChild != null)
+                    setField(surefirePluginClass, "includesFile", Path.of(includesFileChild.getValue()).toFile());
 
-            if (excludesChild != null) {
-                Xpp3Dom[] excludesChildren = excludesChild.getChildren("exclude");
-                List<String> excludes = Arrays.stream(excludesChildren).map(Xpp3Dom::getValue).collect(Collectors.toList());
-                setField(abstractSurefireMojoClass, "excludes", excludes);
+                if (excludesChild != null) {
+                    Xpp3Dom[] excludesChildren = excludesChild.getChildren("exclude");
+                    List<String> excludes = Arrays.stream(excludesChildren).map(Xpp3Dom::getValue).collect(Collectors.toList());
+                    setField(abstractSurefireMojoClass, "excludes", excludes);
+                }
+
+                if (includesChild != null) {
+                    Xpp3Dom[] includesChildren = includesChild.getChildren("include");
+                    List<String> includes = Arrays.stream(includesChildren).map(Xpp3Dom::getValue).collect(Collectors.toList());
+                    setField(surefirePluginClass, "includes", includes);
+                }
+
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
             }
-
-            if (includesChild != null) {
-                Xpp3Dom[] includesChildren = includesChild.getChildren("include");
-                List<String> includes = Arrays.stream(includesChildren).map(Xpp3Dom::getValue).collect(Collectors.toList());
-                setField(surefirePluginClass, "includes", includes);
-            }
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
     }
 
@@ -150,16 +153,18 @@ public abstract class AbstractSelectMojo extends AbstractDirtsMojo {
         Plugin surefirePlugin = lookupPlugin(SUREFIRE_PLUGIN_KEY);
         Xpp3Dom configuration = (Xpp3Dom) surefirePlugin.getConfiguration();
 
-        Xpp3Dom excludesFileChild = configuration.getChild("excludesFile");
+        if (configuration != null) {
+            Xpp3Dom excludesFileChild = configuration.getChild("excludesFile");
 
-        try {
-            Class<?> surefirePluginClass = Class.forName("org.apache.maven.plugin.surefire.SurefirePlugin");
-            if (excludesFileChild != null)
-                setField(surefirePluginClass, "excludesFile", Path.of(excludesFileChild.getValue()).toFile());
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            try {
+                Class<?> surefirePluginClass = Class.forName("org.apache.maven.plugin.surefire.SurefirePlugin");
+                if (excludesFileChild != null)
+                    setField(surefirePluginClass, "excludesFile", Path.of(excludesFileChild.getValue()).toFile());
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            clearPreviousExcludes();
         }
-        clearPreviousExcludes();
     }
 
     protected void clearPreviousExcludes() {

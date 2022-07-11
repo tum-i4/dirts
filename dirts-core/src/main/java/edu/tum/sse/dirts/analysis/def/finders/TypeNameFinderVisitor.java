@@ -26,7 +26,7 @@ import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
  * Collects all Type-nodes and their names
  * (ClassOrInterfaceDeclaration, EnumDeclaration, AnnotationDeclaration)
  */
-public class TypeNameFinderVisitor extends FinderVisitor<Map<String, Node>> {
+public class TypeNameFinderVisitor extends FinderVisitor<Map<String, Node>, TypeDeclaration<?>> {
 
     //##################################################################################################################
     // Visitor Pattern
@@ -40,19 +40,19 @@ public class TypeNameFinderVisitor extends FinderVisitor<Map<String, Node>> {
     @Override
     public void visit(ClassOrInterfaceDeclaration n, Map<String, Node> arg) {
         super.visit(n, arg);
-        arg.put(Names.lookup(n).getFirst(), n);
+        arg.put(lookup(n).getFirst(), n);
     }
 
     @Override
     public void visit(EnumDeclaration n, Map<String, Node> arg) {
         super.visit(n, arg);
-        arg.put(Names.lookup(n).getFirst(), n);
+        arg.put(lookup(n).getFirst(), n);
     }
 
     @Override
     public void visit(AnnotationDeclaration n, Map<String, Node> arg) {
         super.visit(n, arg);
-        arg.put(Names.lookup(n).getFirst(), n);
+        arg.put(lookup(n).getFirst(), n);
     }
 
     //******************************************************************************************************************

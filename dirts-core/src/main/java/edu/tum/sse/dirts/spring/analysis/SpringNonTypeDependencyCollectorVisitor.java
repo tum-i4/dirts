@@ -34,7 +34,7 @@ import static edu.tum.sse.dirts.util.naming_scheme.Names.*;
 import static java.util.logging.Level.FINE;
 
 public class SpringNonTypeDependencyCollectorVisitor
-        extends SpringDependencyCollectorVisitor
+        extends SpringDependencyCollectorVisitor<BodyDeclaration<?>>
         implements NonTypeDependencyCollector {
 
     //##################################################################################################################

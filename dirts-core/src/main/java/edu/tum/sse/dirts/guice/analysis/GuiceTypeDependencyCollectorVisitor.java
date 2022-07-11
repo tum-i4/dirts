@@ -36,7 +36,8 @@ import static edu.tum.sse.dirts.guice.analysis.identifiers.GetInstanceIdentifier
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupNode;
 
-public class GuiceTypeDependencyCollectorVisitor extends GuiceDependencyCollectorVisitor<ResolvedReferenceTypeDeclaration>
+public class GuiceTypeDependencyCollectorVisitor
+        extends GuiceDependencyCollectorVisitor<TypeDeclaration<?>>
         implements TypeDependencyCollector {
 
     public GuiceTypeDependencyCollectorVisitor(BeanStorage<GuiceBinding> bindingsStorage) {

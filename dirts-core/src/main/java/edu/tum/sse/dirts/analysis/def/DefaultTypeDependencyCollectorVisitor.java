@@ -27,6 +27,7 @@ import edu.tum.sse.dirts.analysis.def.identifiers.type.StaticIdentifierVisitor;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.graph.EdgeType;
 
+import java.lang.reflect.Type;
 import java.util.Collection;
 
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
@@ -36,7 +37,7 @@ import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupNode;
  * Collects dependencies based on Delegation, MemberAccess, Inheritance and Annotations (not critical) for Type-nodes
  */
 public class DefaultTypeDependencyCollectorVisitor
-        extends DefaultDependencyCollectorVisitor
+        extends DefaultDependencyCollectorVisitor<TypeDeclaration<?>>
         implements TypeDependencyCollector {
 
     /*

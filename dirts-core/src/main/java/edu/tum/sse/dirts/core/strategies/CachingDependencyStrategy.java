@@ -1,5 +1,6 @@
 package edu.tum.sse.dirts.core.strategies;
 
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.analysis.DependencyCollector;
 import edu.tum.sse.dirts.core.Blackboard;
@@ -16,12 +17,12 @@ import java.util.Set;
  * (J. Öqvist, G. Hedin, and B. Magnusson, “Extraction-based regression test selection,”
  * ACM Int. Conf. Proceeding Ser., vol. Part F1284, 2016, doi: 10.1145/2972206.2972224)
  */
-public class CachingDependencyStrategy implements DependencyStrategy {
+public class CachingDependencyStrategy<T extends BodyDeclaration<?>> implements DependencyStrategy<T> {
 
-    private final Set<DependencyCollector> dependencyCollector;
+    private final Set<DependencyCollector<T>> dependencyCollector;
     private final Set<EdgeType> affectedEdges;
 
-    public CachingDependencyStrategy(Set<DependencyCollector> dependencyCollector,
+    public CachingDependencyStrategy(Set<DependencyCollector<T>> dependencyCollector,
                                      Set<EdgeType> affectedEdges) {
         this.dependencyCollector = dependencyCollector;
         this.affectedEdges = affectedEdges;
@@ -29,20 +30,22 @@ public class CachingDependencyStrategy implements DependencyStrategy {
 
 
     @Override
-    public void doImport(Path tmpPath, Blackboard blackboard, String suffix) {
+    public void doImport(Path tmpPath, Blackboard<T> blackboard, String suffix) {
     }
 
     @Override
-    public void doExport(Path tmpPath, Blackboard blackboard, String suffix) {
+    public void doExport(Path tmpPath, Blackboard<T> blackboard, String suffix) {
     }
 
     @Override
-    public void doChangeAnalysis(Blackboard blackboard) {
+    public void doChangeAnalysis(Blackboard<T> blackboard) {
     }
 
     @Override
-    public void doGraphCropping(Blackboard blackboard) {
+    public void doGraphCropping(Blackboard<T> blackboard) {
         DependencyGraph dependencyGraph = blackboard.getDependencyGraphNewRevision();
+
+        // TODO: this needs to be improved
 
         // remove all edges from changed nodes
         blackboard.getNodesDifferent().keySet()
@@ -50,7 +53,7 @@ public class CachingDependencyStrategy implements DependencyStrategy {
     }
 
     @Override
-    public void doDependencyAnalysis(Blackboard blackboard) {
+    public void doDependencyAnalysis(Blackboard<T> blackboard) {
         Collection<TypeDeclaration<?>> impactedTypes = blackboard.getImpactedTypes();
         dependencyCollector.forEach(d -> d.calculateDependencies(
                 impactedTypes,
@@ -58,7 +61,7 @@ public class CachingDependencyStrategy implements DependencyStrategy {
     }
 
     @Override
-    public void combineGraphs(Blackboard blackboard) {
+    public void combineGraphs(Blackboard<T> blackboard) {
 
     }
 }

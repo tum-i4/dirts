@@ -22,7 +22,7 @@ import static java.util.logging.Level.FINE;
  * Collects all NonType-nodes that may represent tests and their names
  * (might also contain constructors of outer classes if an inner class has test methods)
  */
-public class NonTypeTestFinderVisitor extends FinderVisitor<Collection<String>> {
+public class NonTypeTestFinderVisitor extends FinderVisitor<Collection<String>, BodyDeclaration<?>> {
 
     //##################################################################################################################
     // Attributes

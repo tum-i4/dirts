@@ -12,6 +12,7 @@
  */
 package edu.tum.sse.dirts.analysis;
 
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 
@@ -20,7 +21,8 @@ import java.util.Collection;
 /**
  * Collects dependencies of TypeDeclarations
  */
-public interface DependencyCollector {
+@SuppressWarnings("unused")
+public interface DependencyCollector<P extends BodyDeclaration<?>> {
 
     void calculateDependencies(Collection< TypeDeclaration<?>> ts, DependencyGraph dependencyGraph);
 }

@@ -1,5 +1,7 @@
 package edu.tum.sse.dirts.mojos;
 
+import com.github.javaparser.ast.body.BodyDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
 import edu.tum.sse.dirts.cdi.analysis.CDINonTypeDependencyCollectorVisitor;
 import edu.tum.sse.dirts.cdi.analysis.CDITypeDependencyCollectorVisitor;
@@ -30,7 +32,7 @@ import static edu.tum.sse.dirts.graph.EdgeType.DI_GUICE;
 /**
  * Abstract parent class of all Mojos related to DIRTS
  */
-public abstract class AbstractDirtsMojo extends SurefirePlugin {
+public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends SurefirePlugin {
 
     //##################################################################################################################
     // Static constants
@@ -69,7 +71,7 @@ public abstract class AbstractDirtsMojo extends SurefirePlugin {
     //##################################################################################################################
     // Abstract mehtods implemented by all subclasses
 
-    protected abstract Control getControl();
+    protected abstract Control<T> getControl();
 
     //##################################################################################################################
     // Methods to initialize control objects
@@ -79,25 +81,25 @@ public abstract class AbstractDirtsMojo extends SurefirePlugin {
      *
      * @return
      */
-    protected Blackboard getTypeLevelBlackboard() {
+    protected Blackboard<TypeDeclaration<?>> getTypeLevelBlackboard() {
         Path basePath = getBasePath();
         Path subPath = basePath.relativize(getSubPath());
 
         Log.setLogLevel(Level.parse(logging));
 
         // Blackboard and Control
-        Blackboard blackboard = new Blackboard(basePath, subPath);
+        Blackboard<TypeDeclaration<?>> blackboard = new Blackboard<>(basePath, subPath);
 
         // Spring
         if (useSpringExtension) {
-            blackboard.addDependencyStrategy(new SpringDependencyStrategy(
+            blackboard.addDependencyStrategy(new SpringDependencyStrategy<>(
                     new SpringTypeDependencyCollectorVisitor(),
                     new SpringBeanTypeDependencyCollector()));
         }
 
         // Guice
         if (useGuiceExtension) {
-            blackboard.addDependencyStrategy(new RecomputeAllDependencyStrategy(
+            blackboard.addDependencyStrategy(new RecomputeAllDependencyStrategy<>(
                     Set.of(new GuiceTypeDependencyCollectorVisitor(new BeanStorage<>())),
                     Set.of(DI_GUICE)));
         }
@@ -105,7 +107,7 @@ public abstract class AbstractDirtsMojo extends SurefirePlugin {
         // CDI
         if (useCDIExtension) {
             blackboard.addDependencyStrategy(
-                    new CDIDependencyStrategy(new CDITypeDependencyCollectorVisitor()));
+                    new CDIDependencyStrategy<>(new CDITypeDependencyCollectorVisitor()));
         }
 
         return blackboard;
@@ -116,25 +118,25 @@ public abstract class AbstractDirtsMojo extends SurefirePlugin {
      *
      * @return
      */
-    protected Blackboard getNonTypeLevelBlackboard() {
+    protected Blackboard<BodyDeclaration<?>> getNonTypeLevelBlackboard() {
         Path basePath = getBasePath();
         Path subPath = basePath.relativize(getSubPath());
 
         Log.setLogLevel(Level.parse(logging));
 
         // Blackboard and Control
-        Blackboard blackboard = new Blackboard(basePath, subPath);
+        Blackboard<BodyDeclaration<?>> blackboard = new Blackboard<>(basePath, subPath);
 
         // Spring
         if (useSpringExtension) {
-            blackboard.addDependencyStrategy(new SpringDependencyStrategy(
+            blackboard.addDependencyStrategy(new SpringDependencyStrategy<>(
                     new SpringNonTypeDependencyCollectorVisitor(),
                     new SpringBeanNonTypeDependencyCollector()));
         }
 
         // Guice
         if (useGuiceExtension) {
-            blackboard.addDependencyStrategy(new RecomputeAllDependencyStrategy(
+            blackboard.addDependencyStrategy(new RecomputeAllDependencyStrategy<>(
                     Set.of(new GuiceNonTypeDependencyCollectorVisitor(new BeanStorage<>())),
                     Set.of(DI_GUICE)));
         }
@@ -142,7 +144,7 @@ public abstract class AbstractDirtsMojo extends SurefirePlugin {
         // CDI
         if (useCDIExtension) {
             blackboard.addDependencyStrategy(
-                    new CDIDependencyStrategy(new CDINonTypeDependencyCollectorVisitor()));
+                    new CDIDependencyStrategy<>(new CDINonTypeDependencyCollectorVisitor()));
         }
 
         return blackboard;

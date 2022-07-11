@@ -36,7 +36,7 @@ import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupNode;
 import static java.util.logging.Level.FINE;
 
 public class SpringTypeDependencyCollectorVisitor
-        extends SpringDependencyCollectorVisitor
+        extends SpringDependencyCollectorVisitor<TypeDeclaration<?>>
         implements TypeDependencyCollector {
 
     //##################################################################################################################

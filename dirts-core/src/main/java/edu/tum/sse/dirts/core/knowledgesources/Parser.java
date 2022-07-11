@@ -13,6 +13,7 @@
 package edu.tum.sse.dirts.core.knowledgesources;
 
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
@@ -34,12 +35,12 @@ import static java.util.logging.Level.WARNING;
 /**
  * Parses all compilation units
  */
-public class Parser extends KnowledgeSource {
+public class Parser<T extends BodyDeclaration<?>> extends KnowledgeSource<T> {
 
     //##################################################################################################################
     // Constructors
 
-    public Parser(Blackboard blackboard) {
+    public Parser(Blackboard<T> blackboard) {
         super(blackboard);
 
     }
@@ -51,10 +52,13 @@ public class Parser extends KnowledgeSource {
     public BlackboardState updateBlackboard() {
         CombinedTypeSolver typeSolver = blackboard.getTypeSolver();
 
-        List<SourceRoot> allSourcesRoots = getSourceRoots(blackboard.getRootPath());
+        Path rootPath = blackboard.getRootPath();
+        Path subPath = blackboard.getSubPath();
+
+        List<SourceRoot> allSourcesRoots = getSourceRoots(rootPath);
         List<SourceRoot> sourceRootsSubProject = allSourcesRoots.stream()
                 .filter(r -> r.getRoot().toAbsolutePath().toString()
-                        .startsWith(blackboard.getRootPath().resolve(blackboard.getSubPath()).toAbsolutePath().toString()))
+                        .startsWith(rootPath.resolve(subPath).toAbsolutePath().toString()))
                 .collect(Collectors.toList());
 
         setupTypeSolver(allSourcesRoots, typeSolver);

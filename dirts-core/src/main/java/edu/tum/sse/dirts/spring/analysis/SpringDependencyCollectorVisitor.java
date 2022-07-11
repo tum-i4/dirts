@@ -42,9 +42,9 @@ import static java.util.logging.Level.FINER;
 /**
  * Collects dependencies from beans/code entities to code entities based on @Bean, @Configuration, xml beans @Autowire and getBean(...)
  */
-public abstract class SpringDependencyCollectorVisitor
+public abstract class SpringDependencyCollectorVisitor<P extends BodyDeclaration<?>>
         extends AbstractTruncatedVisitor<DependencyGraph>
-        implements DependencyCollector {
+        implements DependencyCollector<P> {
 
     //##################################################################################################################
     // Attributes

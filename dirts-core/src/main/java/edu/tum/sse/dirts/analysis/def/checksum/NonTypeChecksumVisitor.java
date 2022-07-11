@@ -17,7 +17,7 @@ import java.util.Iterator;
 /**
  * Enables to calculate the checksum of nontype nodes
  */
-public class NonTypeChecksumVisitor implements ChecksumVisitor {
+public class NonTypeChecksumVisitor implements ChecksumVisitor<BodyDeclaration<?>> {
 
     /**
      * The code in this class has been taken from NoCommentsHashCodeVisitor and slightly modified
@@ -43,7 +43,7 @@ public class NonTypeChecksumVisitor implements ChecksumVisitor {
      */
 
     public Integer visit(final CompilationUnit n, final Void arg) {
-        return n.getImports().accept(this, arg) * 31 + (n.getModule().isPresent() ? n.getModule().get().accept(this, arg) : 0) * 31 + (n.getPackageDeclaration().isPresent() ? n.getPackageDeclaration().get().accept(this, arg) : 0) * 31 +  n.getTypes().accept(this, arg);
+        return n.getImports().accept(this, arg) * 31 + (n.getModule().isPresent() ? n.getModule().get().accept(this, arg) : 0) * 31 + (n.getPackageDeclaration().isPresent() ? n.getPackageDeclaration().get().accept(this, arg) : 0) * 31 + n.getTypes().accept(this, arg);
     }
 
     public Integer visit(final ClassOrInterfaceDeclaration n, final Void arg) {
@@ -53,12 +53,12 @@ public class NonTypeChecksumVisitor implements ChecksumVisitor {
 
     public Integer visit(final AnnotationDeclaration n, final Void arg) {
         // this purposefully excludes members
-        return /* n.getMembers().accept(this, arg) * 31 */ + n.getModifiers().accept(this, arg) * 31 + n.getName().accept(this, arg) * 31 + n.getAnnotations().accept(this, arg);
+        return /* n.getMembers().accept(this, arg) * 31  + */ n.getModifiers().accept(this, arg) * 31 + n.getName().accept(this, arg) * 31 + n.getAnnotations().accept(this, arg);
     }
 
     public Integer visit(final EnumDeclaration n, final Void arg) {
         // this purposefully excludes members and entries
-        return /* n.getEntries().accept(this, arg) * 31 */ + n.getImplementedTypes().accept(this, arg) * 31 + /* n.getMembers().accept(this, arg) * 31 */ + n.getModifiers().accept(this, arg) * 31 + n.getName().accept(this, arg) * 31 + n.getAnnotations().accept(this, arg);
+        return /* n.getEntries().accept(this, arg) * 31  + */ n.getImplementedTypes().accept(this, arg) * 31 + /* n.getMembers().accept(this, arg) * 31 */ +n.getModifiers().accept(this, arg) * 31 + n.getName().accept(this, arg) * 31 + n.getAnnotations().accept(this, arg);
     }
 
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -132,7 +132,7 @@ public class NonTypeChecksumVisitor implements ChecksumVisitor {
     }
 
     public Integer visit(final ClassOrInterfaceType n, final Void arg) {
-        return n.getName().accept(this, arg) * 31 + (n.getScope().isPresent() ? n.getScope().get().accept(this, arg) : 0) * 31 + (n.getTypeArguments().isPresent() ? (Integer)((NodeList)n.getTypeArguments().get()).accept(this, arg) : 0) * 31 + n.getAnnotations().accept(this, arg);
+        return n.getName().accept(this, arg) * 31 + (n.getScope().isPresent() ? n.getScope().get().accept(this, arg) : 0) * 31 + (n.getTypeArguments().isPresent() ? (Integer) ((NodeList) n.getTypeArguments().get()).accept(this, arg) : 0) * 31 + n.getAnnotations().accept(this, arg);
     }
 
     public Integer visit(final ConditionalExpr n, final Void arg) {
@@ -168,7 +168,7 @@ public class NonTypeChecksumVisitor implements ChecksumVisitor {
     }
 
     public Integer visit(final ExplicitConstructorInvocationStmt n, final Void arg) {
-        return n.getArguments().accept(this, arg) * 31 + (n.getExpression().isPresent() ? n.getExpression().get().accept(this, arg) : 0) * 31 + (n.isThis() ? 1 : 0) * 31 + (n.getTypeArguments().isPresent() ? (Integer)((NodeList)n.getTypeArguments().get()).accept(this, arg) : 0);
+        return n.getArguments().accept(this, arg) * 31 + (n.getExpression().isPresent() ? n.getExpression().get().accept(this, arg) : 0) * 31 + (n.isThis() ? 1 : 0) * 31 + (n.getTypeArguments().isPresent() ? (Integer) ((NodeList) n.getTypeArguments().get()).accept(this, arg) : 0);
     }
 
     public Integer visit(final ExpressionStmt n, final Void arg) {
@@ -176,7 +176,7 @@ public class NonTypeChecksumVisitor implements ChecksumVisitor {
     }
 
     public Integer visit(final FieldAccessExpr n, final Void arg) {
-        return n.getName().accept(this, arg) * 31 + n.getScope().accept(this, arg) * 31 + (n.getTypeArguments().isPresent() ? (Integer)((NodeList)n.getTypeArguments().get()).accept(this, arg) : 0);
+        return n.getName().accept(this, arg) * 31 + n.getScope().accept(this, arg) * 31 + (n.getTypeArguments().isPresent() ? (Integer) ((NodeList) n.getTypeArguments().get()).accept(this, arg) : 0);
     }
 
     public Integer visit(final FieldDeclaration n, final Void arg) {
@@ -252,7 +252,7 @@ public class NonTypeChecksumVisitor implements ChecksumVisitor {
     }
 
     public Integer visit(final MethodCallExpr n, final Void arg) {
-        return n.getArguments().accept(this, arg) * 31 + n.getName().accept(this, arg) * 31 + (n.getScope().isPresent() ? n.getScope().get().accept(this, arg) : 0) * 31 + (n.getTypeArguments().isPresent() ? (Integer)((NodeList)n.getTypeArguments().get()).accept(this, arg) : 0);
+        return n.getArguments().accept(this, arg) * 31 + n.getName().accept(this, arg) * 31 + (n.getScope().isPresent() ? n.getScope().get().accept(this, arg) : 0) * 31 + (n.getTypeArguments().isPresent() ? (Integer) ((NodeList) n.getTypeArguments().get()).accept(this, arg) : 0);
     }
 
     public Integer visit(final MethodDeclaration n, final Void arg) {
@@ -260,7 +260,7 @@ public class NonTypeChecksumVisitor implements ChecksumVisitor {
     }
 
     public Integer visit(final MethodReferenceExpr n, final Void arg) {
-        return n.getIdentifier().hashCode() * 31 + n.getScope().accept(this, arg) * 31 + (n.getTypeArguments().isPresent() ? (Integer)((NodeList)n.getTypeArguments().get()).accept(this, arg) : 0);
+        return n.getIdentifier().hashCode() * 31 + n.getScope().accept(this, arg) * 31 + (n.getTypeArguments().isPresent() ? (Integer) ((NodeList) n.getTypeArguments().get()).accept(this, arg) : 0);
     }
 
     public Integer visit(final NameExpr n, final Void arg) {
@@ -275,7 +275,7 @@ public class NonTypeChecksumVisitor implements ChecksumVisitor {
         int result = 0;
 
         Object node;
-        for(Iterator var4 = n.iterator(); var4.hasNext(); result += 31 * ((Visitable)node).accept(this, arg)) {
+        for (Iterator var4 = n.iterator(); var4.hasNext(); result += 31 * ((Visitable) node).accept(this, arg)) {
             node = var4.next();
         }
 
@@ -291,7 +291,7 @@ public class NonTypeChecksumVisitor implements ChecksumVisitor {
     }
 
     public Integer visit(final ObjectCreationExpr n, final Void arg) {
-        return (n.getAnonymousClassBody().isPresent() ? (Integer)((NodeList)n.getAnonymousClassBody().get()).accept(this, arg) : 0) * 31 + n.getArguments().accept(this, arg) * 31 + (n.getScope().isPresent() ? n.getScope().get().accept(this, arg) : 0) * 31 + n.getType().accept(this, arg) * 31 + (n.getTypeArguments().isPresent() ? (Integer)((NodeList)n.getTypeArguments().get()).accept(this, arg) : 0);
+        return (n.getAnonymousClassBody().isPresent() ? (Integer) ((NodeList) n.getAnonymousClassBody().get()).accept(this, arg) : 0) * 31 + n.getArguments().accept(this, arg) * 31 + (n.getScope().isPresent() ? n.getScope().get().accept(this, arg) : 0) * 31 + n.getType().accept(this, arg) * 31 + (n.getTypeArguments().isPresent() ? (Integer) ((NodeList) n.getTypeArguments().get()).accept(this, arg) : 0);
     }
 
     public Integer visit(final PackageDeclaration n, final Void arg) {

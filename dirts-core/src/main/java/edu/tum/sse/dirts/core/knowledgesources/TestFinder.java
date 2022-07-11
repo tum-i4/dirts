@@ -1,6 +1,7 @@
 package edu.tum.sse.dirts.core.knowledgesources;
 
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.BodyDeclaration;
 import edu.tum.sse.dirts.analysis.FinderVisitor;
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.BlackboardState;
@@ -15,11 +16,11 @@ import static edu.tum.sse.dirts.core.BlackboardState.*;
 /**
  * Finds tests that are present
  */
-public class TestFinder extends KnowledgeSource {
+public class TestFinder<T extends BodyDeclaration<?>> extends KnowledgeSource<T> {
 
-    private final FinderVisitor<Collection<String>> finderVisitor;
+    private final FinderVisitor<Collection<String>, T> finderVisitor;
 
-    public TestFinder(Blackboard blackboard, FinderVisitor<Collection<String>> finderVisitor) {
+    public TestFinder(Blackboard<T> blackboard, FinderVisitor<Collection<String>, T> finderVisitor) {
         super(blackboard);
         this.finderVisitor = finderVisitor;
     }

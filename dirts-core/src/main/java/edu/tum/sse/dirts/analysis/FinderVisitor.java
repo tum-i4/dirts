@@ -27,7 +27,8 @@ import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
  *
  * @param <T> Collection where the Nodes that should be collected are inserted
  */
-public abstract class FinderVisitor<T> extends AbstractTruncatedVisitor<T> {
+@SuppressWarnings("unused")
+public abstract class FinderVisitor<T, P extends BodyDeclaration<?>> extends AbstractTruncatedVisitor<T> {
 
     //##################################################################################################################
     // Static methods

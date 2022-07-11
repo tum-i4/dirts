@@ -35,7 +35,7 @@ import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupNode;
 
 public class GuiceNonTypeDependencyCollectorVisitor
-        extends GuiceDependencyCollectorVisitor<ResolvedMethodLikeDeclaration>
+        extends GuiceDependencyCollectorVisitor<BodyDeclaration<?>>
         implements NonTypeDependencyCollector {
 
     public GuiceNonTypeDependencyCollectorVisitor(BeanStorage<GuiceBinding> bindingsStorage) {

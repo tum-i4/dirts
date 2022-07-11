@@ -12,6 +12,7 @@
  */
 package edu.tum.sse.dirts.core.knowledgesources;
 
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
@@ -31,12 +32,12 @@ import static java.util.logging.Level.WARNING;
 /**
  * Adds a ReflectionTypeSolver and a JarTypeSolver for jars of maven dependencies
  */
-public class TypeSolverInitializer extends KnowledgeSource {
+public class TypeSolverInitializer<T extends BodyDeclaration<?>> extends KnowledgeSource<T> {
 
     //##################################################################################################################
     // Constructors
 
-    public TypeSolverInitializer(Blackboard blackboard) {
+    public TypeSolverInitializer(Blackboard<T> blackboard) {
         super(blackboard);
     }
 
@@ -45,12 +46,15 @@ public class TypeSolverInitializer extends KnowledgeSource {
 
     @Override
     public BlackboardState updateBlackboard() {
+        Path rootPath = blackboard.getRootPath();
+        Path subPath = blackboard.getSubPath();
+
         CombinedTypeSolver typeSolver = new CombinedTypeSolver();
         typeSolver.add(new ReflectionTypeSolver());
 
-        Path mavenDependenciesPath = blackboard.getRootPath()
+        Path mavenDependenciesPath = rootPath
                 .toAbsolutePath()
-                .resolve(blackboard.getSubPath())
+                .resolve(subPath)
                 .resolve(Path.of(".dirts"))
                 .resolve(Path.of("libraries"));
 
@@ -61,11 +65,13 @@ public class TypeSolverInitializer extends KnowledgeSource {
                         .split(":");
 
                 for (String mavenDependency : mavenDependencies) {
-                    try {
-                        Path dependencyPath = Path.of(mavenDependency);
-                        typeSolver.add(new JarTypeSolver(dependencyPath));
-                    } catch (IOException e) {
-                        Log.errLog(WARNING, "Failed to add resolver for jar:" + mavenDependency);
+                    if (!mavenDependency.equals("")) {
+                        try {
+                            Path dependencyPath = Path.of(mavenDependency);
+                            typeSolver.add(new JarTypeSolver(dependencyPath));
+                        } catch (IOException e) {
+                            Log.errLog(WARNING, "Failed to add resolver for jar:" + mavenDependency);
+                        }
                     }
                 }
                 try {
@@ -79,9 +85,9 @@ public class TypeSolverInitializer extends KnowledgeSource {
                 e.printStackTrace();
             }
         } else {
-            Log.errLog(WARNING,"Failed to read maven dependencies - " +
+            Log.errLog(WARNING, "Failed to read maven dependencies - " +
                     "we will not be able to resolve code from libraries");
-            Log.errLog(WARNING,"File does not exist: " + mavenDependenciesPath);
+            Log.errLog(WARNING, "File does not exist: " + mavenDependenciesPath);
         }
 
         blackboard.setTypeSolver(typeSolver);

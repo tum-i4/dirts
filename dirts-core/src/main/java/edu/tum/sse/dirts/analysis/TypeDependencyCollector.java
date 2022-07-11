@@ -15,6 +15,7 @@ package edu.tum.sse.dirts.analysis;
 import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.EnumDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 
 /**
@@ -22,7 +23,7 @@ import edu.tum.sse.dirts.graph.DependencyGraph;
  * <p>
  * Has to consider ClassOrInterfaceDeclaration, EnumDeclaration, AnnotationDeclaration
  */
-public interface TypeDependencyCollector extends DependencyCollector {
+public interface TypeDependencyCollector extends DependencyCollector<TypeDeclaration<?>> {
 
     /*
     Since generally all subclasses extend VoidVisitor, it is unfortunately not a compilation error

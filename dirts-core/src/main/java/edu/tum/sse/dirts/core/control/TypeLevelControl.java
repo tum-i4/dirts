@@ -14,6 +14,7 @@ package edu.tum.sse.dirts.core.control;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.analysis.DependencyCollector;
 import edu.tum.sse.dirts.analysis.def.DefaultTypeDependencyCollectorVisitor;
 import edu.tum.sse.dirts.analysis.def.JUnitTypeDependencyCollectorVisitor;
@@ -21,6 +22,7 @@ import edu.tum.sse.dirts.analysis.def.checksum.TypeChecksumVisitor;
 import edu.tum.sse.dirts.analysis.def.finders.TypeNameFinderVisitor;
 import edu.tum.sse.dirts.analysis.def.finders.TypeTestFinderVisitor;
 import edu.tum.sse.dirts.core.Blackboard;
+import edu.tum.sse.dirts.core.knowledgesources.GraphCropper;
 import edu.tum.sse.dirts.core.strategies.CachingDependencyStrategy;
 import edu.tum.sse.dirts.graph.EdgeType;
 
@@ -32,7 +34,7 @@ import static edu.tum.sse.dirts.graph.EdgeType.*;
 /**
  * Class-level RTS
  */
-public class TypeLevelControl extends Control {
+public class TypeLevelControl extends Control<TypeDeclaration<?>> {
 
     //##################################################################################################################
     // Attributes
@@ -53,7 +55,7 @@ public class TypeLevelControl extends Control {
     //##################################################################################################################
     // Constructors
 
-    public TypeLevelControl(Blackboard blackboard, boolean overwrite) {
+    public TypeLevelControl(Blackboard<TypeDeclaration<?>> blackboard, boolean overwrite) {
         super(blackboard,
                 overwrite,
                 SUFFIX,
@@ -71,7 +73,11 @@ public class TypeLevelControl extends Control {
     @Override
     public void init() {
         super.init();
-        blackboard.addDependencyStrategy(new CachingDependencyStrategy(
+        blackboard.addKnowledgeSource(new GraphCropper<>(blackboard,
+                nameFinderVisitor,
+                affectedEdges,
+                nodesInGraphFilter, false));
+        blackboard.addDependencyStrategy(new CachingDependencyStrategy<>(
                 Set.of(new JUnitTypeDependencyCollectorVisitor(blackboard.getTestFilter())),
                 Set.of(JUNIT)));
     }

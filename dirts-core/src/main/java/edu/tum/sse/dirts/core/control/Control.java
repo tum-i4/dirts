@@ -13,6 +13,7 @@
 package edu.tum.sse.dirts.core.control;
 
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.BodyDeclaration;
 import edu.tum.sse.dirts.analysis.DependencyCollector;
 import edu.tum.sse.dirts.analysis.FinderVisitor;
 import edu.tum.sse.dirts.analysis.def.checksum.ChecksumVisitor;
@@ -31,7 +32,7 @@ import static java.util.logging.Level.INFO;
 /**
  * Abstract base class for either type-level or nontype-level RTS
  */
-public abstract class Control {
+public abstract class Control<T extends BodyDeclaration<?>> {
 
     //##################################################################################################################
     // Constants
@@ -50,7 +51,7 @@ public abstract class Control {
     /**
      * Central class of the blackboard pattern
      */
-    protected Blackboard blackboard;
+    protected Blackboard<T> blackboard;
 
     /**
      * Suffix for distinguishing cache directories of different levels of RTS
@@ -65,18 +66,18 @@ public abstract class Control {
     /**
      * Visitor used to find the names of the most important nodes
      */
-    private final FinderVisitor<Map<String, Node>> nameFinderVisitor;
+    protected final FinderVisitor<Map<String, Node>, T> nameFinderVisitor;
 
     /**
      * Visitor used to find tests
      */
-    private final FinderVisitor<Collection<String>> testFinderVisitor;
+    private final FinderVisitor<Collection<String>, T> testFinderVisitor;
 
 
     /**
      * Filter used to restrict the nodes that are added to the graph
      */
-    private final Predicate<Node> nodesInGraphFilter;
+    protected final Predicate<Node> nodesInGraphFilter;
 
     /**
      * Dependency collector that creates the most important edges
@@ -87,17 +88,17 @@ public abstract class Control {
     /**
      * Most important edges
      */
-    private final Set<EdgeType> affectedEdges;
+    protected final Set<EdgeType> affectedEdges;
 
     //##################################################################################################################
     // Constructors
 
-    public Control(Blackboard blackboard,
+    public Control(Blackboard<T> blackboard,
                    boolean overwrite,
                    String suffix,
-                   ChecksumVisitor checksumVisitor,
-                   FinderVisitor<Map<String, Node>> nameFinderVisitor,
-                   FinderVisitor<Collection<String>> testFinderVisitor,
+                   ChecksumVisitor<T> checksumVisitor,
+                   FinderVisitor<Map<String, Node>, T> nameFinderVisitor,
+                   FinderVisitor<Collection<String>, T> testFinderVisitor,
                    Predicate<Node> nodesInGraphFilter,
                    DependencyCollector primaryDependencyCollector,
                    Set<EdgeType> affectedEdges) {
@@ -117,28 +118,24 @@ public abstract class Control {
     // Methods
 
     protected void init() {
-        List<KnowledgeSource> knowledgeSources = List.of(
-                new ProjectImporter(blackboard, suffix),
+        List<KnowledgeSource<T>> knowledgeSources = List.of(
+                new ProjectImporter<>(blackboard, suffix),
 
-                new TypeSolverInitializer(blackboard),
+                new TypeSolverInitializer<>(blackboard),
 
-                new Parser(blackboard),
+                new Parser<>(blackboard),
 
-                new CodeChangeAnalyzer(blackboard,
+                new CodeChangeAnalyzer<>(blackboard,
                         nameFinderVisitor,
                         checksumVisitor),
 
-                new TestFinder(blackboard,
+                new TestFinder<>(blackboard,
                         testFinderVisitor),
 
-                new GraphCropper<>(blackboard,
-                        affectedEdges,
-                        nodesInGraphFilter),
-
-                new DependencyAnalyzer(blackboard,
+                new DependencyAnalyzer<>(blackboard,
                         primaryDependencyCollector),
 
-                new GraphCombiner(blackboard),
+                new GraphCombiner<>(blackboard),
 
                 new ProjectExporter<>(blackboard,
                         suffix,
@@ -158,7 +155,7 @@ public abstract class Control {
         while (!blackboard.getState().isTerminalState()) {
 
             // query candidate ready to run
-            KnowledgeSource candidate = blackboard.getKnowledgeSources().stream()
+            KnowledgeSource<T> candidate = blackboard.getKnowledgeSources().stream()
                     .filter(KnowledgeSource::executeCondition)
                     .findFirst().orElse(null);
 

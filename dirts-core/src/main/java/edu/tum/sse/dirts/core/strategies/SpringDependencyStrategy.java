@@ -3,6 +3,7 @@ package edu.tum.sse.dirts.core.strategies;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
@@ -34,12 +35,12 @@ import static java.util.logging.Level.WARNING;
 /**
  * Contains tasks required by the dependency-analyzing extension for CDI
  */
-public class SpringDependencyStrategy implements DependencyStrategy {
+public class SpringDependencyStrategy<T extends BodyDeclaration<?>> implements DependencyStrategy<T> {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private static final TypeReference<HashMap<String, Integer>> typeRefXMLBeans = new TypeReference<>() {};
 
-    private final SpringDependencyCollectorVisitor dependencyCollector;
+    private final SpringDependencyCollectorVisitor<T> dependencyCollector;
     private final SpringBeanDependencyCollector springBeanDependencyCollector;
 
     private Map<String, Integer> checksumsXmlBeansOldRevision;
@@ -54,14 +55,14 @@ public class SpringDependencyStrategy implements DependencyStrategy {
     private final BeanStorage<SpringBean> springBeanBeanStorage = new BeanStorage<>();
 
 
-    public SpringDependencyStrategy(SpringDependencyCollectorVisitor dependencyCollector,
+    public SpringDependencyStrategy(SpringDependencyCollectorVisitor<T> dependencyCollector,
                                     SpringBeanDependencyCollector springBeanDependencyCollector) {
         this.dependencyCollector = dependencyCollector;
         this.springBeanDependencyCollector = springBeanDependencyCollector;
     }
 
     @Override
-    public void doImport(Path tmpPath, Blackboard blackboard, String suffix) {
+    public void doImport(Path tmpPath, Blackboard<T> blackboard, String suffix) {
         Path rootPath = blackboard.getRootPath();
         Path subPath = blackboard.getSubPath();
 
@@ -95,7 +96,7 @@ public class SpringDependencyStrategy implements DependencyStrategy {
 
 
     @Override
-    public void doExport(Path tmpPath, Blackboard blackboard, String suffix) {
+    public void doExport(Path tmpPath, Blackboard<T> blackboard, String suffix) {
         Map<String, Integer> checksumsXMLBeansNewRevision = new HashMap<>(checksumsXmlBeansOldRevision);
         nameMapper.forEach((o, n) -> {
             Integer tmp = checksumsXMLBeansNewRevision.remove(o);
@@ -117,7 +118,7 @@ public class SpringDependencyStrategy implements DependencyStrategy {
     }
 
     @Override
-    public void doChangeAnalysis(Blackboard blackboard) {
+    public void doChangeAnalysis(Blackboard<T> blackboard) {
         CodeChangeAnalyzer.calculateChange(
                 checksumsXmlBeansOldRevision,
                 b -> b.getContent().hashCode(),
@@ -155,7 +156,7 @@ public class SpringDependencyStrategy implements DependencyStrategy {
     }
 
     @Override
-    public void doGraphCropping(Blackboard blackboard) {
+    public void doGraphCropping(Blackboard<T> blackboard) {
         DependencyGraph dependencyGraph = blackboard.getDependencyGraphNewRevision();
 
         // remove removed nodes
@@ -172,7 +173,7 @@ public class SpringDependencyStrategy implements DependencyStrategy {
     }
 
     @Override
-    public void doDependencyAnalysis(Blackboard blackboard) {
+    public void doDependencyAnalysis(Blackboard<T> blackboard) {
         Collection<CompilationUnit> compilationUnits = blackboard.getCompilationUnits();
         DependencyGraph dependencyGraphNewRevision = blackboard.getDependencyGraphNewRevision();
 
@@ -188,7 +189,7 @@ public class SpringDependencyStrategy implements DependencyStrategy {
     }
 
     @Override
-    public void combineGraphs(Blackboard blackboard) {
+    public void combineGraphs(Blackboard<T> blackboard) {
         blackboard.getCombinedGraph().setModificationByStatus(
                 sameBeans.keySet(),
                 differentBeans.keySet(),

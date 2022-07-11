@@ -14,6 +14,7 @@ package edu.tum.sse.dirts.core.control;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.analysis.DependencyCollector;
 import edu.tum.sse.dirts.analysis.def.DefaultNonTypeDependencyCollectorVisitor;
@@ -22,6 +23,7 @@ import edu.tum.sse.dirts.analysis.def.checksum.NonTypeChecksumVisitor;
 import edu.tum.sse.dirts.analysis.def.finders.NonTypeNameFinderVisitor;
 import edu.tum.sse.dirts.analysis.def.finders.NonTypeTestFinderVisitor;
 import edu.tum.sse.dirts.core.Blackboard;
+import edu.tum.sse.dirts.core.knowledgesources.GraphCropper;
 import edu.tum.sse.dirts.core.strategies.CachingDependencyStrategy;
 import edu.tum.sse.dirts.graph.EdgeType;
 
@@ -33,7 +35,7 @@ import static edu.tum.sse.dirts.graph.EdgeType.*;
 /**
  * NonType-level RTS
  */
-public class NonTypeLevelControl extends Control {
+public class NonTypeLevelControl extends Control<BodyDeclaration<?>> {
 
     //##################################################################################################################
     // Static constants
@@ -54,7 +56,7 @@ public class NonTypeLevelControl extends Control {
     //##################################################################################################################
     // Constructors
 
-    public NonTypeLevelControl(Blackboard blackboard, boolean overwrite) {
+    public NonTypeLevelControl(Blackboard<BodyDeclaration<?>> blackboard, boolean overwrite) {
         super(blackboard,
                 overwrite,
                 SUFFIX,
@@ -72,7 +74,12 @@ public class NonTypeLevelControl extends Control {
     @Override
     public void init() {
         super.init();
-        blackboard.addDependencyStrategy(new CachingDependencyStrategy(
+        blackboard.addKnowledgeSource(new GraphCropper<>(blackboard,
+                nameFinderVisitor,
+                affectedEdges,
+                nodesInGraphFilter, true));
+
+        blackboard.addDependencyStrategy(new CachingDependencyStrategy<>(
                 Set.of(new JUnitNonTypeDependencyCollectorVisitor(blackboard.getTestFilter())),
                 Set.of(JUNIT)));
     }
