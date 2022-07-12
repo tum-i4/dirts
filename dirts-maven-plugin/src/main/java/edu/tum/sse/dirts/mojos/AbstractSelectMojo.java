@@ -28,7 +28,7 @@ public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends A
 
     private final static String DIRTS_EXCLUDES_PREFIX = "# DIRTS excluded";
 
-    public void doExecute(Function<String, String> mapper) throws MojoExecutionException {
+    public void doExecute(Function<String, String> mapper) {
         if (getProject().getPackaging().equals("pom")) {
             Log.log(INFO, "There are no tests that could be selected, " +
                     "since this project has packaging \"pom\".");

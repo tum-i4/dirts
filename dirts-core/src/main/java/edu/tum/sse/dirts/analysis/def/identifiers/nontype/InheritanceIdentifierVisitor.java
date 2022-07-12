@@ -12,7 +12,6 @@
  */
 package edu.tum.sse.dirts.analysis.def.identifiers.nontype;
 
-import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;

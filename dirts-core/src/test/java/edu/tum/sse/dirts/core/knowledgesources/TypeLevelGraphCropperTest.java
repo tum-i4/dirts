@@ -5,6 +5,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.analysis.FinderVisitor;
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.BlackboardState;
+import edu.tum.sse.dirts.core.knowledgesources.graph_cropper.TypeLevelGraphCropper;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class GraphCropperTest extends KnowledgeSourceTest {
+public class TypeLevelGraphCropperTest extends KnowledgeSourceTest {
 
     private final BlackboardState resultState = BlackboardState.NEW_GRAPH_SET;
 
@@ -26,7 +27,7 @@ public class GraphCropperTest extends KnowledgeSourceTest {
         FinderVisitor<Map<String, Node>, TypeDeclaration<?>> finderVisitorMock = mock(FinderVisitor.class);
         DependencyGraph dependencyGraph = new DependencyGraph();
 
-        GraphCropper<TypeDeclaration<?>> sut = new GraphCropper<>(blackboardMock, finderVisitorMock, Set.of(), t->true, false);
+        TypeLevelGraphCropper sut = new TypeLevelGraphCropper(blackboardMock, finderVisitorMock, Set.of(), t->true);
 
         /* when */
         when(blackboardMock.getRootPath()).thenReturn(rootPath);

@@ -11,7 +11,6 @@ import edu.tum.sse.dirts.core.BlackboardState;
 import edu.tum.sse.dirts.core.KnowledgeSource;
 import edu.tum.sse.dirts.core.strategies.DependencyStrategy;
 import edu.tum.sse.dirts.graph.DependencyGraph;
-import edu.tum.sse.dirts.util.naming_scheme.Names;
 
 import java.io.IOException;
 import java.nio.file.Files;

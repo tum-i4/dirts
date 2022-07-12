@@ -16,7 +16,6 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.*;
 import edu.tum.sse.dirts.analysis.FinderVisitor;
-import edu.tum.sse.dirts.util.naming_scheme.Names;
 
 import java.util.Map;
 

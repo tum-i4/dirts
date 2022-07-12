@@ -12,7 +12,6 @@
  */
 package edu.tum.sse.dirts.spring.analysis.identifiers;
 
-import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;

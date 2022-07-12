@@ -12,7 +12,6 @@
  */
 package edu.tum.sse.dirts.guice.analysis.identifiers;
 
-import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;

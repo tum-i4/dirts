@@ -13,7 +13,6 @@
 package edu.tum.sse.dirts.analysis;
 
 import com.github.javaparser.ast.body.AnnotationDeclaration;
-import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.EnumDeclaration;
 

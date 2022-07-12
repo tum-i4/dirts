@@ -1,5 +1,6 @@
 package edu.tum.sse.dirts.mojos;
 
+import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
@@ -16,6 +17,7 @@ import edu.tum.sse.dirts.spring.analysis.SpringBeanNonTypeDependencyCollector;
 import edu.tum.sse.dirts.spring.analysis.SpringBeanTypeDependencyCollector;
 import edu.tum.sse.dirts.spring.analysis.SpringNonTypeDependencyCollectorVisitor;
 import edu.tum.sse.dirts.spring.analysis.SpringTypeDependencyCollectorVisitor;
+import edu.tum.sse.dirts.util.JavaParserUtils;
 import edu.tum.sse.dirts.util.Log;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.surefire.SurefirePlugin;
@@ -86,6 +88,7 @@ public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends Su
         Path subPath = basePath.relativize(getSubPath());
 
         Log.setLogLevel(Level.parse(logging));
+        JavaParserUtils.RESTRICTIVE = restrictive;
 
         // Blackboard and Control
         Blackboard<TypeDeclaration<?>> blackboard = new Blackboard<>(basePath, subPath);
@@ -123,6 +126,7 @@ public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends Su
         Path subPath = basePath.relativize(getSubPath());
 
         Log.setLogLevel(Level.parse(logging));
+        JavaParserUtils.RESTRICTIVE = restrictive;
 
         // Blackboard and Control
         Blackboard<BodyDeclaration<?>> blackboard = new Blackboard<>(basePath, subPath);

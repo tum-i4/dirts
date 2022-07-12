@@ -27,7 +27,6 @@ import edu.tum.sse.dirts.util.JavaParserUtils;
 import edu.tum.sse.dirts.util.Log;
 import org.apache.maven.surefire.api.testset.TestFilter;
 
-import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;

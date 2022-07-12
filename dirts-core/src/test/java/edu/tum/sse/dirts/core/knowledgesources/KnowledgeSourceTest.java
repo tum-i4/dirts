@@ -1,6 +1,5 @@
 package edu.tum.sse.dirts.core.knowledgesources;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 public abstract class KnowledgeSourceTest {

@@ -29,8 +29,6 @@ public abstract class DefaultDependencyCollectorVisitor<P extends BodyDeclaratio
 
     @Override
     public void calculateDependencies(Collection<TypeDeclaration<?>> ts, DependencyGraph dependencyGraph) {
-        ts.forEach(t -> {
-            t.accept(this, dependencyGraph);
-        });
+        ts.forEach(t -> t.accept(this, dependencyGraph));
     }
 }

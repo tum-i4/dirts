@@ -22,7 +22,7 @@ import edu.tum.sse.dirts.analysis.def.checksum.TypeChecksumVisitor;
 import edu.tum.sse.dirts.analysis.def.finders.TypeNameFinderVisitor;
 import edu.tum.sse.dirts.analysis.def.finders.TypeTestFinderVisitor;
 import edu.tum.sse.dirts.core.Blackboard;
-import edu.tum.sse.dirts.core.knowledgesources.GraphCropper;
+import edu.tum.sse.dirts.core.knowledgesources.graph_cropper.TypeLevelGraphCropper;
 import edu.tum.sse.dirts.core.strategies.CachingDependencyStrategy;
 import edu.tum.sse.dirts.graph.EdgeType;
 
@@ -37,7 +37,7 @@ import static edu.tum.sse.dirts.graph.EdgeType.*;
 public class TypeLevelControl extends Control<TypeDeclaration<?>> {
 
     //##################################################################################################################
-    // Attributes
+    // Static constants
 
     private static final String SUFFIX = "typeL";
 
@@ -47,7 +47,7 @@ public class TypeLevelControl extends Control<TypeDeclaration<?>> {
     private static final Predicate<Node> TYPES_IN_GRAPH =
             n -> !(n instanceof CompilationUnit);
 
-    private static final DependencyCollector PRIMARY_DEPENDENCY_COLLECTOR =
+    private static final DependencyCollector<TypeDeclaration<?>> PRIMARY_DEPENDENCY_COLLECTOR =
             new DefaultTypeDependencyCollectorVisitor();
     private static final Set<EdgeType> AFFECTED_EDGES =
             Set.of(EXTENDS_IMPLEMENTS, NEW, STATIC, ANNOTATION);
@@ -73,10 +73,10 @@ public class TypeLevelControl extends Control<TypeDeclaration<?>> {
     @Override
     public void init() {
         super.init();
-        blackboard.addKnowledgeSource(new GraphCropper<>(blackboard,
+        blackboard.addKnowledgeSource(new TypeLevelGraphCropper(blackboard,
                 nameFinderVisitor,
                 affectedEdges,
-                nodesInGraphFilter, false));
+                nodesInGraphFilter));
         blackboard.addDependencyStrategy(new CachingDependencyStrategy<>(
                 Set.of(new JUnitTypeDependencyCollectorVisitor(blackboard.getTestFilter())),
                 Set.of(JUNIT)));

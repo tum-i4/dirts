@@ -58,7 +58,7 @@ public class NonTypeChecksumVisitor implements ChecksumVisitor<BodyDeclaration<?
 
     public Integer visit(final EnumDeclaration n, final Void arg) {
         // this purposefully excludes members and entries
-        return /* n.getEntries().accept(this, arg) * 31  + */ n.getImplementedTypes().accept(this, arg) * 31 + /* n.getMembers().accept(this, arg) * 31 */ +n.getModifiers().accept(this, arg) * 31 + n.getName().accept(this, arg) * 31 + n.getAnnotations().accept(this, arg);
+        return /* n.getEntries().accept(this, arg) * 31  + */ n.getImplementedTypes().accept(this, arg) * 31 + /* n.getMembers().accept(this, arg) * 31 + */ n.getModifiers().accept(this, arg) * 31 + n.getName().accept(this, arg) * 31 + n.getAnnotations().accept(this, arg);
     }
 
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

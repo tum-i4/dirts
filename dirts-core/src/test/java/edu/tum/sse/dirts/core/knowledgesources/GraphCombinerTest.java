@@ -1,6 +1,5 @@
 package edu.tum.sse.dirts.core.knowledgesources;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.BlackboardState;
@@ -8,7 +7,6 @@ import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.graph.ModificationGraph;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 
 import java.util.HashMap;
 import java.util.Map;

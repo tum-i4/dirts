@@ -24,7 +24,7 @@ public class DependencyAnalyzerTest extends KnowledgeSourceTest {
     public void testUpdateBlackboard() {
         /* given */
         Blackboard<TypeDeclaration<?>> blackboardMock = mock(Blackboard.class);
-        DependencyCollector dependencyCollectorMock = mock(DependencyCollector.class);
+        DependencyCollector<TypeDeclaration<?>> dependencyCollectorMock = mock(DependencyCollector.class);
         DependencyAnalyzer<TypeDeclaration<?>> sut = new DependencyAnalyzer<>(blackboardMock, dependencyCollectorMock);
 
         TypeDeclaration<?> typeDeclarationMock = mock(TypeDeclaration.class);

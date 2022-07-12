@@ -165,7 +165,7 @@ public class JavaParserUtils {
     }
 
     public enum AnnotationType {
-        MarkerAnnotation, SingleMemberAnnotation, NormalAnnotation;
+        MarkerAnnotation, SingleMemberAnnotation, NormalAnnotation
     }
 
     public static ResolvedType extractClassType(ResolvedReferenceType expressionType, Set<String> allowedTypes) {

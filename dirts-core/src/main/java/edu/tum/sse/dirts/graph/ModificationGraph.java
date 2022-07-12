@@ -192,6 +192,18 @@ public class ModificationGraph extends DependencyGraph {
                 .forEach(e -> e.setValue(e.getValue().stream()
                         .flatMap(p -> reachableNodes(p).stream()).collect(Collectors.toSet())));
 
+        // Add nodes that have outgoing edges with specified type and changed dependencies
+        forwardsEdges.entrySet().stream()
+                .filter(e -> e.getValue().values().stream().flatMap(Collection::stream).anyMatch(edgeType::contains))
+                .map(Map.Entry::getKey)
+                .forEach(start -> {
+                    if (modificationStatus.get(start).isRelevant()) {
+                        String key = start + modificationStatus.get(start);
+                        reachModifiedNode.computeIfAbsent(key, e -> new HashSet<>());
+                        reachModifiedNode.get(key).add(start);
+                    }
+                });
+
         return reachModifiedNode;
     }
 
@@ -202,7 +214,7 @@ public class ModificationGraph extends DependencyGraph {
      * @return reachable nodes
      */
     private Set<String> reachableNodes(String startingPoint) {
-        Queue<String> queue = new LinkedList<String>();
+        Queue<String> queue = new LinkedList<>();
         Set<String> reached = new HashSet<>();
 
         queue.add(startingPoint);

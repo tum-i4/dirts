@@ -38,10 +38,6 @@ public class Blackboard<T extends BodyDeclaration<?>> {
      */
 
     //##################################################################################################################
-    // Phantom Data to allow compiletime checks
-    private T phantom;
-
-    //##################################################################################################################
     // Attributes
 
     private BlackboardState state;

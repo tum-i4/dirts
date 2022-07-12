@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static edu.tum.sse.dirts.core.BlackboardState.*;
+import static edu.tum.sse.dirts.core.BlackboardState.PARSED;
+import static edu.tum.sse.dirts.core.BlackboardState.TESTS_FOUND;
 
 /**
  * Finds tests that are present

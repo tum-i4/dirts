@@ -9,8 +9,6 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import java.lang.reflect.Type;
-
 @Mojo(name = "typeL_graph")
 @Execute(goal = "typeL_graph", phase = LifecyclePhase.INITIALIZE, lifecycle = "dirts")
 public class TypeLevelGraphMojo extends AbstractGraphMojo<TypeDeclaration<?>> {

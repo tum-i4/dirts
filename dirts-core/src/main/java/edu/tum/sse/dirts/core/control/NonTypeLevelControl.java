@@ -23,7 +23,7 @@ import edu.tum.sse.dirts.analysis.def.checksum.NonTypeChecksumVisitor;
 import edu.tum.sse.dirts.analysis.def.finders.NonTypeNameFinderVisitor;
 import edu.tum.sse.dirts.analysis.def.finders.NonTypeTestFinderVisitor;
 import edu.tum.sse.dirts.core.Blackboard;
-import edu.tum.sse.dirts.core.knowledgesources.GraphCropper;
+import edu.tum.sse.dirts.core.knowledgesources.graph_cropper.NonTypeLevelGraphCropper;
 import edu.tum.sse.dirts.core.strategies.CachingDependencyStrategy;
 import edu.tum.sse.dirts.graph.EdgeType;
 
@@ -48,7 +48,7 @@ public class NonTypeLevelControl extends Control<BodyDeclaration<?>> {
     private static final Predicate<Node> NONTYPES_IN_GRAPH =
             n -> !(n instanceof CompilationUnit || n instanceof TypeDeclaration);
 
-    private static final DependencyCollector PRIMARY_DEPENDENCY_COLLECTOR =
+    private static final DependencyCollector<BodyDeclaration<?>> PRIMARY_DEPENDENCY_COLLECTOR =
             new DefaultNonTypeDependencyCollectorVisitor();
     private static final Set<EdgeType> AFFECTED_EDGES =
             Set.of(FIELD_ACCESS, INHERITANCE, DELEGATION, ANNOTATION, JUNIT);
@@ -74,10 +74,10 @@ public class NonTypeLevelControl extends Control<BodyDeclaration<?>> {
     @Override
     public void init() {
         super.init();
-        blackboard.addKnowledgeSource(new GraphCropper<>(blackboard,
+        blackboard.addKnowledgeSource(new NonTypeLevelGraphCropper(blackboard,
                 nameFinderVisitor,
                 affectedEdges,
-                nodesInGraphFilter, true));
+                nodesInGraphFilter));
 
         blackboard.addDependencyStrategy(new CachingDependencyStrategy<>(
                 Set.of(new JUnitNonTypeDependencyCollectorVisitor(blackboard.getTestFilter())),

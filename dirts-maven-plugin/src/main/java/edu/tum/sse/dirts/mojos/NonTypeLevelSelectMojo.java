@@ -4,7 +4,6 @@ import com.github.javaparser.ast.body.BodyDeclaration;
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.core.control.NonTypeLevelControl;
-import edu.tum.sse.dirts.core.control.TypeLevelControl;
 import edu.tum.sse.dirts.util.Log;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;

@@ -1,6 +1,5 @@
 package edu.tum.sse.dirts.analysis.def.finders;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.resolution.declarations.ResolvedClassDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;

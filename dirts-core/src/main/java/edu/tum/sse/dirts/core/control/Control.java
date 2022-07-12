@@ -35,23 +35,14 @@ import static java.util.logging.Level.INFO;
 public abstract class Control<T extends BodyDeclaration<?>> {
 
     //##################################################################################################################
-    // Constants
-
-    public final static boolean DEBUG = false;
-    public final static boolean TIME = true;
-
-    public static boolean PRINT_BEANS = false;
-
-    //##################################################################################################################
     // Attributes
 
-    public static long unitTime;
     protected final boolean overwrite;
 
     /**
      * Central class of the blackboard pattern
      */
-    protected Blackboard<T> blackboard;
+    protected final Blackboard<T> blackboard;
 
     /**
      * Suffix for distinguishing cache directories of different levels of RTS
@@ -61,7 +52,7 @@ public abstract class Control<T extends BodyDeclaration<?>> {
     /**
      * Visitor used to calculate checksums of the most important nodes
      */
-    private final ChecksumVisitor checksumVisitor;
+    private final ChecksumVisitor<T> checksumVisitor;
 
     /**
      * Visitor used to find the names of the most important nodes
@@ -83,7 +74,7 @@ public abstract class Control<T extends BodyDeclaration<?>> {
      * Dependency collector that creates the most important edges
      * (Extensions can be added using DependencyStrategies)
      */
-    private final DependencyCollector primaryDependencyCollector;
+    private final DependencyCollector<T> primaryDependencyCollector;
 
     /**
      * Most important edges
@@ -100,7 +91,7 @@ public abstract class Control<T extends BodyDeclaration<?>> {
                    FinderVisitor<Map<String, Node>, T> nameFinderVisitor,
                    FinderVisitor<Collection<String>, T> testFinderVisitor,
                    Predicate<Node> nodesInGraphFilter,
-                   DependencyCollector primaryDependencyCollector,
+                   DependencyCollector<T> primaryDependencyCollector,
                    Set<EdgeType> affectedEdges) {
         this.blackboard = blackboard;
         this.overwrite = overwrite;
@@ -161,8 +152,7 @@ public abstract class Control<T extends BodyDeclaration<?>> {
 
             if (candidate != null) {
                 // run candidate
-                if (TIME)
-                    unitTime = System.currentTimeMillis();
+                long unitTime = System.currentTimeMillis();
 
                 BlackboardState newState = candidate.updateBlackboard();
                 blackboard.setState(newState);

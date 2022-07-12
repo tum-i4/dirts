@@ -10,7 +10,6 @@ import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.BlackboardState;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static edu.tum.sse.dirts.core.BlackboardState.PARSED;
 import static org.assertj.core.api.Assertions.assertThat;

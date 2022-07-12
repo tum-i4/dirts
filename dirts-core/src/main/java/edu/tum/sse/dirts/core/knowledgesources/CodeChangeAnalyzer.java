@@ -43,7 +43,7 @@ public class CodeChangeAnalyzer<T extends BodyDeclaration<?>> extends KnowledgeS
     private final Blackboard<T> blackboard;
 
 
-    private final ChecksumVisitor checksumVisitor;
+    private final ChecksumVisitor<T> checksumVisitor;
     private final FinderVisitor<Map<String, Node>, T> nameFinderVisitor;
 
 
@@ -52,7 +52,7 @@ public class CodeChangeAnalyzer<T extends BodyDeclaration<?>> extends KnowledgeS
 
     public CodeChangeAnalyzer(Blackboard<T> blackboard,
                               FinderVisitor<Map<String, Node>, T> nameFinderVisitor,
-                              ChecksumVisitor checksumVisitor
+                              ChecksumVisitor<T> checksumVisitor
     ) {
         super(blackboard);
         this.blackboard = blackboard;
@@ -91,7 +91,7 @@ public class CodeChangeAnalyzer<T extends BodyDeclaration<?>> extends KnowledgeS
         blackboard.setChangesNodes(sameCode, differentCode, added, removed);
         blackboard.setNameMapperNodes(nameMapper);
 
-        for (DependencyStrategy dependencyStrategy : blackboard.getDependencyStrategies()) {
+        for (DependencyStrategy<T> dependencyStrategy : blackboard.getDependencyStrategies()) {
             dependencyStrategy.doChangeAnalysis(blackboard);
         }
 

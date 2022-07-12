@@ -12,12 +12,12 @@ public class IgnoreErrorHandler implements ErrorHandler {
     }
 
     @Override
-    public void error(SAXParseException e) throws SAXException {
+    public void error(SAXParseException e) {
 
     }
 
     @Override
-    public void fatalError(SAXParseException e) throws SAXException {
+    public void fatalError(SAXParseException e) {
 
     }
 }

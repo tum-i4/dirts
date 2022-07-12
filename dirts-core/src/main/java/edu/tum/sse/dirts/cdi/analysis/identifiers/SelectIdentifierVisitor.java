@@ -84,7 +84,7 @@ public class SelectIdentifierVisitor extends AbstractIdentifierVisitor<
 
                         //**************************************************************************************************
                         // By type
-                        try {;
+                        try {
                             requestedType = JavaParserUtils.extractClassType(resolvedReferenceType,
                                     Set.of("java.lang.Class", "javax.enterprise.util.TypeLiteral"));
                         } catch (RuntimeException e) {

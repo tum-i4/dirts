@@ -9,18 +9,13 @@ import edu.tum.sse.dirts.core.strategies.DependencyStrategy;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
 import static edu.tum.sse.dirts.core.BlackboardState.DONE;
-import static edu.tum.sse.dirts.core.BlackboardState.IMPORTED;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
 
 public class ProjectExporterTest extends KnowledgeSourceTest {
 

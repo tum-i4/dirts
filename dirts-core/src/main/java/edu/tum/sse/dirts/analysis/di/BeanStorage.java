@@ -154,7 +154,7 @@ public class BeanStorage<T extends Bean> {
     }
 
     public Set<T> getBeansForTypeAndName(ResolvedType type, String name) {
-        Set<T> ret = new HashSet<T>();
+        Set<T> ret = new HashSet<>();
         if (type != null || name != null)
             ret.addAll(allBeans);
         if (type != null)
@@ -165,7 +165,7 @@ public class BeanStorage<T extends Bean> {
     }
 
     public Set<T> getBeansForTypeAndQualifiers(ResolvedType type, Set<String> qualifiers) {
-        Set<T> ret = new HashSet<T>();
+        Set<T> ret = new HashSet<>();
         if (type != null || (qualifiers != null && !qualifiers.isEmpty()))
             ret.addAll(allBeans);
         if (type != null)
@@ -176,7 +176,7 @@ public class BeanStorage<T extends Bean> {
     }
 
     public Set<T> getBeansForNameAndQualifiers(String name, Set<String> qualifiers) {
-        Set<T> ret = new HashSet<T>();
+        Set<T> ret = new HashSet<>();
         if (name != null || (qualifiers != null && !qualifiers.isEmpty()))
             ret.addAll(allBeans);
         if (name != null)
@@ -188,7 +188,7 @@ public class BeanStorage<T extends Bean> {
 
     public Set<T> getBeansForTypeAndNameAndQualifiers(ResolvedType type, String
             name, Set<String> qualifiers) {
-        Set<T> ret = new HashSet<T>();
+        Set<T> ret = new HashSet<>();
         if (type != null || (qualifiers != null && !qualifiers.isEmpty()) || name != null)
             ret.addAll(allBeans);
         if (type != null)
