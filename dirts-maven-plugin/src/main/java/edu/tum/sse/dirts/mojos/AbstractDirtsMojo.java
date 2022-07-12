@@ -52,9 +52,6 @@ public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends Su
     @Parameter(property = "logging", defaultValue = "INFO")
     protected String logging;
 
-    @Parameter(property = "standalone", defaultValue = "false")
-    protected boolean standalone;
-
     @Parameter(property = "restrictive", defaultValue = "false")
     protected boolean restrictive;
 
@@ -66,9 +63,6 @@ public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends Su
 
     @Parameter(property = "useCDIExtension", defaultValue = "false")
     protected boolean useCDIExtension;
-
-    @Parameter(property = "printBeans", defaultValue = "false")
-    protected boolean printBeans;
 
     //##################################################################################################################
     // Abstract mehtods implemented by all subclasses

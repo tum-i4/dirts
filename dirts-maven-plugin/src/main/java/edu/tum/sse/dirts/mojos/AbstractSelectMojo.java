@@ -6,6 +6,7 @@ import edu.tum.sse.dirts.graph.EdgeType;
 import edu.tum.sse.dirts.util.Log;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.surefire.api.testset.TestFilter;
 import org.apache.maven.surefire.api.testset.TestListResolver;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -27,6 +28,9 @@ import static java.util.logging.Level.*;
 public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends AbstractDirtsMojo<P> {
 
     private final static String DIRTS_EXCLUDES_PREFIX = "# DIRTS excluded";
+
+    @Parameter(property = "standalone", defaultValue = "false")
+    protected boolean standalone;
 
     public void doExecute(Function<String, String> mapper) {
         if (getProject().getPackaging().equals("pom")) {
