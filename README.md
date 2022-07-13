@@ -33,7 +33,7 @@ DIRTS is built to be used with Maven Surefire. The simplest way to use DIRTS in 
 <plugin>
     <groupId>edu.tum.sse.dirts</groupId>
     <artifactId>dirts-maven-plugin</artifactId>
-    <version>{$dirts.version}</version>
+    <version>${dirts.version}</version>
     <configuration>
         ...
     </configuration>
