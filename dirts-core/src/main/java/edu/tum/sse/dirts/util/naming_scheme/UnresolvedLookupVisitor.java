@@ -30,9 +30,9 @@ class UnresolvedLookupVisitor extends VoidVisitorWithDefaults<Container<String>>
     //##################################################################################################################
     // Attributes
 
-    private final Map<Node, Integer> unresolvedUniqueNodeMap = Collections.synchronizedMap(new IdentityHashMap<>());
+    private final Map<Node, Integer> unresolvedUniqueNodeMap = new IdentityHashMap<>();
 
-    private final Map<String, Integer> unresolvedOtherNodeMap = Collections.synchronizedMap(new HashMap<>());
+    private final Map<String, Integer> unresolvedOtherNodeMap = new HashMap<>();
 
     //##################################################################################################################
     // Methods

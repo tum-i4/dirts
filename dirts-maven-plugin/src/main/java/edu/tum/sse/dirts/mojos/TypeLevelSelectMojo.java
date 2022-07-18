@@ -20,17 +20,13 @@ public class TypeLevelSelectMojo extends AbstractSelectMojo<TypeDeclaration<?>> 
 
     @Override
     protected Control<TypeDeclaration<?>> getControl() {
-        TestFilter<String, String> testFilter = getTestFilter();
-        if (testFilter != null)
-            Log.log(FINE, "Using test filter: " + testFilter);
-
         Blackboard<TypeDeclaration<?>> typeLevelBlackboard = getTypeLevelBlackboard();
-        typeLevelBlackboard.setTestFilter(testFilter);
+        typeLevelBlackboard.setTestFilter(getTestFilter());
         return new TypeLevelControl(typeLevelBlackboard, true);
     }
 
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    public void execute() {
         doExecute(s -> s);
     }
 }

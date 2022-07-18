@@ -1,6 +1,5 @@
 package edu.tum.sse.dirts.mojos;
 
-import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
@@ -65,7 +64,7 @@ public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends Su
     protected boolean useCDIExtension;
 
     //##################################################################################################################
-    // Abstract mehtods implemented by all subclasses
+    // Abstract methods implemented by all subclasses
 
     protected abstract Control<T> getControl();
 

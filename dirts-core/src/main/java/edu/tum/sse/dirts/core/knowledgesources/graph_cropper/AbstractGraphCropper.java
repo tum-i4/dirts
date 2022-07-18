@@ -5,7 +5,6 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.analysis.FinderVisitor;
-import edu.tum.sse.dirts.analysis.def.finders.TypeFinderVisitor;
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.BlackboardState;
 import edu.tum.sse.dirts.core.KnowledgeSource;
@@ -13,7 +12,10 @@ import edu.tum.sse.dirts.core.strategies.DependencyStrategy;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.graph.EdgeType;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static edu.tum.sse.dirts.core.BlackboardState.NEW_GRAPH_SET;
@@ -71,7 +73,7 @@ public abstract class AbstractGraphCropper<T extends BodyDeclaration<?>> extends
         nameMapperNodes.forEach(dependencyGraph::renameNode);
 
 
-        Set<CompilationUnit> impactedCompilationUnits = calculateImpactedCompilationUnits(
+        Collection<TypeDeclaration<?>> impactedTypes = calculateImpactedTypeDeclarations(
                 dependencyGraph,
                 nameMapperNodes,
                 compilationUnits,
@@ -83,15 +85,12 @@ public abstract class AbstractGraphCropper<T extends BodyDeclaration<?>> extends
 
         // remove all edges from nodes resulting from these compilationUnits, those will be recalculated
         Map<String, Node> nodeMap = new HashMap<>();
-        impactedCompilationUnits.forEach(cu -> cu.accept(finderVisitor, nodeMap));
+        impactedTypes.forEach(cu -> cu.accept(finderVisitor, nodeMap));
         nodesRemoved.forEach((removed, node) -> nodeMap.put(removed, null));
         nodeMap.keySet().forEach(from -> dependencyGraph.removeAllEdgesFrom(from, affectedEdges));
 
-        List<TypeDeclaration<?>> typeDeclarations = new ArrayList<>();
-        TypeFinderVisitor typeFinderVisitor = new TypeFinderVisitor();
-        impactedCompilationUnits.forEach(cu -> cu.accept(typeFinderVisitor, typeDeclarations));
 
-        blackboard.setImpactedTypes(typeDeclarations);
+        blackboard.setImpactedTypes(impactedTypes);
 
         for (DependencyStrategy<T> dependencyStrategy : blackboard.getDependencyStrategies()) {
             dependencyStrategy.doGraphCropping(blackboard);
@@ -100,7 +99,7 @@ public abstract class AbstractGraphCropper<T extends BodyDeclaration<?>> extends
         return NEW_GRAPH_SET;
     }
 
-    protected abstract Set<CompilationUnit> calculateImpactedCompilationUnits(DependencyGraph dependencyGraph,
+    protected abstract Collection<TypeDeclaration<?>> calculateImpactedTypeDeclarations(DependencyGraph dependencyGraph,
                                                                               Map<String, String> nameMapperNodes,
                                                                               Collection<CompilationUnit> compilationUnits,
                                                                               Map<String, Node> nodesAdded,

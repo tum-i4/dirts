@@ -2,6 +2,7 @@ package edu.tum.sse.dirts.core.knowledgesources;
 
 import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.analysis.DependencyCollector;
+import edu.tum.sse.dirts.analysis.def.DefaultDependencyCollectorVisitor;
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.BlackboardState;
 import edu.tum.sse.dirts.core.strategies.DependencyStrategy;
@@ -24,7 +25,7 @@ public class DependencyAnalyzerTest extends KnowledgeSourceTest {
     public void testUpdateBlackboard() {
         /* given */
         Blackboard<TypeDeclaration<?>> blackboardMock = mock(Blackboard.class);
-        DependencyCollector<TypeDeclaration<?>> dependencyCollectorMock = mock(DependencyCollector.class);
+        DefaultDependencyCollectorVisitor<TypeDeclaration<?>> dependencyCollectorMock = mock(DefaultDependencyCollectorVisitor.class);
         DependencyAnalyzer<TypeDeclaration<?>> sut = new DependencyAnalyzer<>(blackboardMock, dependencyCollectorMock);
 
         TypeDeclaration<?> typeDeclarationMock = mock(TypeDeclaration.class);

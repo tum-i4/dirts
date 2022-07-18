@@ -5,8 +5,6 @@ import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.core.control.NonTypeLevelControl;
 import edu.tum.sse.dirts.util.Log;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -34,17 +32,13 @@ public class NonTypeLevelSelectMojo extends AbstractSelectMojo<BodyDeclaration<?
 
     @Override
     protected Control<BodyDeclaration<?>> getControl() {
-        TestFilter<String, String> testFilter = getTestFilter();
-        if (testFilter != null)
-            Log.log(FINE, "Using test filter: " + testFilter);
-
         Blackboard<BodyDeclaration<?>> nontypeLevelBlackboard = getNonTypeLevelBlackboard();
-        nontypeLevelBlackboard.setTestFilter(testFilter);
+        nontypeLevelBlackboard.setTestFilter( getTestFilter());
         return new NonTypeLevelControl(nontypeLevelBlackboard, true);
     }
 
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    public void execute() {
         doExecute(toContainingClass);
     }
 }

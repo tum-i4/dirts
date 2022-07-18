@@ -16,6 +16,7 @@ import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.analysis.AbstractTruncatedVisitor;
 import edu.tum.sse.dirts.analysis.DependencyCollector;
+import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 
 import java.util.Collection;
@@ -31,4 +32,6 @@ public abstract class DefaultDependencyCollectorVisitor<P extends BodyDeclaratio
     public void calculateDependencies(Collection<TypeDeclaration<?>> ts, DependencyGraph dependencyGraph) {
         ts.forEach(t -> t.accept(this, dependencyGraph));
     }
+
+    public void init(Blackboard<?> blackboard) {}
 }

@@ -5,6 +5,7 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import edu.tum.sse.dirts.analysis.FinderVisitor;
+import edu.tum.sse.dirts.analysis.def.finders.TypeFinderVisitor;
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.graph.EdgeType;
@@ -31,7 +32,7 @@ public class TypeLevelGraphCropper extends AbstractGraphCropper<TypeDeclaration<
     }
 
     @Override
-    public Set<CompilationUnit> calculateImpactedCompilationUnits(
+    public Collection<TypeDeclaration<?>> calculateImpactedTypeDeclarations(
             DependencyGraph dependencyGraph,
             Map<String, String> nameMapperNodes,
             Collection<CompilationUnit> compilationUnits,
@@ -87,7 +88,11 @@ public class TypeLevelGraphCropper extends AbstractGraphCropper<TypeDeclaration<
                         .isPresent())
                 .collect(Collectors.toSet()));
 
-        return impactedCompilationUnits;
+        List<TypeDeclaration<?>> typeDeclarations = new ArrayList<>();
+        TypeFinderVisitor typeFinderVisitor = new TypeFinderVisitor();
+        impactedCompilationUnits.forEach(cu -> cu.accept(typeFinderVisitor, typeDeclarations));
+
+        return typeDeclarations;
     }
 
     @Override

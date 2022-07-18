@@ -16,6 +16,7 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import edu.tum.sse.dirts.analysis.DependencyCollector;
 import edu.tum.sse.dirts.analysis.FinderVisitor;
+import edu.tum.sse.dirts.analysis.def.DefaultDependencyCollectorVisitor;
 import edu.tum.sse.dirts.analysis.def.checksum.ChecksumVisitor;
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.BlackboardState;
@@ -74,7 +75,7 @@ public abstract class Control<T extends BodyDeclaration<?>> {
      * Dependency collector that creates the most important edges
      * (Extensions can be added using DependencyStrategies)
      */
-    private final DependencyCollector<T> primaryDependencyCollector;
+    private final DefaultDependencyCollectorVisitor<T> primaryDependencyCollector;
 
     /**
      * Most important edges
@@ -91,7 +92,7 @@ public abstract class Control<T extends BodyDeclaration<?>> {
                    FinderVisitor<Map<String, Node>, T> nameFinderVisitor,
                    FinderVisitor<Collection<String>, T> testFinderVisitor,
                    Predicate<Node> nodesInGraphFilter,
-                   DependencyCollector<T> primaryDependencyCollector,
+                   DefaultDependencyCollectorVisitor<T> primaryDependencyCollector,
                    Set<EdgeType> affectedEdges) {
         this.blackboard = blackboard;
         this.overwrite = overwrite;

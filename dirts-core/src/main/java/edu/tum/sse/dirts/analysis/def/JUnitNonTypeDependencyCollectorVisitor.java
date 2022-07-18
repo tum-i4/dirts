@@ -114,12 +114,14 @@ public class JUnitNonTypeDependencyCollectorVisitor
                     ResolvedReferenceTypeDeclaration resolvedAncestorTypeDeclaration = maybeTypeDeclaration.get();
                     if (resolvedAncestorTypeDeclaration.isClass()) {
                         ResolvedClassDeclaration resolvedClassDeclaration = resolvedAncestorTypeDeclaration.asClass();
-                        for (ResolvedMethodDeclaration declaredMethod : resolvedClassDeclaration.getDeclaredMethods()) {
-                            if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration), declaredMethod.getName())) {
-                                // If the class extends a test class, we have to add an edge to inherited test methods
-                                String fromNode = Names.lookup(resolvedReferenceTypeDeclaration) + "." + declaredMethod.getSignature();
-                                String toNode = Names.lookup(declaredMethod);
-                                dependencyGraph.addEdge(fromNode, toNode, EdgeType.INHERITANCE);
+                        if (!resolvedClassDeclaration.isJavaLangObject()) {
+                            for (ResolvedMethodDeclaration declaredMethod : resolvedClassDeclaration.getDeclaredMethods()) {
+                                if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration), declaredMethod.getName())) {
+                                    // If the class extends a test class, we have to add an edge to inherited test methods
+                                    String fromNode = Names.lookup(resolvedReferenceTypeDeclaration) + "." + declaredMethod.getSignature();
+                                    String toNode = Names.lookup(declaredMethod);
+                                    dependencyGraph.addEdge(fromNode, toNode, EdgeType.INHERITANCE);
+                                }
                             }
                         }
                     }

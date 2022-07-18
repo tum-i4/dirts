@@ -43,19 +43,19 @@ public class NonTypeNameFinderVisitor extends FinderVisitor<Map<String, Node>, B
     @Override
     public void visit(ClassOrInterfaceDeclaration n, Map<String, Node> arg) {
         super.visit(n, arg);
-        arg.put(lookup(n).getFirst(), n);
+        //arg.put(lookup(n).getFirst(), n);
     }
 
     @Override
     public void visit(EnumDeclaration n, Map<String, Node> arg) {
         super.visit(n, arg);
-        arg.put(lookup(n).getFirst(), n);
+        //arg.put(lookup(n).getFirst(), n);
     }
 
     @Override
     public void visit(AnnotationDeclaration n, Map<String, Node> arg) {
         super.visit(n, arg);
-        arg.put(lookup(n).getFirst(), n);
+        //arg.put(lookup(n).getFirst(), n);
     }
 
     //******************************************************************************************************************

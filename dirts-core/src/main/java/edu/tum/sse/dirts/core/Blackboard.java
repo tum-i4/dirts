@@ -17,13 +17,20 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
+import edu.tum.sse.dirts.analysis.def.identifiers.nontype.InheritanceIdentifierVisitor;
 import edu.tum.sse.dirts.core.strategies.DependencyStrategy;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.graph.ModificationGraph;
+import edu.tum.sse.dirts.util.Log;
+import edu.tum.sse.dirts.util.naming_scheme.Names;
+import edu.tum.sse.dirts.util.tuples.Pair;
 import org.apache.maven.surefire.api.testset.TestFilter;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.logging.Level.*;
 
 /**
  * Used to store all available knowledge
@@ -74,8 +81,10 @@ public class Blackboard<T extends BodyDeclaration<?>> {
     private DependencyGraph graphOldRevision;
     private DependencyGraph graphNewRevision;
 
-
     private ModificationGraph modificationGraph;
+
+    // Only used by nontypeL
+    private Map<TypeDeclaration<?>, InheritanceIdentifierVisitor> inheritanceIdentifierVisitorMap;
 
     //##################################################################################################################
     // Constructors
@@ -129,30 +138,47 @@ public class Blackboard<T extends BodyDeclaration<?>> {
 
     // _________________________________________________________________________________________________________________
 
+    public void setTestFilter(TestFilter<String, String> testFilter) {
+        if (testFilter != null)
+            Log.log(FINE, "Using test filter: " + testFilter + "\n");
+
+        this.testFilter = testFilter;
+    }
+
     public TestFilter<String, String> getTestFilter() {
         return testFilter;
     }
 
-    public void setTestFilter(TestFilter<String, String> testFilter) {
-        this.testFilter = testFilter;
-    }
-
     // _________________________________________________________________________________________________________________
+
+    public void setChecksumsNodes(Map<String, Integer> checksumsNodes) {
+        if (checksumsNodes != null)
+            Log.log(FINEST, "Checksums:\n" +
+                    checksumsNodes.entrySet().stream()
+                            .map(e -> e.getKey() + ": " + e.getValue())
+                            .collect(Collectors.joining("\n")) +
+                    "\n");
+
+        this.checksumsNodes = checksumsNodes;
+    }
 
     public Map<String, Integer> getChecksumsNodes() {
         return Collections.unmodifiableMap(checksumsNodes);
     }
 
-    public void setChecksumsNodes(Map<String, Integer> checksumsNodes) {
-        this.checksumsNodes = checksumsNodes;
+    public void setCompilationUnitMapping(Map<String, String> compilationUnitMapping) {
+        if (compilationUnitMapping != null)
+            Log.log(ALL, "Mapping of Nodes to CompilationUnits:\n" +
+                    compilationUnitMapping.entrySet().stream()
+                            .map(e -> e.getKey() + " -> " + e.getValue())
+                            .collect(Collectors.joining("\n")) +
+                    "\n");
+
+        this.compilationUnitMapping = compilationUnitMapping;
     }
 
     public Map<String, String> getCompilationUnitMapping() {
         return Collections.unmodifiableMap(compilationUnitMapping);
-    }
-
-    public void setCompilationUnitMapping(Map<String, String> compilationUnitMapping) {
-        this.compilationUnitMapping = compilationUnitMapping;
     }
 
     // _________________________________________________________________________________________________________________
@@ -168,6 +194,15 @@ public class Blackboard<T extends BodyDeclaration<?>> {
     // _________________________________________________________________________________________________________________
 
     public void setCompilationUnits(Collection<CompilationUnit> compilationUnits) {
+        if (compilationUnits != null)
+            Log.log(ALL, "CompilationUnits in new Revision:\n" +
+                    compilationUnits.stream()
+                            .map(CompilationUnit::getPrimaryTypeName)
+                            .filter(Optional::isPresent)
+                            .map(Optional::get)
+                            .collect(Collectors.joining("\n")) +
+                    "\n");
+
         this.compilationUnits = compilationUnits;
     }
 
@@ -181,10 +216,22 @@ public class Blackboard<T extends BodyDeclaration<?>> {
                                 Map<String, Node> nodesDifferent,
                                 Map<String, Node> nodesAdded,
                                 Map<String, Integer> nodesRemoved) {
+        if (nodesSame != null && nodesDifferent != null && nodesRemoved != null) {
+            Log.log(FINEST, "Nodes that have not been modified:\n" +
+                    String.join("\n", nodesSame.keySet()));
+            Log.log(FINE, "Nodes that have been modified:\n" +
+                    String.join("\n", nodesDifferent.keySet()));
+            Log.log(FINE, "Nodes that have been added:\n" +
+                    String.join("\n", nodesAdded.keySet()));
+            Log.log(FINE, "Nodes that have been removed:\n" +
+                    String.join("\n", nodesRemoved.keySet()));
+        }
+
         this.nodesSame = nodesSame;
         this.nodesDifferent = nodesDifferent;
         this.nodesAdded = nodesAdded;
         this.nodesRemoved = nodesRemoved;
+
         this.allNodes = new HashMap<>();
         allNodes.putAll(nodesSame);
         allNodes.putAll(nodesAdded);
@@ -213,17 +260,26 @@ public class Blackboard<T extends BodyDeclaration<?>> {
 
     // _________________________________________________________________________________________________________________
 
-    public Map<String, String> getNameMapperNodes() {
-        return Collections.unmodifiableMap(nameMapperNodes);
+    public void setNameMapperNodes(Map<String, String> nameMapperNodes) {
+        if (nameMapperNodes != null)
+            Log.log(FINEST, "Identified mappings:\n" +
+                    nameMapperNodes.entrySet().stream()
+                            .map(e -> e.getKey() + "->" + e.getValue())
+                            .collect(Collectors.joining("\n")));
+
+        this.nameMapperNodes = nameMapperNodes;
     }
 
-    public void setNameMapperNodes(Map<String, String> nameMapperNodes) {
-        this.nameMapperNodes = nameMapperNodes;
+    public Map<String, String> getNameMapperNodes() {
+        return Collections.unmodifiableMap(nameMapperNodes);
     }
 
     // _________________________________________________________________________________________________________________
 
     public void setTests(Collection<String> tests) {
+        if (nameMapperNodes != null)
+            Log.log(FINE, "Identified tests:\n" + String.join("\n", tests));
+
         this.tests = tests;
     }
 
@@ -233,40 +289,58 @@ public class Blackboard<T extends BodyDeclaration<?>> {
 
     // _________________________________________________________________________________________________________________
 
+    public void setImpactedTypes(Collection<TypeDeclaration<?>> impactedTypes) {
+        Log.log(INFO, "Recalculating primary dependencies of:\n" +
+                impactedTypes.stream()
+                        .map(Names::lookup)
+                        .map(Pair::getFirst)
+                        .collect(Collectors.joining("\n")) +
+                "\n");
+
+        this.impactedTypes = impactedTypes;
+    }
+
     public Collection<TypeDeclaration<?>> getImpactedTypes() {
         return impactedTypes;
     }
 
-    public void setImpactedTypes(Collection<TypeDeclaration<?>> impactedTypes) {
-        this.impactedTypes = impactedTypes;
-    }
-
     // _________________________________________________________________________________________________________________
-
-    public DependencyGraph getDependencyGraphOldRevision() {
-        return this.graphOldRevision;
-    }
 
     public void setGraphOldRevision(DependencyGraph graphOldRevision) {
         this.graphOldRevision = graphOldRevision;
     }
 
-    public DependencyGraph getDependencyGraphNewRevision() {
-        return this.graphNewRevision;
+    public DependencyGraph getDependencyGraphOldRevision() {
+        return this.graphOldRevision;
     }
 
     public void setGraphNewRevision(DependencyGraph graphNewRevision) {
         this.graphNewRevision = graphNewRevision;
     }
 
-    // _________________________________________________________________________________________________________________
-
-    public ModificationGraph getCombinedGraph() {
-        return modificationGraph;
+    public DependencyGraph getDependencyGraphNewRevision() {
+        return this.graphNewRevision;
     }
+
+    // _________________________________________________________________________________________________________________
 
     public void setCombinedGraph(ModificationGraph modificationGraph) {
         this.modificationGraph = modificationGraph;
     }
 
+    public ModificationGraph getCombinedGraph() {
+        return modificationGraph;
+    }
+
+    // _________________________________________________________________________________________________________________
+
+
+    public void setInheritanceIdentifierVisitorMap(
+            Map<TypeDeclaration<?>, InheritanceIdentifierVisitor> inheritanceIdentifierVisitorMap) {
+        this.inheritanceIdentifierVisitorMap = inheritanceIdentifierVisitorMap;
+    }
+
+    public Map<TypeDeclaration<?>, InheritanceIdentifierVisitor> getInheritanceIdentifierVisitorMap() {
+        return inheritanceIdentifierVisitorMap;
+    }
 }

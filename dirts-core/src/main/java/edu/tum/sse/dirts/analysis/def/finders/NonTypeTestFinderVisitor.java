@@ -71,10 +71,12 @@ public class NonTypeTestFinderVisitor extends FinderVisitor<Collection<String>, 
                     ResolvedReferenceTypeDeclaration resolvedAncestorTypeDeclaration = maybeTypeDeclaration.get();
                     if (resolvedAncestorTypeDeclaration.isClass()) {
                         ResolvedClassDeclaration resolvedClassDeclaration = resolvedAncestorTypeDeclaration.asClass();
-                        for (ResolvedMethodDeclaration declaredMethod : resolvedClassDeclaration.getDeclaredMethods()) {
-                            if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration), declaredMethod.getName()))
-                                // Consider this method as a test
-                                arg.add(lookup(resolvedReferenceTypeDeclaration) + "." + declaredMethod.getSignature());
+                        if (!resolvedClassDeclaration.isJavaLangObject()) {
+                            for (ResolvedMethodDeclaration declaredMethod : resolvedClassDeclaration.getDeclaredMethods()) {
+                                if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration), declaredMethod.getName()))
+                                    // Consider this method as a test
+                                    arg.add(lookup(resolvedReferenceTypeDeclaration) + "." + declaredMethod.getSignature());
+                            }
                         }
                     }
                 }

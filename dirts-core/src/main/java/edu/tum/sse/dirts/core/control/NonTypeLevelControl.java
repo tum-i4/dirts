@@ -17,6 +17,7 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.analysis.DependencyCollector;
+import edu.tum.sse.dirts.analysis.def.DefaultDependencyCollectorVisitor;
 import edu.tum.sse.dirts.analysis.def.DefaultNonTypeDependencyCollectorVisitor;
 import edu.tum.sse.dirts.analysis.def.JUnitNonTypeDependencyCollectorVisitor;
 import edu.tum.sse.dirts.analysis.def.checksum.NonTypeChecksumVisitor;
@@ -48,7 +49,7 @@ public class NonTypeLevelControl extends Control<BodyDeclaration<?>> {
     private static final Predicate<Node> NONTYPES_IN_GRAPH =
             n -> !(n instanceof CompilationUnit || n instanceof TypeDeclaration);
 
-    private static final DependencyCollector<BodyDeclaration<?>> PRIMARY_DEPENDENCY_COLLECTOR =
+    private static final DefaultNonTypeDependencyCollectorVisitor PRIMARY_DEPENDENCY_COLLECTOR =
             new DefaultNonTypeDependencyCollectorVisitor();
     private static final Set<EdgeType> AFFECTED_EDGES =
             Set.of(FIELD_ACCESS, INHERITANCE, DELEGATION, ANNOTATION, JUNIT);

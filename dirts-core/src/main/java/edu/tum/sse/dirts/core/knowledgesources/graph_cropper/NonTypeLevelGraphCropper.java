@@ -3,8 +3,11 @@ package edu.tum.sse.dirts.core.knowledgesources.graph_cropper;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.BodyDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import edu.tum.sse.dirts.analysis.FinderVisitor;
+import edu.tum.sse.dirts.analysis.def.finders.TypeFinderVisitor;
+import edu.tum.sse.dirts.analysis.def.identifiers.nontype.InheritanceIdentifierVisitor;
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.graph.EdgeType;
@@ -15,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static edu.tum.sse.dirts.core.BlackboardState.NODES_CHANGES_SET;
+import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 
 /**
  * Prepares the graph before analyzing dependencies
@@ -33,7 +37,7 @@ public class NonTypeLevelGraphCropper extends AbstractGraphCropper<BodyDeclarati
     }
 
     @Override
-    public Set<CompilationUnit> calculateImpactedCompilationUnits(
+    public Collection<TypeDeclaration<?>> calculateImpactedTypeDeclarations(
             DependencyGraph dependencyGraph,
             Map<String, String> nameMapperNodes,
             Collection<CompilationUnit> compilationUnits,
@@ -120,7 +124,36 @@ public class NonTypeLevelGraphCropper extends AbstractGraphCropper<BodyDeclarati
                     .collect(Collectors.toSet()));
         }
 
-        return impactedCompilationUnits;
+        List<TypeDeclaration<?>> typeDeclarations = new ArrayList<>();
+        TypeFinderVisitor typeFinderVisitor = new TypeFinderVisitor();
+        impactedCompilationUnits.forEach(cu -> cu.accept(typeFinderVisitor, typeDeclarations));
+
+        Map<TypeDeclaration<?>, InheritanceIdentifierVisitor> inheritanceIdentifierVisitorMap = new HashMap<>();
+        Set<CompilationUnit> impactedCompilationUnits2 = typeDeclarations.stream()
+                .flatMap(t -> {
+                    InheritanceIdentifierVisitor inheritanceIdentifierVisitor = new InheritanceIdentifierVisitor(t);
+                    inheritanceIdentifierVisitorMap.put(t, inheritanceIdentifierVisitor);
+
+                    // find all methods that could possibly be overridden
+                    return inheritanceIdentifierVisitor.getInheritedMethods().values().stream();
+                })
+                .flatMap(Set::stream)
+                // find all nodes that delegate to potentially overridden methods
+                .flatMap(m -> dependencyGraph.removeAllEdgesTo(lookup(m), Set.of(EdgeType.DELEGATION)).stream()
+                        .map(allNodes::get)
+                        .filter(Objects::nonNull))
+                .map(Node::findCompilationUnit)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(cu -> !impactedCompilationUnits.contains(cu))
+                .collect(Collectors.toSet());
+
+        impactedCompilationUnits2.forEach(cu -> cu.accept(typeFinderVisitor, typeDeclarations));
+
+
+        blackboard.setInheritanceIdentifierVisitorMap(inheritanceIdentifierVisitorMap);
+
+        return typeDeclarations;
     }
 
     @Override

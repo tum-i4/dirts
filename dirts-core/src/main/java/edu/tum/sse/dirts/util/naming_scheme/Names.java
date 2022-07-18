@@ -38,7 +38,7 @@ public class Names {
     public static boolean DEBUG_INFO = false;
 
     private static final Map<ResolvedValueDeclaration, Integer> unknownValueDeclarations =
-            Collections.synchronizedMap(new IdentityHashMap<>());
+            new IdentityHashMap<>();
 
     private static final UnresolvedLookupVisitor UNRESOLVED_LOOKUP_VISITOR;
     private static final ResolvingLookupVisitor RESOLVING_LOOKUP_VISITOR;

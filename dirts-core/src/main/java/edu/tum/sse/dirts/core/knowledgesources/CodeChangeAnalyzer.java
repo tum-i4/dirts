@@ -41,8 +41,6 @@ public class CodeChangeAnalyzer<T extends BodyDeclaration<?>> extends KnowledgeS
     // Attributes
 
     private final Blackboard<T> blackboard;
-
-
     private final ChecksumVisitor<T> checksumVisitor;
     private final FinderVisitor<Map<String, Node>, T> nameFinderVisitor;
 

@@ -15,6 +15,9 @@ package edu.tum.sse.dirts.core.knowledgesources;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.analysis.DependencyCollector;
+import edu.tum.sse.dirts.analysis.NonTypeDependencyCollector;
+import edu.tum.sse.dirts.analysis.def.DefaultDependencyCollectorVisitor;
+import edu.tum.sse.dirts.analysis.def.DefaultNonTypeDependencyCollectorVisitor;
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.BlackboardState;
 import edu.tum.sse.dirts.core.KnowledgeSource;
@@ -34,12 +37,12 @@ import static java.util.logging.Level.INFO;
  */
 public class DependencyAnalyzer<T extends BodyDeclaration<?>> extends KnowledgeSource<T> {
 
-    private final DependencyCollector<T> primaryDependencyCollector;
+    private final DefaultDependencyCollectorVisitor<T> primaryDependencyCollector;
 
     //##################################################################################################################
     // Constructors
 
-    public DependencyAnalyzer(Blackboard<T> blackboard, DependencyCollector<T> primaryDependencyCollector) {
+    public DependencyAnalyzer(Blackboard<T> blackboard, DefaultDependencyCollectorVisitor<T> primaryDependencyCollector) {
         super(blackboard);
         this.primaryDependencyCollector = primaryDependencyCollector;
     }
@@ -51,12 +54,10 @@ public class DependencyAnalyzer<T extends BodyDeclaration<?>> extends KnowledgeS
     public BlackboardState updateBlackboard() {
         Collection<TypeDeclaration<?>> impactedTypes = blackboard.getImpactedTypes();
 
+        primaryDependencyCollector.init(blackboard);
         primaryDependencyCollector.calculateDependencies(
                 impactedTypes,
                 blackboard.getDependencyGraphNewRevision());
-
-        Log.log(INFO, "Recalculated primary dependencies of "
-                + impactedTypes.stream().map(Names::lookup).map(Pair::getFirst).collect(Collectors.toList()));
 
         for (DependencyStrategy<T> dependencyStrategy : blackboard.getDependencyStrategies()) {
             dependencyStrategy.doDependencyAnalysis(blackboard);

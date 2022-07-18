@@ -16,6 +16,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import edu.tum.sse.dirts.analysis.DependencyCollector;
+import edu.tum.sse.dirts.analysis.def.DefaultDependencyCollectorVisitor;
 import edu.tum.sse.dirts.analysis.def.DefaultTypeDependencyCollectorVisitor;
 import edu.tum.sse.dirts.analysis.def.JUnitTypeDependencyCollectorVisitor;
 import edu.tum.sse.dirts.analysis.def.checksum.TypeChecksumVisitor;
@@ -47,7 +48,7 @@ public class TypeLevelControl extends Control<TypeDeclaration<?>> {
     private static final Predicate<Node> TYPES_IN_GRAPH =
             n -> !(n instanceof CompilationUnit);
 
-    private static final DependencyCollector<TypeDeclaration<?>> PRIMARY_DEPENDENCY_COLLECTOR =
+    private static final DefaultTypeDependencyCollectorVisitor PRIMARY_DEPENDENCY_COLLECTOR =
             new DefaultTypeDependencyCollectorVisitor();
     private static final Set<EdgeType> AFFECTED_EDGES =
             Set.of(EXTENDS_IMPLEMENTS, NEW, STATIC, ANNOTATION);

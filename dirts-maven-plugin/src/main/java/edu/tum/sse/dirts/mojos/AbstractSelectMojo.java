@@ -32,6 +32,9 @@ public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends A
     @Parameter(property = "standalone", defaultValue = "false")
     protected boolean standalone;
 
+    @Parameter(property = "overrideExtension", defaultValue = "false")
+    protected boolean overrideExtension;
+
     public void doExecute(Function<String, String> mapper) {
         if (getProject().getPackaging().equals("pom")) {
             Log.log(INFO, "There are no tests that could be selected, " +
@@ -46,6 +49,12 @@ public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends A
 
         if (standalone) {
             Log.log(INFO, "Running in standalone mode");
+        } else {
+            Log.log(WARNING, "Running in non-standalone mode");
+            if (!overrideExtension) {
+                Log.log(WARNING, "We expect that another RTS-tool has already excluded some tests in the excludesFile. " +
+                        "Every test that has not been excluded this way is considered as included by this other tool and will not be excluded.");
+            }
         }
 
         Control<P> control = getControl();
@@ -84,7 +93,7 @@ public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends A
      */
     protected TestFilter<String, String> getTestFilter() {
         setSurefireParameters();
-        if (!standalone)
+        if (standalone)
             setExcludesFile();
 
         TestListResolver result = null;
@@ -104,7 +113,7 @@ public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends A
             e.printStackTrace();
         }
 
-        if (standalone)
+        if (!standalone)
             setExcludesFile();
         return result;
     }
@@ -206,7 +215,7 @@ public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends A
                 String excludesFileContent = Files.readString(excludesFilePath);
                 StringBuilder newExcludesFileContent = new StringBuilder();
 
-                if (standalone) {
+                if (!standalone && !overrideExtension) {
                     // only change the excluded tests already present
                     String[] lines = excludesFileContent.split("\n");
                     for (String line : lines) {

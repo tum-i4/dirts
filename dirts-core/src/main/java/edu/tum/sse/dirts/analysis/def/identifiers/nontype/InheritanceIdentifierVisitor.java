@@ -79,15 +79,15 @@ public class InheritanceIdentifierVisitor extends AbstractIdentifierVisitor<
             ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration = typeDeclaration.resolve();
             resolvedReferenceTypeDeclaration.getAllAncestors(JavaParserUtils.depthFirstFuncAcceptIncompleteList)
                     .stream()
-                    .filter(m -> !m.getQualifiedName().equals("java.lang.Object"))
+                    .filter(t -> !t.isJavaLangObject())
                     .flatMap(resolvedReferenceType -> resolvedReferenceType.getAllMethodsVisibleToInheritors().stream())
+                    .filter(m -> !m.declaringType().isJavaLangObject())
                     .forEach(m -> {
                         try {
                             String signature = m.getSignature();
                             if (!inheritedMethods.containsKey(signature))
                                 inheritedMethods.put(signature, new HashSet<>());
                             Set<ResolvedMethodDeclaration> resolvedMethodLikeDeclarations =
-
                                     inheritedMethods.get(signature);
                             resolvedMethodLikeDeclarations.add(m);
                         } catch (UnsolvedSymbolException ignored) {

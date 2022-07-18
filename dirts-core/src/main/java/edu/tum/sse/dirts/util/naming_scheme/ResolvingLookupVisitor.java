@@ -35,9 +35,9 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
     //##################################################################################################################
     // Attributes
 
-    private final Map<FieldDeclaration, Integer> fieldDeclarationMap = Collections.synchronizedMap(new IdentityHashMap<>());
+    private final Map<FieldDeclaration, Integer> fieldDeclarationMap = new IdentityHashMap<>();
 
-    private final Map<InitializerDeclaration, Integer> initializerDeclarationMap = Collections.synchronizedMap(new IdentityHashMap<>());
+    private final Map<InitializerDeclaration, Integer> initializerDeclarationMap = new IdentityHashMap<>();
 
     private final UnresolvedLookupVisitor unresolvedLookupVisitor;
 

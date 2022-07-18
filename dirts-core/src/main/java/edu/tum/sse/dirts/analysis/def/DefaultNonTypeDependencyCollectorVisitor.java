@@ -21,12 +21,14 @@ import edu.tum.sse.dirts.analysis.def.identifiers.AnnotationIdentifierVisitor;
 import edu.tum.sse.dirts.analysis.def.identifiers.nontype.DelegationIdentifierVisitor;
 import edu.tum.sse.dirts.analysis.def.identifiers.nontype.FieldAccessIdentifierVisitor;
 import edu.tum.sse.dirts.analysis.def.identifiers.nontype.InheritanceIdentifierVisitor;
+import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.graph.EdgeType;
 import edu.tum.sse.dirts.util.Log;
 import edu.tum.sse.dirts.util.tuples.Pair;
 
 import java.util.*;
+import java.util.function.Function;
 
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupNode;
@@ -39,19 +41,23 @@ public class DefaultNonTypeDependencyCollectorVisitor
         extends DefaultDependencyCollectorVisitor<BodyDeclaration<?>>
         implements NonTypeDependencyCollector {
 
-    private final Map<TypeDeclaration<?>, InheritanceIdentifierVisitor> inheritanceIdentifierVisitorMap =
-            Collections.synchronizedMap(new IdentityHashMap<>());
+    private Map<TypeDeclaration<?>, InheritanceIdentifierVisitor> inheritanceIdentifierVisitorMap;
 
+    public void init(Blackboard<?> blackboard) {
+        this.inheritanceIdentifierVisitorMap = blackboard.getInheritanceIdentifierVisitorMap();
+    }
 
     //##################################################################################################################
     // Visitor pattern - Auxiliary methods (used to set up things before)
 
     @Override
     public void visit(ClassOrInterfaceDeclaration n, DependencyGraph dependencyGraph) {
-        InheritanceIdentifierVisitor inheritanceIdentifierVisitor = new InheritanceIdentifierVisitor(n);
-        inheritanceIdentifierVisitorMap.put(n, inheritanceIdentifierVisitor);
+        //InheritanceIdentifierVisitor inheritanceIdentifierVisitor = new InheritanceIdentifierVisitor(n);
+        //inheritanceIdentifierVisitorMap.put(n, inheritanceIdentifierVisitor);
         n.getMembers().stream().filter(m -> !m.isTypeDeclaration())
                 .forEach(m -> m.accept(this, dependencyGraph));
+
+        InheritanceIdentifierVisitor inheritanceIdentifierVisitor = inheritanceIdentifierVisitorMap.get(n);
 
         // Dependencies from implicitly invoked constructor
         if (n.getConstructors().isEmpty()) {
