@@ -47,7 +47,7 @@ public class GraphCombinerTest extends KnowledgeSourceTest {
 
         // a ModificationGraph should be created
         verify(blackboardMock).setCombinedGraph(modificationGraphCaptor.capture());
-        assertThat(modificationGraphCaptor.getValue().getNodes()).containsKeys("NewClass", "OldClass");
+        assertThat(modificationGraphCaptor.getValue().getNodes()).contains("NewClass", "OldClass");
     }
 
 }

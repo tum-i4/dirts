@@ -46,8 +46,8 @@ public class ProjectImporterTest extends KnowledgeSourceTest {
         // graphs should be set
         verify(blackboardMock).setGraphOldRevision(dependencyGraphOldCaptor.capture());
         verify(blackboardMock).setGraphNewRevision(dependencyGraphNewCaptor.capture());
-        assertThat(dependencyGraphOldCaptor.getValue().getNodes()).containsKey("edu.tum.sse.dirts.test_code.AClass");
-        assertThat(dependencyGraphNewCaptor.getValue().getNodes()).containsKey("edu.tum.sse.dirts.test_code.ATest");
+        assertThat(dependencyGraphOldCaptor.getValue().getNodes()).contains("edu.tum.sse.dirts.test_code.AClass");
+        assertThat(dependencyGraphNewCaptor.getValue().getNodes()).contains("edu.tum.sse.dirts.test_code.ATest");
 
         // checksums should be set
         verify(blackboardMock).setChecksumsNodes(expectedChecksums);

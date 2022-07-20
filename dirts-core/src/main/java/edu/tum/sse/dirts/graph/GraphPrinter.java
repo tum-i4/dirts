@@ -29,7 +29,7 @@ public class GraphPrinter {
         sb.append("digraph G {\n");
 
         Map<String, String> nodesMap = new HashMap<>();
-        graph.getNodes().keySet().forEach(n -> {
+        graph.getNodes().forEach(n -> {
             String qualifier;
             if (n.startsWith("Unresolved")) {
                 qualifier = "";
@@ -134,7 +134,7 @@ public class GraphPrinter {
     private void printNode(StringBuilder sb, String node, int indentLevel) {
         sb.append("    ".repeat(indentLevel));
         printNode(sb, node);
-        Set<String> messages = graph.getNodes().get(node);
+        Set<String> messages = graph.getMessages(node);
         if (messages != null && !messages.isEmpty()) {
             sb.append(" // ");
             sb.append(messages.stream()

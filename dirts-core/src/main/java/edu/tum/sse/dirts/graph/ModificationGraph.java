@@ -21,11 +21,19 @@ public class ModificationGraph extends DependencyGraph {
         // combine graphs
         // *****************************
 
-        // add all nodes from new revision
-        newRevision.nodes.forEach((node, messages) -> {
-            addNode(node);
-            nodes.get(node).addAll(messages);
-        });
+        if (newRevision != null) {
+
+            // add all nodes from new revision
+            newRevision.nodes.forEach((node, messages) -> {
+                addNode(node);
+                nodes.get(node).addAll(messages);
+            });
+
+            // add all edges from new revision
+            newRevision.getForwardsEdges().forEach((fromNode, to) ->
+                    to.forEach((toNode, edges) ->
+                            edges.forEach(e -> addEdge(fromNode, toNode, e))));
+        }
 
         // add all nodes from old revision, probably renamed
         if (oldRevision != null) {
@@ -33,24 +41,15 @@ public class ModificationGraph extends DependencyGraph {
                 addNode(nameMapper.getOrDefault(node, node));
                 nodes.get(nameMapper.getOrDefault(node, node)).addAll(messages);
             });
-        }
 
-        // add all edges from new revision
-        newRevision.forwardsEdges.forEach((fromNode, to) ->
-                to.forEach((toNode, edges) ->
-                        edges.forEach(e -> addEdge(fromNode, toNode, e))));
-
-        // add all edges from old revision, nodes probably renamed
-        if (oldRevision != null) {
-            oldRevision.forwardsEdges.forEach((fromNode, to) ->
+            // add all edges from old revision, nodes probably renamed
+            oldRevision.getForwardsEdges().forEach((fromNode, to) ->
                     to.forEach((toNode, edges) ->
                             edges.forEach(e -> addEdge(
                                     nameMapper.getOrDefault(fromNode, fromNode),
                                     nameMapper.getOrDefault(toNode, toNode),
                                     e))));
         }
-
-
     }
 
     /**
@@ -93,7 +92,9 @@ public class ModificationGraph extends DependencyGraph {
             nodes.forEach((fromNode, m) -> {
                 if (!modificationStatus.get(fromNode).isRelevant()
                         && newRevision.nodes.containsKey(fromNode) && oldRevision.nodes.containsKey(fromNode)
-                        && !oldRevision.forwardsEdges.get(fromNode).equals(newRevision.forwardsEdges.get(fromNode))
+                        && oldRevision.getForwardsEdges().containsKey(fromNode)
+                        && newRevision.getForwardsEdges().containsKey(fromNode)
+                        && !oldRevision.getForwardsEdges().get(fromNode).equals(newRevision.getForwardsEdges().get(fromNode))
                 ) {
                     setModificationType(fromNode, ModificationType.CHANGED_DEPENDENCIES);
                 }
@@ -151,7 +152,9 @@ public class ModificationGraph extends DependencyGraph {
      * (J. Öqvist, G. Hedin, and B. Magnusson, “Extraction-based regression test selection,”
      * ACM Int. Conf. Proceeding Ser., vol. Part F1284, 2016, doi: 10.1145/2972206.2972224)
      *
-     * @return All nodes that reach a modified class in the transitive closure of the graph
+     * @return Map of
+     * modified node and its modification status
+     * to all nodes that reach this node in the transitive closure of the graph
      */
     public Map<String, Set<String>> affected() {
         return nodes.keySet().stream()
@@ -166,21 +169,21 @@ public class ModificationGraph extends DependencyGraph {
      * to contain at least one edge of the specified type
      *
      * @param edgeType appears at least once in a path from a reached node to a modified code entity
-     * @return reachable nodes
+     * @return Map of
+     *  modified node and its modification status
+     *  to all nodes that reach this node in the transitive closure of the graph with the above-mentioned property
      */
     public Map<String, Set<String>> affectedByEdgeType(Set<EdgeType> edgeType) {
         // Find all nodes that have an ingoing edge with specified type
-        Set<String> atTheEndOfEdge = backwardsEdges.entrySet().stream()
+        Set<String> atTheEndOfEdge = getBackwardsEdges().entrySet().stream()
                 .filter(e -> e.getValue().values().stream().flatMap(Collection::stream).anyMatch(edgeType::contains))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
 
         Map<String, Set<String>> reachModifiedNode = new HashMap<>();
-        Set<String> positive = new HashSet<>();
-        Set<String> visited = new HashSet<>();
         for (String node : atTheEndOfEdge) {
-            Optional<String> tmp = reachModifiedNode(node, positive, visited);
-            tmp.ifPresent(s -> {
+            Optional<String> result = reachModifiedNode(node, new HashSet<>(), new HashSet<>());
+            result.ifPresent(s -> {
                 String key = s + modificationStatus.get(s);
                 reachModifiedNode.computeIfAbsent(key, e -> new HashSet<>());
                 reachModifiedNode.get(key).add(node);
@@ -193,7 +196,7 @@ public class ModificationGraph extends DependencyGraph {
                         .flatMap(p -> reachableNodes(p).stream()).collect(Collectors.toSet())));
 
         // Add nodes that have outgoing edges with specified type and changed dependencies
-        forwardsEdges.entrySet().stream()
+        getForwardsEdges().entrySet().stream()
                 .filter(e -> e.getValue().values().stream().flatMap(Collection::stream).anyMatch(edgeType::contains))
                 .map(Map.Entry::getKey)
                 .forEach(start -> {
@@ -223,7 +226,7 @@ public class ModificationGraph extends DependencyGraph {
             String dependencyNode = queue.poll();
             reached.add(dependencyNode);
 
-            Map<String, Set<EdgeType>> edges = backwardsEdges.get(dependencyNode);
+            Map<String, Set<EdgeType>> edges = getBackwardsEdges().get(dependencyNode);
             if (edges != null)
                 for (String outgoingNode : edges.keySet()) {
                     if (!reached.contains(outgoingNode)) {
@@ -240,7 +243,7 @@ public class ModificationGraph extends DependencyGraph {
      *
      * @param node     node to check
      * @param positive accumulator to store affected nodes for subsequent invocations
-     * @return true if node reaches modified node, false otherwise
+     * @return Name of the modified node if found one, empty otherwise
      */
     private Optional<String> reachModifiedNode(String node, Set<String> positive, Set<String> visited) {
         // Performs depth-first-search while adding nodes that lead to modified nodes to the accumulator
@@ -257,7 +260,7 @@ public class ModificationGraph extends DependencyGraph {
         }
         visited.add(node);
 
-        Map<String, Set<EdgeType>> edges = forwardsEdges.get(node);
+        Map<String, Set<EdgeType>> edges = getForwardsEdges().get(node);
         if (edges != null) {
             for (String end : edges.keySet()) {
                 Optional<String> tmp = reachModifiedNode(end, positive, visited);

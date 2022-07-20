@@ -15,11 +15,10 @@ package edu.tum.sse.dirts.graph;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.tum.sse.dirts.util.Log;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.logging.Level;
 
 /**
  * A simple graph that allows to calculate its transitive closure
@@ -31,36 +30,37 @@ public class DependencyGraph {
 
     protected final Map<String, Set<String>> nodes;
 
-    protected final Map<String, Map<String, Set<EdgeType>>> forwardsEdges;
-    protected final Map<String, Map<String, Set<EdgeType>>> backwardsEdges;
+    protected final MultiValueNtoNMap<String, EdgeType> edges;
 
     public DependencyGraph() {
-        forwardsEdges = new HashMap<>();
-        backwardsEdges = new HashMap<>();
         nodes = new HashMap<>();
+        edges = new MultiValueNtoNMap<>();
     }
 
     public DependencyGraph(Map<String, Set<String>> nodes,
                            Map<String, Map<String, Set<EdgeType>>> forwardsEdges,
                            Map<String, Map<String, Set<EdgeType>>> backwardsEdges) {
         this.nodes = nodes;
-        this.forwardsEdges = forwardsEdges;
-        this.backwardsEdges = backwardsEdges;
+        edges = new MultiValueNtoNMap<>(forwardsEdges, backwardsEdges);
     }
 
     //##################################################################################################################
     // Getters
 
-    public Map<String, Set<String>> getNodes() {
-        return nodes;
+    public Set<String> getNodes() {
+        return Collections.unmodifiableSet(nodes.keySet());
     }
 
-    public Map<String, Map<String, Set<EdgeType>>> getForwardsEdges() {
-        return forwardsEdges;
+    Set<String> getMessages(String node) {
+        return nodes.get(node);
     }
 
-    public Map<String, Map<String, Set<EdgeType>>> getBackwardsEdges() {
-        return backwardsEdges;
+    Map<String, Map<String, Set<EdgeType>>> getForwardsEdges() {
+        return Collections.unmodifiableMap(edges.getRegularMap());
+    }
+
+    Map<String, Map<String, Set<EdgeType>>> getBackwardsEdges() {
+        return Collections.unmodifiableMap(edges.getInverseMap());
     }
 
 
@@ -73,9 +73,7 @@ public class DependencyGraph {
      * @param name Name of the node
      */
     public void addNode(String name) {
-        nodes.putIfAbsent(name, new HashSet<>());
-        forwardsEdges.putIfAbsent(name, new HashMap<>());
-        backwardsEdges.putIfAbsent(name, new HashMap<>());
+        nodes.computeIfAbsent(name, n -> new HashSet<>());
     }
 
     /**
@@ -85,16 +83,10 @@ public class DependencyGraph {
      */
     public void removeNode(String name) {
         if (nodes.containsKey(name)) {
-            // Remove edges from this node
-            forwardsEdges.get(name).forEach((to, ts) -> backwardsEdges.get(to).remove(name));
-            forwardsEdges.remove(name);
-
-            // Remove edges to this node
-            backwardsEdges.get(name).forEach((from, ts) -> forwardsEdges.get(from).remove(name));
-            backwardsEdges.remove(name);
-
-            // Remove node
+            edges.remove(name);
             nodes.remove(name);
+        } else {
+            Log.log(Level.WARNING, "Expected node <" + name + "> to be present in the graph, when removing it.");
         }
     }
 
@@ -103,11 +95,11 @@ public class DependencyGraph {
      */
     public void removeNodesWithoutEdges() {
         Set<String> tmp = new HashSet<>();
-        forwardsEdges.forEach((from, toNodes) -> {
-            if (toNodes.isEmpty() && backwardsEdges.get(from).isEmpty()) {
-                tmp.add(from);
+        for (String node : nodes.keySet()) {
+            if (!edges.getRegularMap().containsKey(node) && !edges.getInverseMap().containsKey(node)) {
+                tmp.add(node);
             }
-        });
+        }
 
         tmp.forEach(this::removeNode);
     }
@@ -121,15 +113,7 @@ public class DependencyGraph {
     public void renameNode(String oldName, String newName) {
         if (nodes.containsKey(oldName)) {
             nodes.put(newName, nodes.remove(oldName));
-
-            Set<String> forwards = forwardsEdges.get(oldName).keySet();
-            Set<String> backwards = backwardsEdges.get(oldName).keySet();
-
-            forwards.forEach(to -> backwardsEdges.get(to).put(newName, backwardsEdges.get(to).remove(oldName)));
-            forwardsEdges.put(newName, forwardsEdges.remove(oldName));
-
-            backwards.forEach(to -> forwardsEdges.get(to).put(newName, forwardsEdges.get(to).remove(oldName)));
-            backwardsEdges.put(newName, backwardsEdges.remove(oldName));
+            edges.rename(oldName, newName);
         }
     }
 
@@ -161,19 +145,7 @@ public class DependencyGraph {
         if (!nodes.containsKey(to))
             addNode(to);
 
-        Map<String, Set<EdgeType>> fromMap = forwardsEdges.get(from);
-        Map<String, Set<EdgeType>> toMap = backwardsEdges.get(to);
-        if (!fromMap.containsKey(to)) {
-            assert (!toMap.containsKey(from));
-
-            Set<EdgeType> types = new HashSet<>();
-            types.add(type);
-
-            fromMap.put(to, types);
-            toMap.put(from, types);
-        } else {
-            fromMap.get(to).add(type);
-        }
+        edges.put(from, to, type);
     }
 
     /**
@@ -182,20 +154,7 @@ public class DependencyGraph {
      * @param affectedEdges
      */
     public void removeAllEdgesByType(Set<EdgeType> affectedEdges) {
-        Set<String> tmp = new HashSet<>();
-
-        nodes.keySet().forEach(from -> {
-            Map<String, Set<EdgeType>> forwardsNodes = forwardsEdges.get(from);
-            forwardsNodes.forEach((to, forwardsTypes) -> {
-                forwardsTypes.removeAll(affectedEdges);
-                if (forwardsTypes.isEmpty())
-                    tmp.add(to);
-            });
-            tmp.forEach(to -> {
-                forwardsNodes.remove(to);
-                backwardsEdges.get(to).remove(from);
-            });
-        });
+        edges.removeAllValues(affectedEdges);
 
     }
 
@@ -207,20 +166,7 @@ public class DependencyGraph {
      * @return names of the nodes that are pointed to by removed edges
      */
     public Set<String> removeAllEdgesFrom(String from, Set<EdgeType> affectedEdges) {
-        Set<String> ret = new HashSet<>();
-        if (forwardsEdges.containsKey(from)) {
-
-            Map<String, Set<EdgeType>> forwardsNodes = forwardsEdges.get(from);
-            forwardsNodes.forEach((to, type) -> {
-                type.removeAll(affectedEdges);
-                if (type.isEmpty()) {
-                    backwardsEdges.get(to).remove(from);
-                    ret.add(to);
-                }
-            });
-            ret.forEach(forwardsNodes::remove);
-        }
-        return ret;
+        return edges.removeRegularEntries(from, affectedEdges);
     }
 
     /**
@@ -231,20 +177,7 @@ public class DependencyGraph {
      * @return names of the nodes that are at the start of removed edges
      */
     public Set<String> removeAllEdgesTo(String to, Set<EdgeType> affectedEdges) {
-        Set<String> ret = new HashSet<>();
-        if (backwardsEdges.containsKey(to)) {
-
-            Map<String, Set<EdgeType>> backwardsNodes = backwardsEdges.get(to);
-            backwardsNodes.forEach((from, type) -> {
-                type.removeAll(affectedEdges);
-                if (type.isEmpty()) {
-                    forwardsEdges.get(from).remove(to);
-                    ret.add(from);
-                }
-            });
-            ret.forEach(backwardsNodes::remove);
-        }
-        return ret;
+        return edges.removeInverseEntries(to, affectedEdges);
     }
 
     //##################################################################################################################
@@ -257,10 +190,10 @@ public class DependencyGraph {
                 .writeValueAsString(nodes);
 
         String forwardsString = mapper.writerWithDefaultPrettyPrinter()
-                .writeValueAsString(forwardsEdges);
+                .writeValueAsString(getForwardsEdges());
 
         String backwardsString = mapper.writerWithDefaultPrettyPrinter()
-                .writeValueAsString(backwardsEdges);
+                .writeValueAsString(getBackwardsEdges());
         return nodesString + "\n\n" + forwardsString + "\n\n" + backwardsString;
     }
 
