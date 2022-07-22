@@ -52,10 +52,9 @@ $ mvn compile dirts:typeL_select test
 
 ### Select, then compile and test only those modules that have at least one test selected
 DIRTS creates a list of these modules in `.dirts/affected_modules` inside the folder of the outermost module.
-This list needs to be removed after the tests have been executed.
 ```shell
 $ mvn dirts:typeL_select
-$ mvn -am -pl $(cat .dirts/affected_modules && rm .dirts/affected_modules) compile test
+$ mvn -am -pl "$(cat .dirts/affected_modules)" compile test
 ```
 
 ### Combined with git - Test selection before merging

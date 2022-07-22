@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import static edu.tum.sse.dirts.graph.EdgeType.DI_GUICE;
+import static java.util.logging.Level.CONFIG;
 
 /**
  * Abstract parent class of all Mojos related to DIRTS
@@ -77,14 +78,11 @@ public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends Su
      * @return
      */
     protected Blackboard<TypeDeclaration<?>> getTypeLevelBlackboard() {
-        Path basePath = getBasePath();
-        Path subPath = basePath.relativize(getSubPath());
+        Path rootPath = getRootPath();
+        Path subPath = getSubPath();
 
-        Log.setLogLevel(Level.parse(logging));
-        JavaParserUtils.RESTRICTIVE = restrictive;
-
-        // Blackboard and Control
-        Blackboard<TypeDeclaration<?>> blackboard = new Blackboard<>(basePath, subPath);
+        // Blackboard
+        Blackboard<TypeDeclaration<?>> blackboard = new Blackboard<>(rootPath, subPath, "typeL");
 
         // Spring
         if (useSpringExtension) {
@@ -115,14 +113,14 @@ public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends Su
      * @return
      */
     protected Blackboard<BodyDeclaration<?>> getNonTypeLevelBlackboard() {
-        Path basePath = getBasePath();
-        Path subPath = basePath.relativize(getSubPath());
+        Path rootPath = getRootPath();
+        Path subPath = getSubPath();
 
         Log.setLogLevel(Level.parse(logging));
         JavaParserUtils.RESTRICTIVE = restrictive;
 
-        // Blackboard and Control
-        Blackboard<BodyDeclaration<?>> blackboard = new Blackboard<>(basePath, subPath);
+        // Blackboard
+        Blackboard<BodyDeclaration<?>> blackboard = new Blackboard<>(rootPath, subPath, "nontypeL");
 
         // Spring
         if (useSpringExtension) {
@@ -154,7 +152,7 @@ public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends Su
     /**
      * @return the path of the outermost maven project
      */
-    protected Path getBasePath() {
+    protected Path getRootPath() {
         MavenProject project = getProject();
         while (project.hasParent() && project.getParent().getBasedir() != null) {
             project = project.getParent();
@@ -167,7 +165,7 @@ public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends Su
      */
     protected Path getSubPath() {
         MavenProject project = getProject();
-        return project.getBasedir().toPath();
+        return getRootPath().relativize(project.getBasedir().toPath());
     }
 
 

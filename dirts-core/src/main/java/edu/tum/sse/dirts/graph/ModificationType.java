@@ -25,6 +25,7 @@ public enum ModificationType {
     MODIFIED(" M"),
     ADDED(" A"),
     REMOVED(" R"),
+    EXTERNALLY_MODIFIED(" E"),
     UNKNOWN(" U"),
     CHANGED_DEPENDENCIES(" D");
 
@@ -44,7 +45,11 @@ public enum ModificationType {
     // Methods
 
     public boolean isRelevant() {
-        return this.equals(MODIFIED) || this.equals(ADDED) || this.equals(REMOVED) || this.equals(CHANGED_DEPENDENCIES);
+        return this.equals(MODIFIED)
+                || this.equals(ADDED)
+                || this.equals(REMOVED)
+                || this.equals(CHANGED_DEPENDENCIES)
+                || this.equals(EXTERNALLY_MODIFIED);
     }
 
     @Override

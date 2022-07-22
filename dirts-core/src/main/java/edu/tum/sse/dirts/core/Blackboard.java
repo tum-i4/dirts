@@ -56,6 +56,7 @@ public class Blackboard<T extends BodyDeclaration<?>> {
 
     private final Path rootPath;
     private final Path subPath;
+    private final String suffix;
 
     private TestFilter<String, String> testFilter;
 
@@ -89,9 +90,10 @@ public class Blackboard<T extends BodyDeclaration<?>> {
     //##################################################################################################################
     // Constructors
 
-    public Blackboard(Path rootPath, Path subPath) {
+    public Blackboard(Path rootPath, Path subPath, String suffix) {
         this.rootPath = rootPath;
         this.subPath = subPath;
+        this.suffix = suffix;
 
         this.state = BlackboardState.CLEAN;
         knowledgeSources = new ArrayList<>();
@@ -134,6 +136,10 @@ public class Blackboard<T extends BodyDeclaration<?>> {
 
     public Path getSubPath() {
         return subPath;
+    }
+
+    public String getSuffix() {
+        return suffix;
     }
 
     // _________________________________________________________________________________________________________________

@@ -3,9 +3,10 @@ package edu.tum.sse.dirts.mojos;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.graph.EdgeType;
+import edu.tum.sse.dirts.util.DirtsUtil;
+import edu.tum.sse.dirts.util.JavaParserUtils;
 import edu.tum.sse.dirts.util.Log;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.surefire.api.testset.TestFilter;
 import org.apache.maven.surefire.api.testset.TestListResolver;
@@ -21,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import static java.util.logging.Level.*;
@@ -36,13 +38,60 @@ public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends A
     protected boolean overrideExtension;
 
     public void doExecute(Function<String, String> mapper) {
+        Path subPath = getSubPath();
+        Path rootPath = getRootPath();
+
+        Log.setLogLevel(Level.parse(logging));
+        JavaParserUtils.RESTRICTIVE = restrictive;
+
+        Log.log(CONFIG, "Root path: " + rootPath);
+        Log.log(CONFIG, "Sub path: " + subPath);
+
+        if (subPath.toString().isEmpty()) {
+            Log.log(INFO, "Plugin is executed on the outermost module. Clearing caches for affected modules and changed nodes.");
+
+            Path affectedModulesPath = DirtsUtil.getAffectedModulesPath(rootPath);
+            Path changedNodesPath = DirtsUtil.getChangedNodesPath(rootPath);
+
+            if (!Files.exists(affectedModulesPath)) {
+                try {
+                    Files.createDirectories(affectedModulesPath.getParent());
+                    Files.createFile(affectedModulesPath);
+                } catch (IOException e) {
+                    Log.errLog(INFO, "Failed to create file containing affected modules: " + e.getMessage());
+                }
+            }
+
+            try {
+                Files.writeString(affectedModulesPath, "pom.xml", StandardOpenOption.TRUNCATE_EXISTING);
+            } catch (IOException e) {
+                Log.errLog(INFO, "Failed to reset file containing affected modules: " + e.getMessage());
+            }
+
+            if (!Files.exists(changedNodesPath)) {
+                try {
+                    Files.createDirectories(changedNodesPath.getParent());
+                    Files.createFile(changedNodesPath);
+                } catch (IOException e) {
+                    Log.errLog(INFO, "Failed to create file containing changed nodes: " + e.getMessage());
+                }
+            }
+
+            try {
+                Files.writeString(changedNodesPath, "", StandardOpenOption.TRUNCATE_EXISTING);
+            } catch (IOException e) {
+                Log.errLog(INFO, "Failed to reset file containing changed nodes: " + e.getMessage());
+            }
+
+        }
+
         if (getProject().getPackaging().equals("pom")) {
             Log.log(INFO, "There are no tests that could be selected, " +
                     "since this project has packaging \"pom\".");
             try {
-                Files.delete(getSubPath().resolve(".dirts_dependencies"));
+                Files.delete(DirtsUtil.getLibrariesPath(rootPath, subPath));
             } catch (IOException e) {
-                System.err.println("Failed to delete file containing dependencies: " + e.getMessage());
+                Log.errLog(INFO, "Failed to delete file containing dependencies: " + e.getMessage());
             }
             return;
         }
@@ -50,9 +99,9 @@ public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends A
         if (standalone) {
             Log.log(INFO, "Running in standalone mode");
         } else {
-            Log.log(WARNING, "Running in non-standalone mode");
+            Log.log(INFO, "Running in non-standalone mode");
             if (!overrideExtension) {
-                Log.log(WARNING, "We expect that another RTS-tool has already excluded some tests in the excludesFile. " +
+                Log.log(INFO, "We expect that another RTS-tool has already excluded some tests in the excludesFile. " +
                         "Every test that has not been excluded this way is considered as included by this other tool and will not be excluded.");
             }
         }
@@ -239,26 +288,33 @@ public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends A
                 System.err.println("Unable to read/write excludesFile");
             }
         } else {
-            Log.errLog(WARNING, "Surefire's excludesFile property is not set " +
+            Log.log(WARNING, "Surefire's excludesFile property is not set " +
                     "- test selection will not work properly");
         }
 
 
         try {
-            Path basePath = getBasePath();
+            Path rootPath = getRootPath();
             Path subPath = getSubPath();
-            Path affectedModulesPath = basePath.resolve(".dirts").resolve("affected_modules");
+            Path affectedModulesPath = DirtsUtil.getAffectedModulesPath(rootPath);
 
             if (!Files.exists(affectedModulesPath)) {
                 Files.createDirectories(affectedModulesPath.getParent());
                 Files.createFile(affectedModulesPath);
             }
 
-            if (!included.isEmpty()) {
-                Files.writeString(affectedModulesPath,
-                        basePath.relativize(subPath.resolve("pom.xml")) + ", ",
-                        StandardOpenOption.APPEND);
+            Set<String> affectedModules = new HashSet<>(Set.of(Files.readString(affectedModulesPath).split(", ")));
+            String currentModule = DirtsUtil.getSubPomPathRelative(subPath).toString();
+
+            if (included.isEmpty()) {
+                affectedModules.remove(currentModule);
+            } else {
+                affectedModules.add(currentModule);
             }
+
+            Files.writeString(affectedModulesPath,
+                    String.join(", ", affectedModules),
+                    StandardOpenOption.TRUNCATE_EXISTING);
 
         } catch (IOException e) {
             Log.errLog(SEVERE, "Unable to read/write affectedModules");

@@ -26,7 +26,7 @@ public class ProjectExporterTest extends KnowledgeSourceTest {
         /* given */
         Blackboard<TypeDeclaration<?>> blackboardMock = mock(Blackboard.class);
         ChecksumVisitor<TypeDeclaration<?>> checksumVisitorMock = mock(ChecksumVisitor.class);
-        ProjectExporter<TypeDeclaration<?>> sut = new ProjectExporter<>(blackboardMock, suffix, checksumVisitorMock, true);
+        ProjectExporter<TypeDeclaration<?>> sut = new ProjectExporter<>(blackboardMock, checksumVisitorMock, true);
 
         DependencyStrategy<TypeDeclaration<?>> dependencyStrategyMock = mock(DependencyStrategy.class);
 

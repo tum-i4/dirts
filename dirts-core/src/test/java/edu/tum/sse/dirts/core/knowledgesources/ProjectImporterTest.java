@@ -23,7 +23,7 @@ public class ProjectImporterTest extends KnowledgeSourceTest {
     public void testUpdateBlackboard() {
         /* given */
         Blackboard<TypeDeclaration<?>> blackboardMock = mock(Blackboard.class);
-        ProjectImporter<TypeDeclaration<?>> sut = new ProjectImporter<>(blackboardMock, suffix);
+        ProjectImporter<TypeDeclaration<?>> sut = new ProjectImporter<>(blackboardMock);
 
         DependencyStrategy<TypeDeclaration<?>> dependencyStrategyMock = mock(DependencyStrategy.class);
 

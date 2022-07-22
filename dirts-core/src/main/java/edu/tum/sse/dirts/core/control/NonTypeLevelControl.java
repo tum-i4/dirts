@@ -41,8 +41,6 @@ public class NonTypeLevelControl extends Control<BodyDeclaration<?>> {
     //##################################################################################################################
     // Static constants
 
-    private static final String SUFFIX = "nontypeL";
-
     private static final NonTypeChecksumVisitor NONTYPE_CHECKSUM_VISITOR = new NonTypeChecksumVisitor();
     private static final NonTypeNameFinderVisitor NONTYPE_NAME_FINDER_VISITOR = new NonTypeNameFinderVisitor();
 
@@ -60,7 +58,6 @@ public class NonTypeLevelControl extends Control<BodyDeclaration<?>> {
     public NonTypeLevelControl(Blackboard<BodyDeclaration<?>> blackboard, boolean overwrite) {
         super(blackboard,
                 overwrite,
-                SUFFIX,
                 NONTYPE_CHECKSUM_VISITOR,
                 NONTYPE_NAME_FINDER_VISITOR,
                 new NonTypeTestFinderVisitor(blackboard.getTestFilter()),

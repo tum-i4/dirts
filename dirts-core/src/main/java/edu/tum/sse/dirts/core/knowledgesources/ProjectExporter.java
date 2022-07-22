@@ -1,5 +1,6 @@
 package edu.tum.sse.dirts.core.knowledgesources;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
@@ -11,17 +12,20 @@ import edu.tum.sse.dirts.core.BlackboardState;
 import edu.tum.sse.dirts.core.KnowledgeSource;
 import edu.tum.sse.dirts.core.strategies.DependencyStrategy;
 import edu.tum.sse.dirts.graph.DependencyGraph;
+import edu.tum.sse.dirts.util.DirtsUtil;
+import edu.tum.sse.dirts.util.Log;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static edu.tum.sse.dirts.core.BlackboardState.*;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
+import static java.util.logging.Level.WARNING;
 
 /**
  * Exports checksums, graph and other important information for the next run
@@ -29,19 +33,18 @@ import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 public class ProjectExporter<T extends BodyDeclaration<?>> extends KnowledgeSource<T> {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
+    private static final TypeReference<Set<String>> typeRefAffectedNodes = new TypeReference<>() {
+    };
 
     private final Blackboard<T> blackboard;
-    private final String suffix;
     private final ChecksumVisitor<T> checksumVisitor;
     private final boolean overwrite;
 
     public ProjectExporter(Blackboard<T> blackboard,
-                           String suffix,
                            ChecksumVisitor<T> checksumVisitor,
                            boolean overwrite) {
         super(blackboard);
         this.blackboard = blackboard;
-        this.suffix = suffix;
         this.checksumVisitor = checksumVisitor;
         this.overwrite = overwrite;
     }
@@ -50,6 +53,7 @@ public class ProjectExporter<T extends BodyDeclaration<?>> extends KnowledgeSour
     public BlackboardState updateBlackboard() {
         Path rootPath = blackboard.getRootPath();
         Path subPath = blackboard.getSubPath();
+        String suffix = blackboard.getSuffix();
 
         if (overwrite) {
             Path tmpPath = rootPath.resolve(subPath).resolve(Path.of(".dirts"));
@@ -117,9 +121,47 @@ public class ProjectExporter<T extends BodyDeclaration<?>> extends KnowledgeSour
             } catch (IOException e) {
                 return FAILED;
             }
+
+            HashSet<String> affectedNodes = new HashSet<>();
+            affectedNodes.addAll(nodesAdded.keySet());
+            affectedNodes.addAll(nodesRemoved.keySet());
+            affectedNodes.addAll(nodesDifferent.keySet());
+            writeAffectedNodes(affectedNodes, blackboard.getNodesSame().keySet());
         }
 
         return DONE;
+    }
+
+    private void writeAffectedNodes(Set<String> affectedNodes, Set<String> nonAffectedNodes) {
+        Path changedNodesPath = DirtsUtil.getChangedNodesPath(blackboard.getRootPath());
+
+        if (!Files.exists(changedNodesPath)) {
+            try {
+                Files.createDirectories(changedNodesPath.getParent());
+                Files.createFile(changedNodesPath);
+            } catch (IOException e) {
+                Log.errLog(WARNING, "Failed to create file containing changed nodes: " + e.getMessage());
+            }
+        }
+
+        try {
+            String changedNodesContent = Files.readString(changedNodesPath);
+            Set<String> changedNodes = new HashSet<>();
+            if (!changedNodesContent.isEmpty()) {
+                changedNodes.addAll(objectMapper.readValue(changedNodesContent, typeRefAffectedNodes));
+            }
+
+            changedNodes.removeAll(nonAffectedNodes);
+            changedNodes.addAll(affectedNodes);
+
+            Files.writeString(
+                    changedNodesPath,
+                    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(changedNodes),
+                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING
+            );
+        } catch (IOException e) {
+            Log.errLog(WARNING, "Failed to read or write file containing changed nodes: " + e.getMessage());
+        }
     }
 
     @Override

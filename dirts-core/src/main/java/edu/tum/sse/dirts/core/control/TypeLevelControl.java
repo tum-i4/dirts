@@ -40,8 +40,6 @@ public class TypeLevelControl extends Control<TypeDeclaration<?>> {
     //##################################################################################################################
     // Static constants
 
-    private static final String SUFFIX = "typeL";
-
     private static final TypeChecksumVisitor TYPE_CHECKSUM_VISITOR = new TypeChecksumVisitor();
     private static final TypeNameFinderVisitor TYPE_NAME_FINDER_VISITOR = new TypeNameFinderVisitor();
 
@@ -59,7 +57,6 @@ public class TypeLevelControl extends Control<TypeDeclaration<?>> {
     public TypeLevelControl(Blackboard<TypeDeclaration<?>> blackboard, boolean overwrite) {
         super(blackboard,
                 overwrite,
-                SUFFIX,
                 TYPE_CHECKSUM_VISITOR,
                 TYPE_NAME_FINDER_VISITOR,
                 new TypeTestFinderVisitor(blackboard.getTestFilter()),

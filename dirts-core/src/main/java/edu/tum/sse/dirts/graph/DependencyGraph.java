@@ -37,9 +37,9 @@ public class DependencyGraph {
         edges = new MultiValueNtoNMap<>();
     }
 
-    public DependencyGraph(Map<String, Set<String>> nodes,
-                           Map<String, Map<String, Set<EdgeType>>> forwardsEdges,
-                           Map<String, Map<String, Set<EdgeType>>> backwardsEdges) {
+    private DependencyGraph(Map<String, Set<String>> nodes,
+                            Map<String, Map<String, Set<EdgeType>>> forwardsEdges,
+                            Map<String, Map<String, Set<EdgeType>>> backwardsEdges) {
         this.nodes = nodes;
         edges = new MultiValueNtoNMap<>(forwardsEdges, backwardsEdges);
     }

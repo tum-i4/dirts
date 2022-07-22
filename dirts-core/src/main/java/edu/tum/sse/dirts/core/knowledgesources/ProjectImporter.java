@@ -20,6 +20,7 @@ import edu.tum.sse.dirts.core.BlackboardState;
 import edu.tum.sse.dirts.core.KnowledgeSource;
 import edu.tum.sse.dirts.core.strategies.DependencyStrategy;
 import edu.tum.sse.dirts.graph.DependencyGraph;
+import edu.tum.sse.dirts.util.DirtsUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,16 +38,8 @@ public class ProjectImporter<T extends BodyDeclaration<?>> extends KnowledgeSour
     private static final TypeReference<HashMap<String, String>> typeRefCUMapping = new TypeReference<>() {
     };
 
-    private final String suffix;
-
-
-    //##################################################################################################################
-    // Constructors
-
-    public ProjectImporter(Blackboard<T> blackboard, String suffix) {
+    public ProjectImporter(Blackboard<T> blackboard) {
         super(blackboard);
-
-        this.suffix = suffix;
     }
 
     //##################################################################################################################
@@ -56,21 +49,20 @@ public class ProjectImporter<T extends BodyDeclaration<?>> extends KnowledgeSour
     public BlackboardState updateBlackboard() {
         Path rootPath = blackboard.getRootPath();
         Path subPath = blackboard.getSubPath();
-
-        Path tmpPath = rootPath.resolve(subPath.resolve(".dirts"));
+        String suffix = blackboard.getSuffix();
 
         try {
             // DependencyGraph
-            String graph = Files.readString(tmpPath.resolve(Path.of("graph_" + suffix)));
+            String graph = Files.readString(DirtsUtil.getGraphPath(rootPath, subPath, suffix));
             blackboard.setGraphOldRevision(DependencyGraph.deserializeGraph(graph));
             blackboard.setGraphNewRevision(DependencyGraph.deserializeGraph(graph));
 
             // import Checksums
-            String checksumsNodes = Files.readString(tmpPath.resolve(Path.of("checksums_" + suffix)));
+            String checksumsNodes = Files.readString(DirtsUtil.getChecksumsPath(rootPath, subPath, suffix));
             blackboard.setChecksumsNodes(objectMapper.readValue(checksumsNodes, typeRefNodes));
 
             // import CompilationUnits mapping
-            String compilationUnitsMapping = Files.readString(tmpPath.resolve(Path.of("cuMapping_" + suffix)));
+            String compilationUnitsMapping = Files.readString(DirtsUtil.getCUMappingPath(rootPath, subPath, suffix));
             blackboard.setCompilationUnitMapping(objectMapper.readValue(compilationUnitsMapping, typeRefCUMapping));
 
         } catch (IOException ignored) {
@@ -83,7 +75,7 @@ public class ProjectImporter<T extends BodyDeclaration<?>> extends KnowledgeSour
         }
 
         for (DependencyStrategy<T> dependencyStrategy : blackboard.getDependencyStrategies()) {
-            dependencyStrategy.doImport(tmpPath, blackboard, suffix);
+            dependencyStrategy.doImport(DirtsUtil.getSubTemporaryDirectory(rootPath, subPath), blackboard, suffix);
         }
 
         return BlackboardState.IMPORTED;

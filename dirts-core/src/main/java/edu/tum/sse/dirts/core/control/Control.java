@@ -45,10 +45,6 @@ public abstract class Control<T extends BodyDeclaration<?>> {
      */
     protected final Blackboard<T> blackboard;
 
-    /**
-     * Suffix for distinguishing cache directories of different levels of RTS
-     */
-    private final String suffix;
 
     /**
      * Visitor used to calculate checksums of the most important nodes
@@ -87,7 +83,6 @@ public abstract class Control<T extends BodyDeclaration<?>> {
 
     public Control(Blackboard<T> blackboard,
                    boolean overwrite,
-                   String suffix,
                    ChecksumVisitor<T> checksumVisitor,
                    FinderVisitor<Map<String, Node>, T> nameFinderVisitor,
                    FinderVisitor<Collection<String>, T> testFinderVisitor,
@@ -97,7 +92,6 @@ public abstract class Control<T extends BodyDeclaration<?>> {
         this.blackboard = blackboard;
         this.overwrite = overwrite;
 
-        this.suffix = suffix;
         this.checksumVisitor = checksumVisitor;
         this.nameFinderVisitor = nameFinderVisitor;
         this.testFinderVisitor = testFinderVisitor;
@@ -111,7 +105,7 @@ public abstract class Control<T extends BodyDeclaration<?>> {
 
     protected void init() {
         List<KnowledgeSource<T>> knowledgeSources = List.of(
-                new ProjectImporter<>(blackboard, suffix),
+                new ProjectImporter<>(blackboard),
 
                 new TypeSolverInitializer<>(blackboard),
 
@@ -130,7 +124,6 @@ public abstract class Control<T extends BodyDeclaration<?>> {
                 new GraphCombiner<>(blackboard),
 
                 new ProjectExporter<>(blackboard,
-                        suffix,
                         checksumVisitor,
                         overwrite)
         );

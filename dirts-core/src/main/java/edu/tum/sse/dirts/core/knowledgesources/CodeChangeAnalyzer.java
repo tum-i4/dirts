@@ -21,7 +21,13 @@ import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.BlackboardState;
 import edu.tum.sse.dirts.core.KnowledgeSource;
 import edu.tum.sse.dirts.core.strategies.DependencyStrategy;
+import edu.tum.sse.dirts.util.Log;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static edu.tum.sse.dirts.core.BlackboardState.NODES_CHANGES_SET;
 import static edu.tum.sse.dirts.core.BlackboardState.TESTS_FOUND;
+import static java.util.logging.Level.WARNING;
 
 /**
  * Partitions code objects into four categories: same, added, removed, changed

@@ -141,6 +141,11 @@ public class ModificationGraph extends DependencyGraph {
         modificationStatus.put(name, type);
     }
 
+    public void setModificationTypeIfPresent(String name, ModificationType type) {
+        if (nodes.containsKey(name))
+            modificationStatus.put(name, type);
+    }
+
     public ModificationType getModificationType(String name) {
         return modificationStatus.getOrDefault(name, ModificationType.UNKNOWN);
     }
@@ -170,8 +175,8 @@ public class ModificationGraph extends DependencyGraph {
      *
      * @param edgeType appears at least once in a path from a reached node to a modified code entity
      * @return Map of
-     *  modified node and its modification status
-     *  to all nodes that reach this node in the transitive closure of the graph with the above-mentioned property
+     * modified node and its modification status
+     * to all nodes that reach this node in the transitive closure of the graph with the above-mentioned property
      */
     public Map<String, Set<String>> affectedByEdgeType(Set<EdgeType> edgeType) {
         // Find all nodes that have an ingoing edge with specified type
