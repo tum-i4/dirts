@@ -37,6 +37,7 @@ public class ProjectExporterTest extends KnowledgeSourceTest {
         /* when */
         when(blackboardMock.getRootPath()).thenReturn(rootPath);
         when(blackboardMock.getSubPath()).thenReturn(subPath);
+        when(blackboardMock.getSuffix()).thenReturn("test");
 
         when(blackboardMock.getDependencyStrategies()).thenReturn(List.of(dependencyStrategyMock));
 
