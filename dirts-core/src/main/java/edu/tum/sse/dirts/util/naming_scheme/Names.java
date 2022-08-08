@@ -49,13 +49,6 @@ public class Names {
     }
 
     //##################################################################################################################
-    // Lookup for Annotations
-
-    public static String lookupAnnotationsNode(String className) {
-        return className + "." + "!annotations";
-    }
-
-    //##################################################################################################################
     // lookup for types that are only referenced in Strings for example in xml beans
 
     public static Optional<ResolvedReferenceTypeDeclaration> lookupTypeDeclaration(String name,

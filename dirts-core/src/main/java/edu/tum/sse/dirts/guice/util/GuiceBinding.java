@@ -51,7 +51,7 @@ public class GuiceBinding implements Bean {
     }
 
     @Override
-    public String asString() {
+    public String toString() {
         if (source.isFirstOption()){
             return lookup(source.getAsFirstOption());
         } else if (source.isSecondOption()) {

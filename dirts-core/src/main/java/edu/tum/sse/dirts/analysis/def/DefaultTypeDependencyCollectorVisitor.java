@@ -28,7 +28,9 @@ import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.graph.EdgeType;
 
 import java.util.Collection;
+import java.util.Set;
 
+import static edu.tum.sse.dirts.graph.EdgeType.*;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupNode;
 
@@ -53,7 +55,7 @@ public class DefaultTypeDependencyCollectorVisitor
                             Collection<ResolvedReferenceTypeDeclaration> resolvedReferenceTypeDeclarations) {
         for (ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration : resolvedReferenceTypeDeclarations) {
             String toNode = lookup(resolvedReferenceTypeDeclaration);
-            dependencyGraph.addEdge(node, toNode, EdgeType.NEW);
+            dependencyGraph.addEdge(node, toNode, NEW);
         }
     }
 
@@ -62,7 +64,7 @@ public class DefaultTypeDependencyCollectorVisitor
                                Collection<ResolvedTypeDeclaration> resolvedReferenceTypeDeclarations) {
         for (ResolvedTypeDeclaration resolvedReferenceTypeDeclaration : resolvedReferenceTypeDeclarations) {
             String toNode = lookup(resolvedReferenceTypeDeclaration);
-            dependencyGraph.addEdge(node, toNode, EdgeType.STATIC);
+            dependencyGraph.addEdge(node, toNode, STATIC);
         }
     }
 
@@ -71,7 +73,7 @@ public class DefaultTypeDependencyCollectorVisitor
                                           Collection<ResolvedReferenceTypeDeclaration> resolvedReferenceTypes) {
         for (ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration : resolvedReferenceTypes) {
             String toNode = lookup(resolvedReferenceTypeDeclaration);
-            dependencyGraph.addEdge(node, toNode, EdgeType.EXTENDS_IMPLEMENTS);
+            dependencyGraph.addEdge(node, toNode, EXTENDS_IMPLEMENTS);
         }
     }
 
@@ -80,7 +82,7 @@ public class DefaultTypeDependencyCollectorVisitor
                                     Collection<ResolvedAnnotationDeclaration> resolvedAnnotations) {
         for (ResolvedAnnotationDeclaration resolvedAnnotation : resolvedAnnotations) {
             String toNode = lookup(resolvedAnnotation);
-            dependencyGraph.addEdge(node, toNode, EdgeType.ANNOTATION);
+            dependencyGraph.addEdge(node, toNode, ANNOTATION);
         }
     }
 
@@ -107,6 +109,7 @@ public class DefaultTypeDependencyCollectorVisitor
 
     private void handleExtendsImplementsNewStatic(TypeDeclaration<?> n, DependencyGraph dependencyGraph) {
         String node = lookupNode(n, dependencyGraph);
+        dependencyGraph.removeAllEdgesFrom(node, Set.of(NEW, EXTENDS_IMPLEMENTS, STATIC, ANNOTATION));
         processNew(dependencyGraph, node, NewIdentifierVisitor.identifyDependencies(n));
         processExtendsImplements(dependencyGraph, node, ExtendsImplementsIdentifierVisitor.identifyDependencies(n));
         processStatic(dependencyGraph, node, StaticIdentifierVisitor.identifyDependencies(n));

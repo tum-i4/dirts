@@ -17,6 +17,7 @@ import java.util.Iterator;
 /**
  * Enables to calculate the checksum of nontype nodes
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class TypeChecksumVisitor implements ChecksumVisitor<TypeDeclaration<?>> {
 
     /**

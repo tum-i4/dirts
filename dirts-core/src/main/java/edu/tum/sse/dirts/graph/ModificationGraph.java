@@ -12,8 +12,7 @@ public class ModificationGraph extends DependencyGraph {
 
     public ModificationGraph(
             DependencyGraph oldRevision,
-            DependencyGraph newRevision,
-            Map<String, String> nameMapper) {
+            DependencyGraph newRevision) {
         this.oldRevision = oldRevision;
         this.newRevision = newRevision;
 
@@ -38,16 +37,16 @@ public class ModificationGraph extends DependencyGraph {
         // add all nodes from old revision, probably renamed
         if (oldRevision != null) {
             oldRevision.nodes.forEach((node, messages) -> {
-                addNode(nameMapper.getOrDefault(node, node));
-                nodes.get(nameMapper.getOrDefault(node, node)).addAll(messages);
+                addNode(node);
+                nodes.get(node).addAll(messages);
             });
 
             // add all edges from old revision, nodes probably renamed
             oldRevision.getForwardsEdges().forEach((fromNode, to) ->
                     to.forEach((toNode, edges) ->
                             edges.forEach(e -> addEdge(
-                                    nameMapper.getOrDefault(fromNode, fromNode),
-                                    nameMapper.getOrDefault(toNode, toNode),
+                                    fromNode,
+                                    toNode,
                                     e))));
         }
     }

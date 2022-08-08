@@ -17,6 +17,8 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
+import edu.tum.sse.dirts.analysis.FinderVisitor;
+import edu.tum.sse.dirts.analysis.def.finders.TypeNameFinderVisitor;
 import edu.tum.sse.dirts.analysis.def.identifiers.nontype.InheritanceIdentifierVisitor;
 import edu.tum.sse.dirts.core.strategies.DependencyStrategy;
 import edu.tum.sse.dirts.graph.DependencyGraph;
@@ -67,13 +69,13 @@ public class Blackboard<T extends BodyDeclaration<?>> {
 
     private Collection<CompilationUnit> compilationUnits;
 
+    private FinderVisitor<Map<String, Node>, T> nameFinderVisitor;
+
     private Map<String, Node> allNodes;
     private Map<String, Node> nodesSame;
     private Map<String, Node> nodesDifferent;
     private Map<String, Node> nodesAdded;
     private Map<String, Integer> nodesRemoved;
-
-    private Map<String, String> nameMapperNodes;
 
     private Collection<String> tests;
 
@@ -218,6 +220,18 @@ public class Blackboard<T extends BodyDeclaration<?>> {
 
     // _________________________________________________________________________________________________________________
 
+
+    public void setNameFinderVisitor(FinderVisitor<Map<String, Node>, T> nameFinderVisitor) {
+        this.nameFinderVisitor = nameFinderVisitor;
+    }
+
+    public FinderVisitor<Map<String, Node>, T> getNameFinderVisitor() {
+        return nameFinderVisitor;
+    }
+
+    // _________________________________________________________________________________________________________________
+
+
     public void setChangesNodes(Map<String, Node> nodesSame,
                                 Map<String, Node> nodesDifferent,
                                 Map<String, Node> nodesAdded,
@@ -266,24 +280,8 @@ public class Blackboard<T extends BodyDeclaration<?>> {
 
     // _________________________________________________________________________________________________________________
 
-    public void setNameMapperNodes(Map<String, String> nameMapperNodes) {
-        if (nameMapperNodes != null)
-            Log.log(FINEST, "Identified mappings:\n" +
-                    nameMapperNodes.entrySet().stream()
-                            .map(e -> e.getKey() + "->" + e.getValue())
-                            .collect(Collectors.joining("\n")));
-
-        this.nameMapperNodes = nameMapperNodes;
-    }
-
-    public Map<String, String> getNameMapperNodes() {
-        return Collections.unmodifiableMap(nameMapperNodes);
-    }
-
-    // _________________________________________________________________________________________________________________
-
     public void setTests(Collection<String> tests) {
-        if (nameMapperNodes != null)
+        if (tests != null)
             Log.log(FINE, "Identified tests:\n" + String.join("\n", tests));
 
         this.tests = tests;
@@ -308,6 +306,13 @@ public class Blackboard<T extends BodyDeclaration<?>> {
 
     public Collection<TypeDeclaration<?>> getImpactedTypes() {
         return impactedTypes;
+    }
+
+    public Collection<String> getImpactedNodes() {
+        Collection<TypeDeclaration<?>> impactedTypes = getImpactedTypes();
+        Map<String, Node> ret = new HashMap<>();
+        impactedTypes.forEach(t -> t.accept(nameFinderVisitor, ret));
+        return ret.keySet();
     }
 
     // _________________________________________________________________________________________________________________

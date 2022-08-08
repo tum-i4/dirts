@@ -57,7 +57,7 @@ public class SpringBean implements Bean {
     }
 
     @Override
-    public String asString() {
+    public String toString() {
         if (definition.isFirstOption()) {
             return SpringNames.lookup(definition.getAsFirstOption());
         } else if (definition.isSecondOption()) {

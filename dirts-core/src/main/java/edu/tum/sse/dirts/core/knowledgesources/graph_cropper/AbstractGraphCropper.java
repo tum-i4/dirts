@@ -50,8 +50,6 @@ public abstract class AbstractGraphCropper<T extends BodyDeclaration<?>> extends
     public BlackboardState updateBlackboard() {
         DependencyGraph dependencyGraph = blackboard.getDependencyGraphNewRevision();
 
-        Map<String, String> nameMapperNodes = blackboard.getNameMapperNodes();
-
         Collection<CompilationUnit> compilationUnits = blackboard.getCompilationUnits();
 
         Map<String, Node> nodesAdded = blackboard.getNodesAdded();
@@ -69,13 +67,8 @@ public abstract class AbstractGraphCropper<T extends BodyDeclaration<?>> extends
         // remove removed nodes
         nodesRemoved.keySet().forEach(dependencyGraph::removeNode);
 
-        // rename nodes that have been renamed
-        nameMapperNodes.forEach(dependencyGraph::renameNode);
-
-
         Collection<TypeDeclaration<?>> impactedTypes = calculateImpactedTypeDeclarations(
                 dependencyGraph,
-                nameMapperNodes,
                 compilationUnits,
                 nodesAdded,
                 nodesRemoved,
@@ -100,7 +93,6 @@ public abstract class AbstractGraphCropper<T extends BodyDeclaration<?>> extends
     }
 
     protected abstract Collection<TypeDeclaration<?>> calculateImpactedTypeDeclarations(DependencyGraph dependencyGraph,
-                                                                              Map<String, String> nameMapperNodes,
                                                                               Collection<CompilationUnit> compilationUnits,
                                                                               Map<String, Node> nodesAdded,
                                                                               Map<String, Integer> nodesRemoved,

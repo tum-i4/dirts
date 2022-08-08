@@ -30,6 +30,8 @@ import edu.tum.sse.dirts.util.tuples.Pair;
 import java.util.*;
 import java.util.function.Function;
 
+import static edu.tum.sse.dirts.graph.EdgeType.*;
+import static edu.tum.sse.dirts.graph.EdgeType.ANNOTATION;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupNode;
 import static java.util.logging.Level.FINE;
@@ -52,33 +54,8 @@ public class DefaultNonTypeDependencyCollectorVisitor
 
     @Override
     public void visit(ClassOrInterfaceDeclaration n, DependencyGraph dependencyGraph) {
-        //InheritanceIdentifierVisitor inheritanceIdentifierVisitor = new InheritanceIdentifierVisitor(n);
-        //inheritanceIdentifierVisitorMap.put(n, inheritanceIdentifierVisitor);
         n.getMembers().stream().filter(m -> !m.isTypeDeclaration())
                 .forEach(m -> m.accept(this, dependencyGraph));
-
-        InheritanceIdentifierVisitor inheritanceIdentifierVisitor = inheritanceIdentifierVisitorMap.get(n);
-
-        // Dependencies from implicitly invoked constructor
-        if (n.getConstructors().isEmpty()) {
-            /*
-                If a class has no constructors, it has an implicit default constructor
-                When this constructor is invoked, the zero-argument constructor of the parent class is invoked implicitly
-             */
-
-            try {
-                Set<ResolvedConstructorDeclaration> parentConstructors = inheritanceIdentifierVisitor.getParentZeroArgConstructors();
-                ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration = n.resolve();
-                List<ResolvedConstructorDeclaration> constructors = resolvedReferenceTypeDeclaration.getConstructors();
-                for (ResolvedConstructorDeclaration constructor : constructors) { // Will only contain a single default constructor
-                    String node = lookup(constructor);
-                    dependencyGraph.addNode(node);
-                    processDelegation(dependencyGraph, node, new HashSet<>(parentConstructors));
-                }
-            } catch (RuntimeException e) {
-                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
-            }
-        }
     }
 
 
@@ -110,19 +87,19 @@ public class DefaultNonTypeDependencyCollectorVisitor
         for (ResolvedValueDeclaration resolvedAccessedField : resolvedAccessedFields) {
             if (resolvedAccessedField.isField()) {
                 String toNode = lookup(resolvedAccessedField.asField().declaringType(), resolvedAccessedField.asField());
-                dependencyGraph.addEdge(node, toNode, EdgeType.FIELD_ACCESS);
+                dependencyGraph.addEdge(node, toNode, FIELD_ACCESS);
             } else if (resolvedAccessedField.isEnumConstant()) {
                 Optional<ResolvedReferenceTypeDeclaration> maybeTypeDeclaration = resolvedAccessedField.getType().asReferenceType().getTypeDeclaration();
                 if (maybeTypeDeclaration.isPresent()) {
                     String toNode = lookup(maybeTypeDeclaration.get(), resolvedAccessedField.asEnumConstant());
-                    dependencyGraph.addEdge(node, toNode, EdgeType.FIELD_ACCESS);
+                    dependencyGraph.addEdge(node, toNode, FIELD_ACCESS);
                 }
             }
         }
         for (ResolvedValueDeclaration resolvedAssignedField : resolvedAssignedFields) {
             if (resolvedAssignedField.isField()) {
                 String fromNode = lookup(resolvedAssignedField.asField().declaringType(), resolvedAssignedField.asField());
-                dependencyGraph.addEdge(fromNode, node, EdgeType.FIELD_ACCESS);
+                dependencyGraph.addEdge(fromNode, node, FIELD_ACCESS);
             }
             // Assignment to EnumConstants is not possible
         }
@@ -134,7 +111,7 @@ public class DefaultNonTypeDependencyCollectorVisitor
         for (ResolvedMethodLikeDeclaration resolvedMethod : resolvedMethods) {
             if (!resolvedMethod.declaringType().isAnonymousClass()) {
                 String toNode = lookup(resolvedMethod);
-                dependencyGraph.addEdge(node, toNode, EdgeType.DELEGATION);
+                dependencyGraph.addEdge(node, toNode, DELEGATION);
             }
         }
     }
@@ -145,7 +122,7 @@ public class DefaultNonTypeDependencyCollectorVisitor
         for (ResolvedMethodLikeDeclaration resolvedOverriddenMethod : resolvedOverriddenMethods) {
             if (!resolvedOverriddenMethod.declaringType().isAnonymousClass()) {
                 String fromNode = lookup(resolvedOverriddenMethod);
-                dependencyGraph.addEdge(fromNode, node, EdgeType.INHERITANCE);
+                dependencyGraph.addEdge(fromNode, node, INHERITANCE);
             }
         }
     }
@@ -155,7 +132,7 @@ public class DefaultNonTypeDependencyCollectorVisitor
                                     Collection<ResolvedAnnotationDeclaration> resolvedAnnotations) {
         for (ResolvedAnnotationDeclaration resolvedAnnotation : resolvedAnnotations) {
             String toNode = lookup(resolvedAnnotation);
-            dependencyGraph.addEdge(node, toNode, EdgeType.ANNOTATION);
+            dependencyGraph.addEdge(node, toNode, ANNOTATION);
         }
     }
 
@@ -183,24 +160,6 @@ public class DefaultNonTypeDependencyCollectorVisitor
 
     @Override
     public void visit(ConstructorDeclaration n, DependencyGraph dependencyGraph) {
-        String node = lookupNode(n, dependencyGraph);
-
-        // Dependencies from implicitly invoked constructor
-        if (n.getBody().findFirst(SuperExpr.class).isEmpty()) {
-            /*
-                When no explicit call to super(...) is present, the zero-argument constructor of the parent class is invoked implicitly
-             */
-
-            TypeDeclaration<?> containingTypeDeclaration = getContainingTypeDeclaration(n);
-            if (containingTypeDeclaration != null) {
-                InheritanceIdentifierVisitor inheritanceIdentifierVisitor = this.inheritanceIdentifierVisitorMap.get(containingTypeDeclaration);
-                if (inheritanceIdentifierVisitor != null) {
-                    Set<ResolvedConstructorDeclaration> parentConstructors = inheritanceIdentifierVisitor.getParentZeroArgConstructors();
-                    processDelegation(dependencyGraph, node, new HashSet<>(parentConstructors));
-                }
-            }
-        }
-
         // Dependencies from Delegation and Accessed Fields
         handleDelegationFieldsAndAnnotations(n, dependencyGraph);
     }
@@ -215,8 +174,8 @@ public class DefaultNonTypeDependencyCollectorVisitor
                 String node = lookupNode(n, dependencyGraph);
                 String declaratorNode = lookupNode(variableDeclarator, dependencyGraph);
                 dependencyGraph.addNode(declaratorNode);
-                dependencyGraph.addEdge(node, declaratorNode, EdgeType.MULTIPLE_FIELD_DECL);
-                dependencyGraph.addEdge(declaratorNode, node, EdgeType.MULTIPLE_FIELD_DECL);
+                dependencyGraph.addEdge(node, declaratorNode, MULTIPLE_FIELD_DECL);
+                dependencyGraph.addEdge(declaratorNode, node, MULTIPLE_FIELD_DECL);
 
                 // Dependencies from Delegation and Accessed Fields
                 handleDelegationFieldsAndAnnotations(variableDeclarator, dependencyGraph);
@@ -247,6 +206,8 @@ public class DefaultNonTypeDependencyCollectorVisitor
 
     private void handleDelegationFieldsAndAnnotations(Node n, DependencyGraph dependencyGraph) {
         String node = lookupNode(n, dependencyGraph);
+
+        dependencyGraph.removeAllEdgesFrom(node, Set.of(DELEGATION, FIELD_ACCESS, ANNOTATION));
 
         // Dependencies from Delegation
         processDelegation(dependencyGraph, node, DelegationIdentifierVisitor.identifyDependencies(n));

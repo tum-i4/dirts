@@ -67,24 +67,15 @@ public class ProjectExporter<T extends BodyDeclaration<?>> extends KnowledgeSour
             Map<String, Node> nodesAdded = blackboard.getNodesAdded();
             Map<String, Node> nodesDifferent = blackboard.getNodesDifferent();
             Map<String, Integer> nodesRemoved = blackboard.getNodesRemoved();
-            Map<String, String> nameMapperNodes = blackboard.getNameMapperNodes();
 
             // Checksums
             Map<String, Integer> checksumsNodesNewRevision = new HashMap<>(blackboard.getChecksumsNodes());
-            nameMapperNodes.forEach((o, n) -> {
-                Integer tmp = checksumsNodesNewRevision.remove(o);
-                checksumsNodesNewRevision.put(n, tmp);
-            });
             nodesRemoved.keySet().forEach(checksumsNodesNewRevision::remove);
             nodesDifferent.forEach((name, t) -> checksumsNodesNewRevision.put(name, checksumVisitor.hashCode(t)));
             nodesAdded.forEach((name, t) -> checksumsNodesNewRevision.put(name, checksumVisitor.hashCode(t)));
 
             // CompilationUnits mapping
             Map<String, String> compilationUnitsMappingNew = new HashMap<>(blackboard.getCompilationUnitMapping());
-            nameMapperNodes.forEach((o, n) -> {
-                String tmp = compilationUnitsMappingNew.remove(o);
-                compilationUnitsMappingNew.put(n, tmp);
-            });
             nodesRemoved.keySet().forEach(compilationUnitsMappingNew::remove);
             nodesDifferent.forEach((name, t) -> {
                 Optional<CompilationUnit> maybeCompilationUnit = t.findCompilationUnit();

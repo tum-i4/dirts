@@ -2,20 +2,21 @@ package edu.tum.sse.dirts.core.strategies;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
-import edu.tum.sse.dirts.analysis.def.finders.TypeFinderVisitor;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
 import edu.tum.sse.dirts.core.Blackboard;
-import edu.tum.sse.dirts.core.knowledgesources.CodeChangeAnalyzer;
+import edu.tum.sse.dirts.core.knowledgesources.ChangeAnalyzer;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.spring.analysis.SpringBeanDependencyCollector;
-import edu.tum.sse.dirts.spring.analysis.SpringDependencyCollectorVisitor;
+import edu.tum.sse.dirts.spring.analysis.SpringInjectionPointCollectorVisitor;
+import edu.tum.sse.dirts.spring.analysis.SpringMapper;
 import edu.tum.sse.dirts.spring.analysis.bean.SpringBean;
 import edu.tum.sse.dirts.spring.analysis.bean.XMLBeanDefinition;
+import edu.tum.sse.dirts.spring.analysis.identifiers.SpringBeanMethodIdentifierVisitor;
+import edu.tum.sse.dirts.spring.analysis.identifiers.SpringComponentIdentifierVisitor;
 import edu.tum.sse.dirts.spring.analysis.identifiers.SpringXMLBeanIdentifier;
 import edu.tum.sse.dirts.util.JavaParserUtils;
 import edu.tum.sse.dirts.util.Log;
@@ -35,12 +36,16 @@ import static java.util.logging.Level.WARNING;
 /**
  * Contains tasks required by the dependency-analyzing extension for CDI
  */
-public class SpringDependencyStrategy<T extends BodyDeclaration<?>> implements DependencyStrategy<T> {
+public class SpringDependencyStrategy<T extends BodyDeclaration<?>>
+        extends DIDependencyStrategy<T, SpringBean>
+        implements DependencyStrategy<T> {
+
+    private final static String PREFIX = "spring";
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
-    private static final TypeReference<HashMap<String, Integer>> typeRefXMLBeans = new TypeReference<>() {};
+    private static final TypeReference<HashMap<String, Integer>> typeRefXMLBeans = new TypeReference<>() {
+    };
 
-    private final SpringDependencyCollectorVisitor<T> dependencyCollector;
     private final SpringBeanDependencyCollector springBeanDependencyCollector;
 
     private Map<String, Integer> checksumsXmlBeansOldRevision;
@@ -50,19 +55,20 @@ public class SpringDependencyStrategy<T extends BodyDeclaration<?>> implements D
     private final Map<String, XMLBeanDefinition> differentBeans = new HashMap<>();
     private final Map<String, XMLBeanDefinition> addedBeans = new HashMap<>();
     private final Map<String, Integer> removedBeans = new HashMap<>();
-    private final Map<String, String> nameMapper = new HashMap<>();
 
-    private final BeanStorage<SpringBean> springBeanBeanStorage = new BeanStorage<>();
+    private final BeanStorage<SpringBean> beanStorage = new BeanStorage<>();
 
-
-    public SpringDependencyStrategy(SpringDependencyCollectorVisitor<T> dependencyCollector,
-                                    SpringBeanDependencyCollector springBeanDependencyCollector) {
-        this.dependencyCollector = dependencyCollector;
+    public SpringDependencyStrategy(SpringInjectionPointCollectorVisitor<T> injectionPointCollector,
+                                    SpringBeanDependencyCollector springBeanDependencyCollector,
+                                    SpringMapper<T> nameMapper) {
+        super(PREFIX, injectionPointCollector, DI_SPRING, nameMapper);
         this.springBeanDependencyCollector = springBeanDependencyCollector;
     }
 
     @Override
     public void doImport(Path tmpPath, Blackboard<T> blackboard, String suffix) {
+        super.doImport(tmpPath, blackboard, suffix);
+
         Path rootPath = blackboard.getRootPath();
         Path subPath = blackboard.getSubPath();
 
@@ -97,11 +103,9 @@ public class SpringDependencyStrategy<T extends BodyDeclaration<?>> implements D
 
     @Override
     public void doExport(Path tmpPath, Blackboard<T> blackboard, String suffix) {
+        super.doExport(tmpPath, blackboard, suffix);
+
         Map<String, Integer> checksumsXMLBeansNewRevision = new HashMap<>(checksumsXmlBeansOldRevision);
-        nameMapper.forEach((o, n) -> {
-            Integer tmp = checksumsXMLBeansNewRevision.remove(o);
-            checksumsXMLBeansNewRevision.put(n, tmp);
-        });
         removedBeans.keySet().forEach(checksumsXMLBeansNewRevision::remove);
         differentBeans.forEach((name, t) -> checksumsXMLBeansNewRevision.put(name, t.getContent().hashCode()));
         addedBeans.forEach((name, t) -> checksumsXMLBeansNewRevision.put(name, t.getContent().hashCode()));
@@ -119,15 +123,16 @@ public class SpringDependencyStrategy<T extends BodyDeclaration<?>> implements D
 
     @Override
     public void doChangeAnalysis(Blackboard<T> blackboard) {
-        CodeChangeAnalyzer.calculateChange(
+        super.doChangeAnalysis(blackboard);
+
+        ChangeAnalyzer.calculateChange(
                 checksumsXmlBeansOldRevision,
                 b -> b.getContent().hashCode(),
                 xmlBeansNewRevision,
                 sameBeans,
                 differentBeans,
                 addedBeans,
-                removedBeans,
-                nameMapper);
+                removedBeans);
 
         TypeSolver typeSolver = blackboard.getTypeSolver();
 
@@ -139,14 +144,14 @@ public class SpringDependencyStrategy<T extends BodyDeclaration<?>> implements D
             SpringBean bean = new SpringBean(definition);
 
             for (String name : names) {
-                springBeanBeanStorage.addBeanByName(name, bean);
+                beanStorage.addBeanByName(name, bean);
             }
 
             lookupTypeDeclaration(definition.getClassName(), typeSolver).ifPresent(c -> {
-                springBeanBeanStorage.addBeanByTypeDeclaration(c, bean);
+                beanStorage.addBeanByTypeDeclaration(c, bean);
                 try {
                     for (ResolvedReferenceType ancestor : c.getAllAncestors(JavaParserUtils.depthFirstFuncAcceptIncompleteList)) {
-                        springBeanBeanStorage.addBeanByType(ancestor, bean);
+                        beanStorage.addBeanByType(ancestor, bean);
                     }
                 } catch (RuntimeException ignored) {
                 }
@@ -157,39 +162,48 @@ public class SpringDependencyStrategy<T extends BodyDeclaration<?>> implements D
 
     @Override
     public void doGraphCropping(Blackboard<T> blackboard) {
+        super.doGraphCropping(blackboard);
+
         DependencyGraph dependencyGraph = blackboard.getDependencyGraphNewRevision();
 
         // remove removed nodes
         removedBeans.forEach((n, i) -> dependencyGraph.removeNode(n));
 
-        // rename nodes that have been renamed
-        nameMapper.forEach(dependencyGraph::renameNode);
-
         // add new nodes
         addedBeans.keySet().forEach(dependencyGraph::addNode);
+    }
 
-        // remove all edges of Type Spring
-        dependencyGraph.removeAllEdgesByType(Set.of(DI_SPRING));
+    @Override
+    protected Set<Set<String>> calculateImpactedBeans() {
+        return removedBeans.keySet().stream().map(Set::of).collect(Collectors.toSet());
+    }
+
+    @Override
+    protected BeanStorage<SpringBean> collectBeans(Collection<TypeDeclaration<?>> ts) {
+
+        // Collect all types annotated with @Component
+        SpringComponentIdentifierVisitor.identifyDependencies(ts, beanStorage);
+
+        // Collect all methods annotated with @Bean
+        // Because of "lite mode" beans can be declared in all classes, not only in those annotated with @Configuration
+        SpringBeanMethodIdentifierVisitor.identifyDependencies(ts, beanStorage);
+
+        return beanStorage;
     }
 
     @Override
     public void doDependencyAnalysis(Blackboard<T> blackboard) {
-        Collection<CompilationUnit> compilationUnits = blackboard.getCompilationUnits();
-        DependencyGraph dependencyGraphNewRevision = blackboard.getDependencyGraphNewRevision();
-
-        List<TypeDeclaration<?>> typeDeclarations = new ArrayList<>();
-        TypeFinderVisitor typeFinderVisitor = new TypeFinderVisitor();
-        compilationUnits.forEach(cu -> cu.accept(typeFinderVisitor, typeDeclarations));
-
-        dependencyCollector.setBeanStorage(springBeanBeanStorage);
-        dependencyCollector.calculateDependencies(typeDeclarations, dependencyGraphNewRevision);
+        super.doDependencyAnalysis(blackboard);
 
         springBeanDependencyCollector.setTypeSolver(blackboard.getTypeSolver());
-        springBeanDependencyCollector.calculateDependencies(xmlBeansNewRevision.values(), dependencyGraphNewRevision);
+        springBeanDependencyCollector.calculateDependencies(xmlBeansNewRevision.values(),
+                blackboard.getDependencyGraphNewRevision());
     }
 
     @Override
     public void combineGraphs(Blackboard<T> blackboard) {
+        super.combineGraphs(blackboard);
+
         blackboard.getCombinedGraph().setModificationByStatus(
                 sameBeans.keySet(),
                 differentBeans.keySet(),

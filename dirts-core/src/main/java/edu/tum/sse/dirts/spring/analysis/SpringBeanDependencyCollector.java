@@ -12,21 +12,27 @@
  */
 package edu.tum.sse.dirts.spring.analysis;
 
+import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.spring.analysis.bean.SpringBean;
 import edu.tum.sse.dirts.spring.analysis.bean.XMLBeanDefinition;
+import edu.tum.sse.dirts.spring.util.SpringNames;
+import edu.tum.sse.dirts.util.alternatives.TriAlternative;
+import edu.tum.sse.dirts.util.alternatives.TriFirstOption;
+import edu.tum.sse.dirts.util.alternatives.TriSecondOption;
+import edu.tum.sse.dirts.util.naming_scheme.Names;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupMethods;
-import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupTypeDeclaration;
+import static edu.tum.sse.dirts.util.naming_scheme.Names.*;
 
 /**
  * Collects dependencies from beans to beans/code entities
@@ -98,7 +104,7 @@ public abstract class SpringBeanDependencyCollector {
 
         // edges to other beans
         for (String dependsOnBean : dependsOnBeans) {
-            Set<SpringBean> beans = beanStorage.getBeansForName(dependsOnBean);
+            Set<SpringBean> beans = beanStorage.getBeans(null, dependsOnBean, Set.of());
             ret.addAll(beans);
         }
 

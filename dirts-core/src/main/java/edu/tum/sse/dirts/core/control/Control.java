@@ -14,7 +14,6 @@ package edu.tum.sse.dirts.core.control;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.BodyDeclaration;
-import edu.tum.sse.dirts.analysis.DependencyCollector;
 import edu.tum.sse.dirts.analysis.FinderVisitor;
 import edu.tum.sse.dirts.analysis.def.DefaultDependencyCollectorVisitor;
 import edu.tum.sse.dirts.analysis.def.checksum.ChecksumVisitor;
@@ -104,6 +103,8 @@ public abstract class Control<T extends BodyDeclaration<?>> {
     // Methods
 
     protected void init() {
+        blackboard.setNameFinderVisitor(nameFinderVisitor);
+
         List<KnowledgeSource<T>> knowledgeSources = List.of(
                 new ProjectImporter<>(blackboard),
 
@@ -111,8 +112,7 @@ public abstract class Control<T extends BodyDeclaration<?>> {
 
                 new Parser<>(blackboard),
 
-                new CodeChangeAnalyzer<>(blackboard,
-                        nameFinderVisitor,
+                new ChangeAnalyzer<>(blackboard,
                         checksumVisitor),
 
                 new TestFinder<>(blackboard,

@@ -28,7 +28,7 @@ public enum BlackboardState {
     TYPE_SOLVER_SET,        // TypeSolverInitializer
     PARSED,                  // Parser
     TESTS_FOUND,            // TestFinder
-    NODES_CHANGES_SET,      // CodeChangeAnalyzer<T,T>
+    NODES_CHANGES_SET,      // ChangeAnalyzer<T,T>
     NEW_GRAPH_SET,          // GraphCropper
 
     DEPENDENCIES_UPDATED,   // DEPENDENCY_ANALYZER

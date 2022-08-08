@@ -26,9 +26,11 @@ import edu.tum.sse.dirts.spring.util.SpringUtil;
 import edu.tum.sse.dirts.util.JavaParserUtils;
 import edu.tum.sse.dirts.util.Log;
 
+import javax.swing.*;
 import java.util.Collection;
 import java.util.Set;
 
+import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 import static java.util.logging.Level.FINE;
 
 /**

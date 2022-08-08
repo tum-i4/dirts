@@ -15,8 +15,6 @@ package edu.tum.sse.dirts.core.control;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.TypeDeclaration;
-import edu.tum.sse.dirts.analysis.DependencyCollector;
-import edu.tum.sse.dirts.analysis.def.DefaultDependencyCollectorVisitor;
 import edu.tum.sse.dirts.analysis.def.DefaultTypeDependencyCollectorVisitor;
 import edu.tum.sse.dirts.analysis.def.JUnitTypeDependencyCollectorVisitor;
 import edu.tum.sse.dirts.analysis.def.checksum.TypeChecksumVisitor;
@@ -76,7 +74,7 @@ public class TypeLevelControl extends Control<TypeDeclaration<?>> {
                 affectedEdges,
                 nodesInGraphFilter));
         blackboard.addDependencyStrategy(new CachingDependencyStrategy<>(
-                Set.of(new JUnitTypeDependencyCollectorVisitor(blackboard.getTestFilter())),
-                Set.of(JUNIT)));
+                Set.of(new JUnitTypeDependencyCollectorVisitor(blackboard.getTestFilter()))
+        ));
     }
 }

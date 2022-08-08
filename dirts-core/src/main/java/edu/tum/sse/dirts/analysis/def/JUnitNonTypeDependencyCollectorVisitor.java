@@ -30,7 +30,9 @@ import org.apache.maven.surefire.api.testset.TestFilter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import static edu.tum.sse.dirts.graph.EdgeType.JUNIT;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 import static java.util.logging.Level.FINE;
 
@@ -81,7 +83,7 @@ public class JUnitNonTypeDependencyCollectorVisitor
                             {
                                 List<ResolvedConstructorDeclaration> constructors = resolvedInnerClassDeclaration.getConstructors();
                                 String toNode = lookup(constructors.get(0));
-                                dependencyGraph.addEdge(fromNode, toNode, EdgeType.JUNIT);
+                                dependencyGraph.addEdge(fromNode, toNode, JUNIT);
                             }
 
                             // Create edges from constructor of outer class to test methods
@@ -89,7 +91,7 @@ public class JUnitNonTypeDependencyCollectorVisitor
                                 for (ResolvedMethodDeclaration declaredMethod : resolvedInnerClassDeclaration.getDeclaredMethods()) {
                                     if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration), declaredMethod.getName())) {
                                         String toNode = lookup(declaredMethod);
-                                        dependencyGraph.addEdge(fromNode, toNode, EdgeType.JUNIT);
+                                        dependencyGraph.addEdge(fromNode, toNode, JUNIT);
                                     }
                                 }
                             }
@@ -172,7 +174,7 @@ public class JUnitNonTypeDependencyCollectorVisitor
                                       Collection<ResolvedMethodDeclaration> resolvedBeforeMethods) {
         for (ResolvedMethodLikeDeclaration resolvedBeforeMethod : resolvedBeforeMethods) {
             String toNode = lookup(resolvedBeforeMethod);
-            dependencyGraph.addEdge(node, toNode, EdgeType.JUNIT);
+            dependencyGraph.addEdge(node, toNode, JUNIT);
         }
     }
 
@@ -186,6 +188,7 @@ public class JUnitNonTypeDependencyCollectorVisitor
             String node = lookup.getFirst();
             lookup.getSecond().ifPresent(e -> dependencyGraph.addMessage(node, e));
 
+            dependencyGraph.removeAllEdgesFrom(node, Set.of(JUNIT));
             // Dependencies from methods annotated with @Before
             processBeforeMethods(dependencyGraph, node, this.resolvedBeforeMethods);
         }

@@ -39,7 +39,6 @@ public class NonTypeLevelGraphCropper extends AbstractGraphCropper<BodyDeclarati
     @Override
     public Collection<TypeDeclaration<?>> calculateImpactedTypeDeclarations(
             DependencyGraph dependencyGraph,
-            Map<String, String> nameMapperNodes,
             Collection<CompilationUnit> compilationUnits,
             Map<String, Node> nodesAdded,
             Map<String, Integer> nodesRemoved,
@@ -55,19 +54,18 @@ public class NonTypeLevelGraphCropper extends AbstractGraphCropper<BodyDeclarati
 
         // In nontypeL it may be that removed or renamed nodes are pointed to by other nodes that need not change
         // However, the dependencies of these nodes may change and need to be recalculated
-        Stream.concat(nodesRemoved.keySet().stream(), nameMapperNodes.values().stream())
-                .forEach(name -> {
-                    Set<String> affectedNodesNames = dependencyGraph.removeAllEdgesTo(name, affectedEdges);
-                    Set<Node> affectedNodes = allNodes.entrySet().stream()
-                            .filter(e -> affectedNodesNames.contains(e.getKey()))
-                            .map(Map.Entry::getValue)
-                            .collect(Collectors.toSet());
-                    impactedCompilationUnits.addAll(affectedNodes.stream()
-                            .map(Node::findCompilationUnit)
-                            .filter(Optional::isPresent)
-                            .map(Optional::get)
-                            .collect(Collectors.toSet()));
-                });
+        nodesRemoved.keySet().forEach(name -> {
+            Set<String> affectedNodesNames = dependencyGraph.removeAllEdgesTo(name, affectedEdges);
+            Set<Node> affectedNodes = allNodes.entrySet().stream()
+                    .filter(e -> affectedNodesNames.contains(e.getKey()))
+                    .map(Map.Entry::getValue)
+                    .collect(Collectors.toSet());
+            impactedCompilationUnits.addAll(affectedNodes.stream()
+                    .map(Node::findCompilationUnit)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toSet()));
+        });
 
         // Add all CompilationUnits that contained removed nodes (if they are not removed entirely)
         impactedCompilationUnits.addAll(nodesRemoved.keySet()
@@ -107,7 +105,7 @@ public class NonTypeLevelGraphCropper extends AbstractGraphCropper<BodyDeclarati
                     .map(NodeWithName::getNameAsString)
                     .collect(Collectors.toSet()));
 
-            // Add all nodes that have been renamed and correspond to a CompilationUnit
+/*            // Add all nodes that have been renamed and correspond to a CompilationUnit
             affectedPackagesNodes.addAll(nodesSame.entrySet().stream()
                     .filter(n -> n.getValue() instanceof CompilationUnit)
                     .filter(n -> nameMapperNodes.containsValue(n.getKey()))
@@ -115,7 +113,7 @@ public class NonTypeLevelGraphCropper extends AbstractGraphCropper<BodyDeclarati
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .map(NodeWithName::getNameAsString)
-                    .collect(Collectors.toSet()));
+                    .collect(Collectors.toSet()));*/
 
             impactedCompilationUnits.addAll(compilationUnits.stream()
                     .filter(cu -> cu.getPackageDeclaration()

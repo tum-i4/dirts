@@ -2,20 +2,17 @@ package edu.tum.sse.dirts.mojos;
 
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
-import edu.tum.sse.dirts.analysis.di.BeanStorage;
-import edu.tum.sse.dirts.cdi.analysis.CDINonTypeDependencyCollectorVisitor;
-import edu.tum.sse.dirts.cdi.analysis.CDITypeDependencyCollectorVisitor;
+import edu.tum.sse.dirts.cdi.analysis.*;
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.core.strategies.CDIDependencyStrategy;
-import edu.tum.sse.dirts.core.strategies.RecomputeAllDependencyStrategy;
+import edu.tum.sse.dirts.core.strategies.GuiceDependencyStrategy;
 import edu.tum.sse.dirts.core.strategies.SpringDependencyStrategy;
-import edu.tum.sse.dirts.guice.analysis.GuiceNonTypeDependencyCollectorVisitor;
-import edu.tum.sse.dirts.guice.analysis.GuiceTypeDependencyCollectorVisitor;
-import edu.tum.sse.dirts.spring.analysis.SpringBeanNonTypeDependencyCollector;
-import edu.tum.sse.dirts.spring.analysis.SpringBeanTypeDependencyCollector;
-import edu.tum.sse.dirts.spring.analysis.SpringNonTypeDependencyCollectorVisitor;
-import edu.tum.sse.dirts.spring.analysis.SpringTypeDependencyCollectorVisitor;
+import edu.tum.sse.dirts.guice.analysis.GuiceNonTypeInjectionPointCollectorVisitor;
+import edu.tum.sse.dirts.guice.analysis.GuiceNonTypeMapper;
+import edu.tum.sse.dirts.guice.analysis.GuiceTypeInjectionPointCollectorVisitor;
+import edu.tum.sse.dirts.guice.analysis.GuiceTypeMapper;
+import edu.tum.sse.dirts.spring.analysis.*;
 import edu.tum.sse.dirts.util.JavaParserUtils;
 import edu.tum.sse.dirts.util.Log;
 import org.apache.maven.model.Plugin;
@@ -25,11 +22,7 @@ import org.apache.maven.project.MavenProject;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
-
-import static edu.tum.sse.dirts.graph.EdgeType.DI_GUICE;
-import static java.util.logging.Level.CONFIG;
 
 /**
  * Abstract parent class of all Mojos related to DIRTS
@@ -73,9 +66,9 @@ public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends Su
     // Methods to initialize control objects
 
     /**
-     * Initializes class level control object
+     * Initializes class level blackboard
      *
-     * @return
+     * @return blackboard
      */
     protected Blackboard<TypeDeclaration<?>> getTypeLevelBlackboard() {
         Path rootPath = getRootPath();
@@ -87,30 +80,32 @@ public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends Su
         // Spring
         if (useSpringExtension) {
             blackboard.addDependencyStrategy(new SpringDependencyStrategy<>(
-                    new SpringTypeDependencyCollectorVisitor(),
-                    new SpringBeanTypeDependencyCollector()));
+                    new SpringTypeInjectionPointCollectorVisitor(),
+                    new SpringBeanTypeDependencyCollector(),
+                    new SpringTypeMapper()));
         }
 
         // Guice
         if (useGuiceExtension) {
-            blackboard.addDependencyStrategy(new RecomputeAllDependencyStrategy<>(
-                    Set.of(new GuiceTypeDependencyCollectorVisitor(new BeanStorage<>())),
-                    Set.of(DI_GUICE)));
+            blackboard.addDependencyStrategy(new GuiceDependencyStrategy<>(
+                    new GuiceTypeInjectionPointCollectorVisitor(),
+                    new GuiceTypeMapper()));
         }
 
         // CDI
         if (useCDIExtension) {
-            blackboard.addDependencyStrategy(
-                    new CDIDependencyStrategy<>(new CDITypeDependencyCollectorVisitor()));
+            blackboard.addDependencyStrategy(new CDIDependencyStrategy<>(
+                    new CDITypeInjectionPointCollectorVisitor(),
+                    new CDITypeMapper(), new CDITypeAlternativeDependencyCollector()));
         }
 
         return blackboard;
     }
 
     /**
-     * Initializes method level control object
+     * Initializes method level blackboard
      *
-     * @return
+     * @return blackboard
      */
     protected Blackboard<BodyDeclaration<?>> getNonTypeLevelBlackboard() {
         Path rootPath = getRootPath();
@@ -125,21 +120,23 @@ public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends Su
         // Spring
         if (useSpringExtension) {
             blackboard.addDependencyStrategy(new SpringDependencyStrategy<>(
-                    new SpringNonTypeDependencyCollectorVisitor(),
-                    new SpringBeanNonTypeDependencyCollector()));
+                    new SpringNonTypeInjectionPointCollectorVisitor(),
+                    new SpringBeanNonTypeDependencyCollector(),
+                    new SpringNonTypeMapper()));
         }
 
         // Guice
         if (useGuiceExtension) {
-            blackboard.addDependencyStrategy(new RecomputeAllDependencyStrategy<>(
-                    Set.of(new GuiceNonTypeDependencyCollectorVisitor(new BeanStorage<>())),
-                    Set.of(DI_GUICE)));
+            blackboard.addDependencyStrategy(new GuiceDependencyStrategy<>(
+                    new GuiceNonTypeInjectionPointCollectorVisitor(),
+                    new GuiceNonTypeMapper()));
         }
 
         // CDI
         if (useCDIExtension) {
-            blackboard.addDependencyStrategy(
-                    new CDIDependencyStrategy<>(new CDINonTypeDependencyCollectorVisitor()));
+            blackboard.addDependencyStrategy(new CDIDependencyStrategy<>(
+                    new CDINonTypeInjectionPointCollectorVisitor(),
+                    new CDINonTypeMapper(), new CDINonTypeAlternativeDependencyCollector()));
         }
 
         return blackboard;
@@ -175,6 +172,7 @@ public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends Su
      */
     // From ekstazi: https://github.com/gliga/ekstazi/blob/6567da0534c20eeee802d2dfb8d216cbcbf6883c/ekstazi-maven-plugin/src/main/java/org/ekstazi/maven/AbstractEkstaziMojo.java#L128
     // with slight modifications
+    @SuppressWarnings({"SameParameterValue", "unchecked"})
     protected Plugin lookupPlugin(String key) {
         List<Plugin> plugins = this.getProject().getBuildPlugins();
 

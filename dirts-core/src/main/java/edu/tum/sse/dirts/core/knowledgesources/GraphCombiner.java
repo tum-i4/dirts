@@ -34,12 +34,10 @@ public class GraphCombiner<T extends BodyDeclaration<?>> extends KnowledgeSource
     public BlackboardState updateBlackboard() {
         DependencyGraph dependencyGraphOldRevision = blackboard.getDependencyGraphOldRevision();
         DependencyGraph dependencyGraphNewRevision = blackboard.getDependencyGraphNewRevision();
-        Map<String, String> nameMapper = blackboard.getNameMapperNodes();
 
         ModificationGraph modificationGraph = new ModificationGraph(
                 dependencyGraphOldRevision,
-                dependencyGraphNewRevision,
-                nameMapper);
+                dependencyGraphNewRevision);
 
 
         modificationGraph.setModificationByStatus(

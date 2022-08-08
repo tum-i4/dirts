@@ -13,13 +13,22 @@
 package edu.tum.sse.dirts.analysis.def.finders;
 
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.*;
+import com.github.javaparser.ast.expr.SuperExpr;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import edu.tum.sse.dirts.analysis.FinderVisitor;
+import edu.tum.sse.dirts.util.Log;
 
+import javax.swing.text.BadLocationException;
+import java.util.List;
 import java.util.Map;
 
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
+import static java.util.logging.Level.FINE;
 
 /**
  * Collects all NonType-nodes and their names
@@ -42,6 +51,14 @@ public class NonTypeNameFinderVisitor extends FinderVisitor<Map<String, Node>, B
 
     @Override
     public void visit(ClassOrInterfaceDeclaration n, Map<String, Node> arg) {
+        // we add an entry for the default constructor without node
+        if (!n.isInterface() || n.getConstructors().isEmpty()) {
+            ConstructorDeclaration constructorDeclaration = n.addConstructor(Modifier.Keyword.PUBLIC);
+            BlockStmt blockStmt = new BlockStmt();
+            blockStmt.addStatement(new SuperExpr());
+            constructorDeclaration.setBody(blockStmt);
+        }
+
         super.visit(n, arg);
         //arg.put(lookup(n).getFirst(), n);
     }

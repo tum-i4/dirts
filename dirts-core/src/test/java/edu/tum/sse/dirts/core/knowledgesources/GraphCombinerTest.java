@@ -28,14 +28,12 @@ public class GraphCombinerTest extends KnowledgeSourceTest {
         DependencyGraph dependencyGraphNewMock = new DependencyGraph();
         dependencyGraphNewMock.addNode("NewClass");
         dependencyGraphOldMock.addNode("OldClass");
-        Map<String, String> nameMapper = new HashMap<>();
 
         ArgumentCaptor<ModificationGraph> modificationGraphCaptor = ArgumentCaptor.forClass(ModificationGraph.class);
 
         /* when */
         when(blackboardMock.getRootPath()).thenReturn(rootPath);
         when(blackboardMock.getSubPath()).thenReturn(subPath);
-        when(blackboardMock.getNameMapperNodes()).thenReturn(nameMapper);
 
         when(blackboardMock.getDependencyGraphOldRevision()).thenReturn(dependencyGraphOldMock);
         when(blackboardMock.getDependencyGraphNewRevision()).thenReturn(dependencyGraphNewMock);

@@ -12,18 +12,17 @@
  */
 package edu.tum.sse.dirts.guice.analysis;
 
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import edu.tum.sse.dirts.analysis.AbstractTruncatedVisitor;
-import edu.tum.sse.dirts.analysis.DependencyCollector;
-import edu.tum.sse.dirts.analysis.di.BeanStorage;
-import edu.tum.sse.dirts.graph.DependencyGraph;
-import edu.tum.sse.dirts.guice.analysis.identifiers.*;
-import edu.tum.sse.dirts.guice.util.GuiceBinding;
+import edu.tum.sse.dirts.analysis.di.InjectionPointCollector;
+import edu.tum.sse.dirts.analysis.di.InjectionPointStorage;
 import edu.tum.sse.dirts.guice.util.GuiceUtil;
 import edu.tum.sse.dirts.util.JavaParserUtils;
 import edu.tum.sse.dirts.util.Log;
@@ -32,46 +31,25 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
+import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 
-public abstract class GuiceDependencyCollectorVisitor<P extends BodyDeclaration<?>> extends AbstractTruncatedVisitor<DependencyGraph>
-        implements DependencyCollector<P> {
-
-    //##################################################################################################################
-    // Attributes
-
-    private final BeanStorage<GuiceBinding> bindingsStorage;
-
-    public GuiceDependencyCollectorVisitor(BeanStorage<GuiceBinding> bindingsStorage) {
-        this.bindingsStorage = bindingsStorage;
-    }
+public abstract class GuiceInjectionPointCollectorVisitor<P extends BodyDeclaration<?>>
+        extends AbstractTruncatedVisitor<InjectionPointStorage>
+        implements InjectionPointCollector<P> {
 
     //##################################################################################################################
     // Methods specified by DependencyCollector
 
-    public void calculateDependencies(Collection<TypeDeclaration<?>> ts, DependencyGraph dependencyGraph) {
-        // collect all bindings
-        ProvidesIdentifierVisitor.identifyDependencies(ts, bindingsStorage);
-        BindToIdentifier.identifyDependencies(ts, bindingsStorage);
-        AutoBindSingletonIdentifierVisitor.identifyDependencies(ts, bindingsStorage);
-        ProviderIdentifierVisitor.identifyDependencies(ts, bindingsStorage);
-        JustInTimeIdentifierVisitor.identifyDependencies(ts, bindingsStorage);
-        ImplementedByIdentifierVisitor.identifyDependencies(ts, bindingsStorage);
-        ProvidedByIdentifierVisitor.identifyDependencies(ts, bindingsStorage);
-
+    public void collectInjectionPoints(Collection<TypeDeclaration<?>> ts, InjectionPointStorage injectionPoints) {
         for (TypeDeclaration<?> t : ts) {
-            t.accept(this, dependencyGraph);
+            t.accept(this, injectionPoints);
         }
-
-        Log.log(FINER, "BEANS", "\n" + bindingsStorage.toString());
     }
-
-    //##################################################################################################################
-    // Methods required in subclasses
-
-    protected abstract void processBindings(DependencyGraph arg, BodyDeclaration<?> n, Set<GuiceBinding> bindings);
 
     //##################################################################################################################
     // Methods used by subclasses
@@ -80,28 +58,67 @@ public abstract class GuiceDependencyCollectorVisitor<P extends BodyDeclaration<
         return GuiceUtil.isInjectNode(bodyDeclaration);
     }
 
-    protected void getCandidates(ResolvedType injectedType,
-                                 String name,
-                                 Set<String> bindingAnnotations,
-                                 Collection<GuiceBinding> candidates) {
-        candidates.addAll(bindingsStorage.getBeansForTypeAndNameAndQualifiers(injectedType, name, bindingAnnotations));
-        if (injectedType.isReferenceType()) {
-            checkCollectionInjection(injectedType.asReferenceType(), candidates);
+    protected <T extends Node & NodeWithAnnotations<?>, R> void handleInjectionVariable(
+            InjectionPointStorage injectionPoints,
+            R node,
+            Function<R, String> getterNodeName,
+            T injectionVariable,
+            Function<T, ResolvedType> getterType) {
+
+        ResolvedType type = null;
+        String nodeName = null;
+
+        // Name
+        String name = GuiceUtil.findName(injectionVariable).orElse(null);
+
+        // Qualifiers
+        Set<String> qualifiers = GuiceUtil.findQualifiers(injectionVariable);
+
+        try {
+            // Type
+            type = getterType.apply(injectionVariable);
+
+            nodeName = getterNodeName.apply(node);
+
+        } catch (RuntimeException e) {
+            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        }
+
+        // add injection points
+        if (nodeName != null) {
+            injectionPoints.addInjectionPoint(nodeName, type, name, qualifiers);
+
+            if (type != null && type.isReferenceType()) {
+                checkCollectionInjection(injectionPoints, nodeName, type.asReferenceType(), name, qualifiers);
+            }
         }
     }
 
-    protected void handleGetInstance(Set<GuiceBinding> candidateMethods, Set<ResolvedType> retrievedTypes) {
+    protected <R> void handleGetInstance(InjectionPointStorage injectionPoints,
+                                         R node,
+                                         Function<R, String> getterNodeName,
+                                         Set<ResolvedType> retrievedTypes) {
         // injection through getInstance()
-        for (ResolvedType retrievedType : retrievedTypes) {
-            getCandidates(retrievedType, null, null, candidateMethods);
+        if (!retrievedTypes.isEmpty()) {
+            String nodeName = getterNodeName.apply(node);
+            for (ResolvedType retrievedType : retrievedTypes) {
+                injectionPoints.addInjectionPoint(nodeName, retrievedType, null, Set.of());
+
+                if (retrievedType.isReferenceType()){
+                    checkCollectionInjection(injectionPoints, nodeName, retrievedType.asReferenceType(), null, Set.of());
+                }
+            }
         }
     }
 
     //##################################################################################################################
     // Auxiliary methods
 
-    private void checkCollectionInjection(ResolvedReferenceType injectedReferenceType,
-                                          Collection<GuiceBinding> candidates) {
+    private void checkCollectionInjection(InjectionPointStorage injectionPointStorage,
+                                          String outerName,
+                                          ResolvedReferenceType injectedReferenceType,
+                                          String name,
+                                          Set<String> qualifiers) {
         Optional<ResolvedReferenceTypeDeclaration> mayBeTypeDeclaration = injectedReferenceType.getTypeDeclaration();
         if (mayBeTypeDeclaration.isPresent()) {
             ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration = mayBeTypeDeclaration.get();
@@ -126,7 +143,7 @@ public abstract class GuiceDependencyCollectorVisitor<P extends BodyDeclaration<
                         .stream().map(p -> p.b)
                         .collect(Collectors.toList());
                 ResolvedType containedType = typeParameters.get(0);
-                getCandidates(containedType, null, null, candidates);
+                injectionPointStorage.addInjectionPoint(outerName, containedType, name, qualifiers);
             }
 
             // Map
@@ -146,7 +163,7 @@ public abstract class GuiceDependencyCollectorVisitor<P extends BodyDeclaration<
                             (keyType.asReferenceType().getQualifiedName().equals("java.lang.String")
                                     || keyType.asReferenceType().getQualifiedName().equals("java.lang.Class")
                                     || keyType.asReferenceType().getQualifiedName().equals("java.lang.Enum"))) {
-                        getCandidates(valueType, null, null, candidates);
+                        injectionPointStorage.addInjectionPoint(outerName, valueType, name, qualifiers);
                     }
                 }
             }

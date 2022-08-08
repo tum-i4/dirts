@@ -12,6 +12,7 @@
  */
 package edu.tum.sse.dirts.analysis.di;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
@@ -23,10 +24,8 @@ import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 
 /**
  * Used to store Bean
- *
- * @param <T>
  */
-public class BeanStorage<T extends Bean> {
+public class BeanStorage<T> {
 
     /*
      * Unfortunately, JavaParser considers two resolved entities as different, if their corresponding declarations
@@ -36,7 +35,7 @@ public class BeanStorage<T extends Bean> {
      * That is why we use the qualified name as keys here
      *
      * Problems may occur when types are renamed and changed at the same revision
-     * This is partially solved by treating such classes as added in the CodeChangeAnalyzer
+     * This is partially solved by treating such classes as added in the ChangeAnalyzer
      */
 
     //##################################################################################################################
@@ -46,6 +45,27 @@ public class BeanStorage<T extends Bean> {
     private final Map<String, Set<T>> beansByName = new HashMap<>();
     private final Map<String, Set<T>> beansByType = new HashMap<>();
     private final Map<String, Set<T>> beansByQualifier = new HashMap<>();
+
+    public Set<T> getBeans(String type, String name, Set<String> qualifiers) {
+        HashSet<T> ret = new HashSet<>(allBeans);
+
+        if (type != null) {
+            if (beansByType.containsKey(type)) {
+                ret.retainAll(beansByType.get(type));
+            } else {
+                // if type is give, but does not match, we do not want any beans to be returned
+                ret.clear();
+            }
+        }
+        if (name != null && beansByName.containsKey(name)) {
+            ret.retainAll(beansByName.get(name));
+        }
+        for (String qualifier : qualifiers) {
+            if (beansByQualifier.containsKey(qualifier))
+                ret.retainAll(beansByQualifier.get(qualifier));
+        }
+        return ret;
+    }
 
     //##################################################################################################################
     // Setters (...methods that add beans)
@@ -75,6 +95,15 @@ public class BeanStorage<T extends Bean> {
                 addBeanStrictlyByType(type, newBean);
             }
         }
+    }
+
+    public void addBeanByType(String type, T newBean) {
+        if (type != null && newBean != null)
+            if (!beansByType.containsKey(type)) {
+                beansByType.put(type, new HashSet<>());
+            }
+        allBeans.add(newBean);
+        beansByType.get(type).add(newBean);
     }
 
     private void addBeanStrictlyByType(ResolvedType type, T newBean) {
@@ -107,123 +136,74 @@ public class BeanStorage<T extends Bean> {
         }
     }
 
-    //##################################################################################################################
-    // Getters
-    // Are designed to yield the intersection of beans corresponding to name, type and qualifier
-    // if at least one is present
-
-    public Set<T> getBeansForType(ResolvedType type) {
-        Set<T> ret = new HashSet<>();
-        if (type != null) {
-            String key;
-            if (type.isReferenceType()) {
-                Optional<ResolvedReferenceTypeDeclaration> maybeTypeDeclaration = type.asReferenceType().getTypeDeclaration();
-                if (maybeTypeDeclaration.isPresent()) {
-                    key = lookup(maybeTypeDeclaration.get());
-                } else {
-                    key = lookup(type);
-                }
-                if (beansByType.containsKey(key))
-                    ret.addAll(beansByType.get(key));
-            } else {
-                key = lookup(type);
-                if (beansByType.containsKey(key))
-                    ret.addAll(beansByType.get(key));
-            }
-        }
-        return Collections.unmodifiableSet(ret);
-    }
-
-    public Set<T> getBeansForName(String name) {
-        Set<T> ret = new HashSet<>();
-        if (name != null)
-            if (beansByName.containsKey(name))
-                ret.addAll(beansByName.get(name));
-        return Collections.unmodifiableSet(ret);
-    }
-
-    public Set<T> getBeansForQualifiers(Set<String> qualifiers) {
-        Set<T> ret = new HashSet<>();
-        if (qualifiers != null) {
-            for (String qualifier : qualifiers) {
-                if (beansByQualifier.containsKey(qualifier))
-                    ret.addAll(beansByQualifier.get(qualifier));
-            }
-        }
-        return Collections.unmodifiableSet(ret);
-    }
-
-    public Set<T> getBeansForTypeAndName(ResolvedType type, String name) {
-        Set<T> ret = new HashSet<>();
-        if (type != null || name != null)
-            ret.addAll(allBeans);
-        if (type != null)
-            ret.retainAll(getBeansForType(type));
-        if (name != null)
-            ret.retainAll(getBeansForName(name));
-        return Collections.unmodifiableSet(ret);
-    }
-
-    public Set<T> getBeansForTypeAndQualifiers(ResolvedType type, Set<String> qualifiers) {
-        Set<T> ret = new HashSet<>();
-        if (type != null || (qualifiers != null && !qualifiers.isEmpty()))
-            ret.addAll(allBeans);
-        if (type != null)
-            ret.retainAll(getBeansForType(type));
-        if (qualifiers != null && !qualifiers.isEmpty())
-            ret.retainAll(getBeansForQualifiers(qualifiers));
-        return Collections.unmodifiableSet(ret);
-    }
-
-    public Set<T> getBeansForNameAndQualifiers(String name, Set<String> qualifiers) {
-        Set<T> ret = new HashSet<>();
-        if (name != null || (qualifiers != null && !qualifiers.isEmpty()))
-            ret.addAll(allBeans);
-        if (name != null)
-            ret.retainAll(getBeansForName(name));
-        if (qualifiers != null && !qualifiers.isEmpty())
-            ret.retainAll(getBeansForQualifiers(qualifiers));
-        return Collections.unmodifiableSet(ret);
-    }
-
-    public Set<T> getBeansForTypeAndNameAndQualifiers(ResolvedType type, String
-            name, Set<String> qualifiers) {
-        Set<T> ret = new HashSet<>();
-        if (type != null || (qualifiers != null && !qualifiers.isEmpty()) || name != null)
-            ret.addAll(allBeans);
-        if (type != null)
-            ret.retainAll(getBeansForType(type));
-        if (name != null)
-            ret.retainAll(getBeansForName(name));
-        if (qualifiers != null && !qualifiers.isEmpty())
-            ret.retainAll(getBeansForQualifiers(qualifiers));
-        return Collections.unmodifiableSet(ret);
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("\nBy type:\n");
-        beansByType.forEach((k, v) -> sb.append(k)
-                .append(" -> ")
-                .append("{")
-                .append(v.stream().map(Bean::asString).collect(Collectors.joining("; ")))
-                .append("}\n"));
-
-        sb.append("\nBy name:\n");
-        beansByName.forEach((k, v) -> sb.append(k)
-                .append(" -> ")
-                .append("{")
-                .append(v.stream().map(Bean::asString).collect(Collectors.joining("; ")))
-                .append("}\n"));
-
-        sb.append("\nBy qualifier:\n");
-        beansByQualifier.forEach((k, v) -> sb.append(k)
-                .append(" -> ")
-                .append("{")
-                .append(v.stream().map(Bean::asString).collect(Collectors.joining("; ")))
-                .append("}\n"));
+        if (!beansByType.isEmpty()) {
+            sb.append("\nBy type:\n");
+            beansByType.forEach((k, v) -> sb.append(k)
+                    .append(" -> ")
+                    .append("{")
+                    .append(v.stream().map(Objects::toString).collect(Collectors.joining("; ")))
+                    .append("}\n"));
+        }
+        if (!beansByName.isEmpty()) {
+            sb.append("\nBy name:\n");
+            beansByName.forEach((k, v) -> sb.append(k)
+                    .append(" -> ")
+                    .append("{")
+                    .append(v.stream().map(Objects::toString).collect(Collectors.joining("; ")))
+                    .append("}\n"));
+        }
+        if (!beansByQualifier.isEmpty()) {
+            sb.append("\nBy qualifier:\n");
+            beansByQualifier.forEach((k, v) -> sb.append(k)
+                    .append(" -> ")
+                    .append("{")
+                    .append(v.stream().map(Objects::toString).collect(Collectors.joining("; ")))
+                    .append("}\n"));
+        }
 
         return sb.toString();
+    }
+
+    public void removeBean(T bean) {
+        allBeans.remove(bean);
+
+        removeHelper(bean, beansByType);
+        removeHelper(bean, beansByName);
+        removeHelper(bean, beansByQualifier);
+    }
+
+    private void removeHelper(T bean, Map<String, Set<T>> beansBySome) {
+        Set<String> toRemoveName = new HashSet<>();
+        beansBySome.forEach((key, value) -> {
+            value.remove(bean);
+            if (value.isEmpty()) {
+                toRemoveName.add(key);
+            }
+        });
+        toRemoveName.forEach(beansBySome::remove);
+    }
+
+    public Set<T> getAllBeans() {
+        return Collections.unmodifiableSet(allBeans);
+    }
+
+    public Map<String, Set<T>> getBeansByName() {
+        return Collections.unmodifiableMap(beansByName);
+    }
+
+    public Map<String, Set<T>> getBeansByType() {
+        return Collections.unmodifiableMap(beansByType);
+    }
+
+    public Map<String, Set<T>> getBeansByQualifier() {
+        return Collections.unmodifiableMap(beansByQualifier);
+    }
+
+    @JsonIgnore
+    public boolean isEmpty() {
+        return allBeans.isEmpty();
     }
 }

@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
+import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 import static java.util.logging.Level.FINE;
 
 /**

@@ -2,11 +2,17 @@ package edu.tum.sse.dirts.core.strategies;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
-import edu.tum.sse.dirts.analysis.def.finders.TypeFinderVisitor;
 import edu.tum.sse.dirts.analysis.di.BeanStorage;
-import edu.tum.sse.dirts.cdi.analysis.CDIDependencyCollectorVisitor;
+import edu.tum.sse.dirts.cdi.analysis.CDIAlternativeDependencyCollector;
+import edu.tum.sse.dirts.cdi.analysis.CDIInjectionPointCollectorVisitor;
+import edu.tum.sse.dirts.cdi.analysis.CDIMapper;
+import edu.tum.sse.dirts.cdi.analysis.identifiers.ManagedBeanIdentifierVisitor;
+import edu.tum.sse.dirts.cdi.analysis.identifiers.ProducerFieldIdentifierVisitor;
+import edu.tum.sse.dirts.cdi.analysis.identifiers.ProducerMethodIdentifierVisitor;
+import edu.tum.sse.dirts.cdi.util.CDIBean;
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.graph.ModificationGraph;
@@ -26,10 +32,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static edu.tum.sse.dirts.cdi.util.CDIUtil.lookupXMlAlternativeName;
@@ -39,24 +42,33 @@ import static java.util.logging.Level.SEVERE;
 /**
  * Contains tasks required by the dependency-analyzing extension for CDI
  */
-public class CDIDependencyStrategy<T extends BodyDeclaration<?>> implements DependencyStrategy<T> {
+public class CDIDependencyStrategy<T extends BodyDeclaration<?>>
+        extends DIDependencyStrategy<T, CDIBean>
+        implements DependencyStrategy<T> {
+
+    private final static String PREFIX = "cdi";
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private static final TypeReference<Set<String>> typeRefXMLAlternatives = new TypeReference<>() {
     };
 
-    private Set<String> xmlAlternativesNewRevision, xmlAlternativesOldRevision;
+    private CDIAlternativeDependencyCollector<T> alternativeDependencyCollector;
 
+    private Set<String> xmlAlternativesNewRevision, xmlAlternativesOldRevision;
     private Set<String> xmlAlternativesAdded, xmlAlternativesRemoved, xmlAlternativesSame;
 
-    private final CDIDependencyCollectorVisitor<T> dependencyCollector;
+    private final BeanStorage<CDIBean> beanStorage = new BeanStorage<>();
 
-    public CDIDependencyStrategy(CDIDependencyCollectorVisitor<T> dependencyCollector) {
-        this.dependencyCollector = dependencyCollector;
+    public CDIDependencyStrategy(CDIInjectionPointCollectorVisitor<T> injectionPointCollector,
+                                 CDIMapper<T> nameMapper, CDIAlternativeDependencyCollector<T> alternativeDependencyCollector) {
+        super(PREFIX, injectionPointCollector, DI_CDI, nameMapper);
+        this.alternativeDependencyCollector = alternativeDependencyCollector;
     }
 
     @Override
     public void doImport(Path tmpPath, Blackboard<T> blackboard, String suffix) {
+        super.doImport(tmpPath, blackboard, suffix);
+
         Path rootPath = blackboard.getRootPath();
         Path subPath = blackboard.getSubPath();
         Set<Path> beansXMLPaths = findBeansXMLFiles(rootPath.resolve(subPath));
@@ -117,6 +129,8 @@ public class CDIDependencyStrategy<T extends BodyDeclaration<?>> implements Depe
 
     @Override
     public void doExport(Path tmpPath, Blackboard<T> blackboard, String suffix) {
+        super.doExport(tmpPath, blackboard, suffix);
+
         try {
             Files.createDirectories(tmpPath);
 
@@ -131,6 +145,8 @@ public class CDIDependencyStrategy<T extends BodyDeclaration<?>> implements Depe
 
     @Override
     public void doChangeAnalysis(Blackboard<T> blackboard) {
+        super.doChangeAnalysis(blackboard);
+
         xmlAlternativesAdded = new HashSet<>();
         xmlAlternativesRemoved = new HashSet<>();
         xmlAlternativesSame = new HashSet<>();
@@ -147,28 +163,43 @@ public class CDIDependencyStrategy<T extends BodyDeclaration<?>> implements Depe
 
     @Override
     public void doGraphCropping(Blackboard<T> blackboard) {
+        super.doGraphCropping(blackboard);
+
         DependencyGraph dependencyGraph = blackboard.getDependencyGraphNewRevision();
 
         xmlAlternativesAdded.forEach(s -> dependencyGraph.addNode(lookupXMlAlternativeName(s)));
         xmlAlternativesRemoved.forEach(s -> dependencyGraph.removeNode(lookupXMlAlternativeName(s)));
 
-        // remove all edges of Type CDI
-        dependencyGraph.removeAllEdgesByType(Set.of(DI_CDI));
+    }
+
+    @Override
+    protected BeanStorage<CDIBean> collectBeans(Collection<TypeDeclaration<?>> ts) {
+        ManagedBeanIdentifierVisitor.identifyDependencies(ts, beanStorage);
+        ProducerFieldIdentifierVisitor.identifyDependencies(ts, beanStorage);
+        ProducerMethodIdentifierVisitor.identifyDependencies(ts, beanStorage);
+
+        return beanStorage;
     }
 
     @Override
     public void doDependencyAnalysis(Blackboard<T> blackboard) {
-        dependencyCollector.setBeanStorage(new BeanStorage<>());
-        dependencyCollector.setAlternatives(xmlAlternativesNewRevision);
+        super.doDependencyAnalysis(blackboard);
 
-        List<TypeDeclaration<?>> typeDeclarations = new ArrayList<>();
-        TypeFinderVisitor typeFinderVisitor = new TypeFinderVisitor();
-        blackboard.getCompilationUnits().forEach(cu -> cu.accept(typeFinderVisitor, typeDeclarations));
-        dependencyCollector.calculateDependencies(typeDeclarations, blackboard.getDependencyGraphNewRevision());
+        Set<String> alternativesPresent = new HashSet<>();
+        alternativesPresent.addAll(xmlAlternativesAdded);
+        alternativesPresent.addAll(xmlAlternativesSame);
+
+        alternativeDependencyCollector.setAlternatives(alternativesPresent);
+
+        for (CompilationUnit compilationUnit : blackboard.getCompilationUnits()) {
+            compilationUnit.accept(alternativeDependencyCollector, blackboard.getDependencyGraphNewRevision());
+        }
     }
 
     @Override
     public void combineGraphs(Blackboard<T> blackboard) {
+        super.combineGraphs(blackboard);
+
         ModificationGraph modificationGraph = blackboard.getCombinedGraph();
 
         xmlAlternativesSame.forEach(s -> modificationGraph.setModificationType(lookupXMlAlternativeName(s),

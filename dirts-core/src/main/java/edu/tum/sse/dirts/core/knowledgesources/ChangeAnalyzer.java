@@ -42,27 +42,23 @@ import static java.util.logging.Level.WARNING;
 /**
  * Partitions code objects into four categories: same, added, removed, changed
  */
-public class CodeChangeAnalyzer<T extends BodyDeclaration<?>> extends KnowledgeSource<T> {
+public class ChangeAnalyzer<T extends BodyDeclaration<?>> extends KnowledgeSource<T> {
 
     //##################################################################################################################
     // Attributes
 
     private final Blackboard<T> blackboard;
     private final ChecksumVisitor<T> checksumVisitor;
-    private final FinderVisitor<Map<String, Node>, T> nameFinderVisitor;
-
 
     //##################################################################################################################
     // Constructors
 
-    public CodeChangeAnalyzer(Blackboard<T> blackboard,
-                              FinderVisitor<Map<String, Node>, T> nameFinderVisitor,
-                              ChecksumVisitor<T> checksumVisitor
+    public ChangeAnalyzer(Blackboard<T> blackboard,
+                          ChecksumVisitor<T> checksumVisitor
     ) {
         super(blackboard);
         this.blackboard = blackboard;
         this.checksumVisitor = checksumVisitor;
-        this.nameFinderVisitor = nameFinderVisitor;
     }
 
     //##################################################################################################################
@@ -76,12 +72,10 @@ public class CodeChangeAnalyzer<T extends BodyDeclaration<?>> extends KnowledgeS
         Map<String, Node> added = new HashMap<>();
         Map<String, Integer> removed = new HashMap<>();
 
-        Map<String, String> nameMapper = new HashMap<>();
-
         Map<String, Node> allObjects = new HashMap<>();
 
         Collection<CompilationUnit> compilationUnits = blackboard.getCompilationUnits();
-        compilationUnits.forEach(cu -> cu.accept(nameFinderVisitor, allObjects));
+        compilationUnits.forEach(cu -> cu.accept(blackboard.getNameFinderVisitor(), allObjects));
 
         calculateChange(
                 blackboard.getChecksumsNodes(),
@@ -90,11 +84,9 @@ public class CodeChangeAnalyzer<T extends BodyDeclaration<?>> extends KnowledgeS
                 sameCode,
                 differentCode,
                 added,
-                removed,
-                nameMapper);
+                removed);
 
         blackboard.setChangesNodes(sameCode, differentCode, added, removed);
-        blackboard.setNameMapperNodes(nameMapper);
 
         for (DependencyStrategy<T> dependencyStrategy : blackboard.getDependencyStrategies()) {
             dependencyStrategy.doChangeAnalysis(blackboard);
@@ -115,8 +107,7 @@ public class CodeChangeAnalyzer<T extends BodyDeclaration<?>> extends KnowledgeS
             Map<String, T> objectsSame,
             Map<String, T> objectsDifferent,
             Map<String, T> objectsAdded,
-            Map<String, Integer> objectsRemoved,
-            Map<String, String> nameMapping) {
+            Map<String, Integer> objectsRemoved) {
 
 
         objectsAdded.putAll(allObjects);
@@ -154,33 +145,6 @@ public class CodeChangeAnalyzer<T extends BodyDeclaration<?>> extends KnowledgeS
             objectsSame.forEach(objectsAdded::remove);
             objectsDifferent.forEach(objectsAdded::remove);
 
-            // same Code, different Name but able to clearly identify source
-            for (Map.Entry<String, T> tNew : objectsAdded.entrySet()) {
-                String newName = tNew.getKey();
-
-            /*
-            We need to ensure there is only one t with this code in tsNew and tsOld
-            Only then we can identify the source without ambiguity
-             */
-
-                Set<String> matchingOldT = objectsRemoved.entrySet().stream()
-                        .filter(tOld -> tOld.getValue().equals(checksumFunction.apply(tNew.getValue())))
-                        .map(Map.Entry::getKey)
-                        .collect(Collectors.toSet());
-                Set<String> matchingNewT = objectsAdded.entrySet().stream()
-                        .filter(tNewOther -> checksumFunction.apply(tNewOther.getValue()).equals(checksumFunction.apply(tNew.getValue())))
-                        .map(Map.Entry::getKey)
-                        .collect(Collectors.toSet());
-                if (matchingOldT.size() == 1 && matchingNewT.size() == 1) {
-                    objectsSame.put(newName, tNew.getValue());
-
-                    if (nameMapping != null)
-                        nameMapping.put(matchingOldT.stream().findFirst().get(), newName);
-
-                    // remove old class from active set
-                    matchingOldT.forEach(objectsRemoved::remove);
-                }
-            }
             // remove new ts from active set
             objectsSame.forEach(objectsAdded::remove);
         } else {

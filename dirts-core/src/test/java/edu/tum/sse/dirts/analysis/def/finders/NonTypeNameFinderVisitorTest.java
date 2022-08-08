@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -51,7 +52,11 @@ public class NonTypeNameFinderVisitorTest {
         }
 
         nonTypeNames = typeDeclarationMap.keySet();
-        mappedNonTypeNames = typeDeclarationMap.values().stream().map(Names::lookup).map(Pair::getFirst).collect(Collectors.toSet());
+        mappedNonTypeNames = typeDeclarationMap.values().stream()
+                .filter(Objects::nonNull)
+                .map(Names::lookup)
+                .map(Pair::getFirst)
+                .collect(Collectors.toSet());
     }
 
     @Test

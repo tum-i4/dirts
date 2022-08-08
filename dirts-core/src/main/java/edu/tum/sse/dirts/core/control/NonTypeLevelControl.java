@@ -16,8 +16,6 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
-import edu.tum.sse.dirts.analysis.DependencyCollector;
-import edu.tum.sse.dirts.analysis.def.DefaultDependencyCollectorVisitor;
 import edu.tum.sse.dirts.analysis.def.DefaultNonTypeDependencyCollectorVisitor;
 import edu.tum.sse.dirts.analysis.def.JUnitNonTypeDependencyCollectorVisitor;
 import edu.tum.sse.dirts.analysis.def.checksum.NonTypeChecksumVisitor;
@@ -78,7 +76,7 @@ public class NonTypeLevelControl extends Control<BodyDeclaration<?>> {
                 nodesInGraphFilter));
 
         blackboard.addDependencyStrategy(new CachingDependencyStrategy<>(
-                Set.of(new JUnitNonTypeDependencyCollectorVisitor(blackboard.getTestFilter())),
-                Set.of(JUNIT)));
+                Set.of(new JUnitNonTypeDependencyCollectorVisitor(blackboard.getTestFilter()))
+        ));
     }
 }

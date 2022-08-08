@@ -20,12 +20,9 @@ import java.util.Set;
 public class CachingDependencyStrategy<T extends BodyDeclaration<?>> implements DependencyStrategy<T> {
 
     private final Set<DependencyCollector<T>> dependencyCollector;
-    private final Set<EdgeType> affectedEdges;
 
-    public CachingDependencyStrategy(Set<DependencyCollector<T>> dependencyCollector,
-                                     Set<EdgeType> affectedEdges) {
+    public CachingDependencyStrategy(Set<DependencyCollector<T>> dependencyCollector) {
         this.dependencyCollector = dependencyCollector;
-        this.affectedEdges = affectedEdges;
     }
 
 
@@ -43,13 +40,7 @@ public class CachingDependencyStrategy<T extends BodyDeclaration<?>> implements 
 
     @Override
     public void doGraphCropping(Blackboard<T> blackboard) {
-        DependencyGraph dependencyGraph = blackboard.getDependencyGraphNewRevision();
-
-        // TODO: this needs to be improved
-
-        // remove all edges from changed nodes
-        blackboard.getNodesDifferent().keySet()
-                .forEach(from -> dependencyGraph.removeAllEdgesFrom(from, affectedEdges));
+        // Done in the individual DependencyCollectors
     }
 
     @Override

@@ -34,7 +34,6 @@ public class TypeLevelGraphCropper extends AbstractGraphCropper<TypeDeclaration<
     @Override
     public Collection<TypeDeclaration<?>> calculateImpactedTypeDeclarations(
             DependencyGraph dependencyGraph,
-            Map<String, String> nameMapperNodes,
             Collection<CompilationUnit> compilationUnits,
             Map<String, Node> nodesAdded,
             Map<String, Integer> nodesRemoved,
@@ -71,7 +70,7 @@ public class TypeLevelGraphCropper extends AbstractGraphCropper<TypeDeclaration<
                 .map(NodeWithName::getNameAsString)
                 .collect(Collectors.toSet()));
 
-        // Consider all nodes that have been renamed and correspond to a CompilationUnit
+/*        // Consider all nodes that have been renamed and correspond to a CompilationUnit
         affectedPackagesNodes.addAll(nodesSame.entrySet().stream()
                 .filter(n -> n.getValue() instanceof CompilationUnit)
                 .filter(n -> nameMapperNodes.containsValue(n.getKey()))
@@ -79,7 +78,7 @@ public class TypeLevelGraphCropper extends AbstractGraphCropper<TypeDeclaration<
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .map(NodeWithName::getNameAsString)
-                .collect(Collectors.toSet()));
+                .collect(Collectors.toSet()));*/
 
         // Add all CompilationUnits that are declared in an affected package
         impactedCompilationUnits.addAll(compilationUnits.stream()
