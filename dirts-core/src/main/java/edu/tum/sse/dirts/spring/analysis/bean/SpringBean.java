@@ -24,15 +24,17 @@ import edu.tum.sse.dirts.util.alternatives.TriThirdOption;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 
 /**
- * Represents a bean
- * Either a method annotated with @Bean, a Constructor of a @Component or a XMLBeanDefinition (from xml)
+ * Represents a bean in Spring
+ * Can be either a method, a type or a xml bean definition
  */
 public class SpringBean implements Bean {
 
     //##################################################################################################################
     // Attributes
 
-    private final TriAlternative<XMLBeanDefinition, ResolvedMethodDeclaration, ResolvedReferenceTypeDeclaration> definition;
+    private final TriAlternative<XMLBeanDefinition,
+            ResolvedMethodDeclaration,
+            ResolvedReferenceTypeDeclaration> definition;
 
     //##################################################################################################################
     // Constructors

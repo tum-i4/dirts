@@ -42,7 +42,6 @@ public class Parser<T extends BodyDeclaration<?>> extends KnowledgeSource<T> {
 
     public Parser(Blackboard<T> blackboard) {
         super(blackboard);
-
     }
 
     //##################################################################################################################

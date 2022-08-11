@@ -52,7 +52,8 @@ public class SpringComponentIdentifierVisitor extends AbstractTruncatedVisitor<
     private SpringComponentIdentifierVisitor() {
     }
 
-    public static void identifyDependencies(Collection<TypeDeclaration<?>> typeDeclarations, BeanStorage<SpringBean> beanStorage) {
+    public static void identifyDependencies(Collection<TypeDeclaration<?>> typeDeclarations,
+                                            BeanStorage<SpringBean> beanStorage) {
         for (TypeDeclaration<?> typeDeclaration : typeDeclarations) {
             typeDeclaration.accept(singleton, beanStorage);
         }
@@ -71,7 +72,7 @@ public class SpringComponentIdentifierVisitor extends AbstractTruncatedVisitor<
                     ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration = n.resolve();
                     SpringBean newBean = new SpringBean(resolvedReferenceTypeDeclaration);
 
-                    //******************************************************************************************************
+                    //**************************************************************************************************
                     // By type
 
                     // add entry to this class
@@ -83,7 +84,7 @@ public class SpringComponentIdentifierVisitor extends AbstractTruncatedVisitor<
                         arg.addBeanByType(ancestor, newBean);
                     }
 
-                    //******************************************************************************************************
+                    //**************************************************************************************************
                     // By name
 
                     Set<String> names = SpringUtil.findNames(n, componentAnnotation);

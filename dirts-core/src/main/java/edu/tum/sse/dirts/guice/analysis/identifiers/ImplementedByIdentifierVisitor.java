@@ -74,7 +74,8 @@ public class ImplementedByIdentifierVisitor extends AbstractIdentifierVisitor<Be
                 try {
                     ResolvedType resolvedType = singleMemberAnnotationExpr.getMemberValue().calculateResolvedType();
                     if (resolvedType.isReferenceType()) {
-                        type = JavaParserUtils.extractClassType(resolvedType.asReferenceType(), Set.of("java.lang.Class"));
+                        type = JavaParserUtils.extractClassType(resolvedType.asReferenceType(),
+                                Set.of("java.lang.Class"));
                     }
                 } catch (RuntimeException e) {
                     Log.log(FINE, "Exception in " + JavaParserUtils.class.getSimpleName() + ": " + e.getMessage());
@@ -88,17 +89,20 @@ public class ImplementedByIdentifierVisitor extends AbstractIdentifierVisitor<Be
                         try {
                             ResolvedType resolvedType = pair.getValue().calculateResolvedType();
                             if (resolvedType.isReferenceType()) {
-                                type = JavaParserUtils.extractClassType(resolvedType.asReferenceType(), Set.of("java.lang.Class"));
+                                type = JavaParserUtils.extractClassType(resolvedType.asReferenceType(),
+                                        Set.of("java.lang.Class"));
                             }
                         } catch (RuntimeException e) {
-                            Log.log(FINE, "Exception in " + JavaParserUtils.class.getSimpleName() + ": " + e.getMessage());
+                            Log.log(FINE, "Exception in " + JavaParserUtils.class.getSimpleName() + ": "
+                                    + e.getMessage());
                         }
                     }
                 }
             }
             if (type != null && type.isReferenceType()) {
                 ResolvedReferenceType resolvedReferenceType = type.asReferenceType();
-                Optional<ResolvedReferenceTypeDeclaration> maybeTypeDeclaration = resolvedReferenceType.getTypeDeclaration();
+                Optional<ResolvedReferenceTypeDeclaration> maybeTypeDeclaration =
+                        resolvedReferenceType.getTypeDeclaration();
                 if (maybeTypeDeclaration.isPresent()) {
                     byType = maybeTypeDeclaration.get();
                 }

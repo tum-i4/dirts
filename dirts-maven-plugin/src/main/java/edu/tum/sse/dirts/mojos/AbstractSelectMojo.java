@@ -48,7 +48,8 @@ public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends A
         Log.log(CONFIG, "Sub path: " + subPath);
 
         if (subPath.toString().isEmpty()) {
-            Log.log(INFO, "Plugin is executed on the outermost module. Clearing caches for affected modules and changed nodes.");
+            Log.log(INFO, "Plugin is executed on the outermost module. " +
+                    "Clearing caches for affected modules and changed nodes.");
 
             Path affectedModulesPath = DirtsUtil.getAffectedModulesPath(rootPath);
             Path changedNodesPath = DirtsUtil.getChangedNodesPath(rootPath);
@@ -150,7 +151,8 @@ public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends A
             Class<?> abstractSurefireMojoClass = Class.forName("org.apache.maven.plugin.surefire.AbstractSurefireMojo");
 
             try {
-                Method getIncludedAndExcludedTestsMethod = abstractSurefireMojoClass.getDeclaredMethod("getIncludedAndExcludedTests");
+                Method getIncludedAndExcludedTestsMethod =
+                        abstractSurefireMojoClass.getDeclaredMethod("getIncludedAndExcludedTests");
                 getIncludedAndExcludedTestsMethod.setAccessible(true);
 
                 result = (TestListResolver) getIncludedAndExcludedTestsMethod.invoke(this);

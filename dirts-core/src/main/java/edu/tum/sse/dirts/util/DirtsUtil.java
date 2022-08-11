@@ -45,6 +45,7 @@ public class DirtsUtil {
     }
 
     public static Path getInjectionPointsPath(Path rootPath, Path subPath, String prefix, String suffix) {
-        return getSubTemporaryDirectory(rootPath, subPath).resolve(Path.of(prefix + "_injection_points_" + suffix));
+        return getSubTemporaryDirectory(rootPath, subPath)
+                .resolve(Path.of(prefix + "_injection_points_" + suffix));
     }
 }

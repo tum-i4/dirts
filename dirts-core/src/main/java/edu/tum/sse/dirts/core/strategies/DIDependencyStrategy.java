@@ -25,13 +25,15 @@ import static edu.tum.sse.dirts.util.DirtsUtil.getBeansPath;
 import static edu.tum.sse.dirts.util.DirtsUtil.getInjectionPointsPath;
 import static java.util.logging.Level.*;
 
-public abstract class DIDependencyStrategy<T extends BodyDeclaration<?>, B extends Bean> implements DependencyStrategy<T> {
+public abstract class DIDependencyStrategy<T extends BodyDeclaration<?>, B extends Bean>
+        implements DependencyStrategy<T> {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private static final TypeReference<BeanStorage<Set<String>>> typeReferenceBeanStorage = new TypeReference<>() {
     };
-    private static final TypeReference<InjectionPointStorage> typeReferenceInjectionPointStorage = new TypeReference<>() {
-    };
+    private static final TypeReference<InjectionPointStorage> typeReferenceInjectionPointStorage =
+            new TypeReference<>() {
+            };
 
     private final String prefix;
 
@@ -148,8 +150,6 @@ public abstract class DIDependencyStrategy<T extends BodyDeclaration<?>, B exten
         return Set.of();
     }
 
-    ;
-
     protected abstract BeanStorage<B> collectBeans(Collection<TypeDeclaration<?>> ts);
 
     @Override
@@ -189,9 +189,12 @@ public abstract class DIDependencyStrategy<T extends BodyDeclaration<?>, B exten
         // consider join between (old) beans and newInjectionPoints
         join(dependencyGraph, newInjectionPoints, beans, b -> b);
 
-        newBeans.getBeansByName().forEach((k, v) -> v.forEach(b -> beans.addBeanByName(k, nameMapper.mapToString(b))));
-        newBeans.getBeansByType().forEach((k, v) -> v.forEach(b -> beans.addBeanByType(k, nameMapper.mapToString(b))));
-        newBeans.getBeansByQualifier().forEach((k, v) -> v.forEach(b -> beans.addBeanByName(k, nameMapper.mapToString(b))));
+        newBeans.getBeansByName().forEach((k, v) ->
+                v.forEach(b -> beans.addBeanByName(k, nameMapper.mapToString(b))));
+        newBeans.getBeansByType().forEach((k, v) ->
+                v.forEach(b -> beans.addBeanByType(k, nameMapper.mapToString(b))));
+        newBeans.getBeansByQualifier().forEach((k, v) ->
+                v.forEach(b -> beans.addBeanByName(k, nameMapper.mapToString(b))));
 
         injectionPoints.addAll(newInjectionPoints);
     }
@@ -202,7 +205,7 @@ public abstract class DIDependencyStrategy<T extends BodyDeclaration<?>, B exten
     }
 
 
-    private <T1, B1> void join(DependencyGraph dependencyGraph,
+    private <B1> void join(DependencyGraph dependencyGraph,
                                InjectionPointStorage injectionPoints,
                                BeanStorage<B1> beanStorage,
                                Function<B1, Set<String>> mapper) {

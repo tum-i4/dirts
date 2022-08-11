@@ -8,10 +8,10 @@ import edu.tum.sse.dirts.core.control.Control;
 import edu.tum.sse.dirts.core.strategies.CDIDependencyStrategy;
 import edu.tum.sse.dirts.core.strategies.GuiceDependencyStrategy;
 import edu.tum.sse.dirts.core.strategies.SpringDependencyStrategy;
-import edu.tum.sse.dirts.guice.analysis.GuiceNonTypeInjectionPointCollectorVisitor;
-import edu.tum.sse.dirts.guice.analysis.GuiceNonTypeMapper;
-import edu.tum.sse.dirts.guice.analysis.GuiceTypeInjectionPointCollectorVisitor;
-import edu.tum.sse.dirts.guice.analysis.GuiceTypeMapper;
+import edu.tum.sse.dirts.guice.analysis.GuiceMethodLevelInjectionPointCollectorVisitor;
+import edu.tum.sse.dirts.guice.analysis.GuiceMethodLevelMapper;
+import edu.tum.sse.dirts.guice.analysis.GuiceClassLevelInjectionPointCollectorVisitor;
+import edu.tum.sse.dirts.guice.analysis.GuiceClassLevelMapper;
 import edu.tum.sse.dirts.spring.analysis.*;
 import edu.tum.sse.dirts.util.JavaParserUtils;
 import edu.tum.sse.dirts.util.Log;
@@ -57,6 +57,9 @@ public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends Su
     @Parameter(property = "useCDIExtension", defaultValue = "false")
     protected boolean useCDIExtension;
 
+    @Parameter(property = "considerAnnotationsAsDependencies", defaultValue = "false")
+    protected boolean annotations;
+
     //##################################################################################################################
     // Abstract methods implemented by all subclasses
 
@@ -70,33 +73,34 @@ public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends Su
      *
      * @return blackboard
      */
-    protected Blackboard<TypeDeclaration<?>> getTypeLevelBlackboard() {
+    protected Blackboard<TypeDeclaration<?>> getClassLevelBlackboard() {
         Path rootPath = getRootPath();
         Path subPath = getSubPath();
 
         // Blackboard
-        Blackboard<TypeDeclaration<?>> blackboard = new Blackboard<>(rootPath, subPath, "typeL");
+        Blackboard<TypeDeclaration<?>> blackboard = new Blackboard<>(rootPath, subPath, "class_level");
+        Blackboard.considerAnnotationsAsDependencies = annotations;
 
         // Spring
         if (useSpringExtension) {
             blackboard.addDependencyStrategy(new SpringDependencyStrategy<>(
-                    new SpringTypeInjectionPointCollectorVisitor(),
-                    new SpringBeanTypeDependencyCollector(),
-                    new SpringTypeMapper()));
+                    new SpringClassLevelInjectionPointCollectorVisitor(),
+                    new SpringBeanClassLevelDependencyCollector(),
+                    new SpringClassLevelMapper()));
         }
 
         // Guice
         if (useGuiceExtension) {
             blackboard.addDependencyStrategy(new GuiceDependencyStrategy<>(
-                    new GuiceTypeInjectionPointCollectorVisitor(),
-                    new GuiceTypeMapper()));
+                    new GuiceClassLevelInjectionPointCollectorVisitor(),
+                    new GuiceClassLevelMapper()));
         }
 
         // CDI
         if (useCDIExtension) {
             blackboard.addDependencyStrategy(new CDIDependencyStrategy<>(
-                    new CDITypeInjectionPointCollectorVisitor(),
-                    new CDITypeMapper(), new CDITypeAlternativeDependencyCollector()));
+                    new CDIClassLevelInjectionPointCollectorVisitor(),
+                    new CDIClassLevelMapper(), new CDIClassLevelAlternativeDependencyCollector()));
         }
 
         return blackboard;
@@ -107,7 +111,7 @@ public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends Su
      *
      * @return blackboard
      */
-    protected Blackboard<BodyDeclaration<?>> getNonTypeLevelBlackboard() {
+    protected Blackboard<BodyDeclaration<?>> getMethodLevelBlackboard() {
         Path rootPath = getRootPath();
         Path subPath = getSubPath();
 
@@ -115,28 +119,29 @@ public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends Su
         JavaParserUtils.RESTRICTIVE = restrictive;
 
         // Blackboard
-        Blackboard<BodyDeclaration<?>> blackboard = new Blackboard<>(rootPath, subPath, "nontypeL");
+        Blackboard<BodyDeclaration<?>> blackboard = new Blackboard<>(rootPath, subPath, "method_level");
+        Blackboard.considerAnnotationsAsDependencies = annotations;
 
         // Spring
         if (useSpringExtension) {
             blackboard.addDependencyStrategy(new SpringDependencyStrategy<>(
-                    new SpringNonTypeInjectionPointCollectorVisitor(),
-                    new SpringBeanNonTypeDependencyCollector(),
-                    new SpringNonTypeMapper()));
+                    new SpringMethodLevelInjectionPointCollectorVisitor(),
+                    new SpringBeanMethodLevelDependencyCollector(),
+                    new SpringMethodLevelMapper()));
         }
 
         // Guice
         if (useGuiceExtension) {
             blackboard.addDependencyStrategy(new GuiceDependencyStrategy<>(
-                    new GuiceNonTypeInjectionPointCollectorVisitor(),
-                    new GuiceNonTypeMapper()));
+                    new GuiceMethodLevelInjectionPointCollectorVisitor(),
+                    new GuiceMethodLevelMapper()));
         }
 
         // CDI
         if (useCDIExtension) {
             blackboard.addDependencyStrategy(new CDIDependencyStrategy<>(
-                    new CDINonTypeInjectionPointCollectorVisitor(),
-                    new CDINonTypeMapper(), new CDINonTypeAlternativeDependencyCollector()));
+                    new CDIMethodLevelInjectionPointCollectorVisitor(),
+                    new CDIMethodLevelMapper(), new CDIMethodLevelAlternativeDependencyCollector()));
         }
 
         return blackboard;

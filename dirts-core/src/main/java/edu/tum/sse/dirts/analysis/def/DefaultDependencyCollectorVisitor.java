@@ -22,7 +22,7 @@ import edu.tum.sse.dirts.graph.DependencyGraph;
 import java.util.Collection;
 
 /**
- * Collects dependencies based on Delegation, accessed and assigned fields, Inheritance and Annotations (not critical)
+ * Collects dependencies based on a default strategy
  */
 public abstract class DefaultDependencyCollectorVisitor<P extends BodyDeclaration<?>>
         extends AbstractTruncatedVisitor<DependencyGraph>

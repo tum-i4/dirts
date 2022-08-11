@@ -305,12 +305,15 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
                 ResolvedFieldDeclaration resolvedFieldDeclaration = resolvedValueDeclaration.asField();
                 container.content = lookup(resolvedFieldDeclaration.declaringType(), resolvedFieldDeclaration);
             } else if (resolvedValueDeclaration.isEnumConstant()) {
-                ResolvedEnumConstantDeclaration resolvedEnumConstantDeclaration = resolvedValueDeclaration.asEnumConstant();
-                Optional<ResolvedReferenceTypeDeclaration> maybeTypeDeclaration = resolvedValueDeclaration.getType().asReferenceType().getTypeDeclaration();
+                ResolvedEnumConstantDeclaration resolvedEnumConstantDeclaration =
+                        resolvedValueDeclaration.asEnumConstant();
+                Optional<ResolvedReferenceTypeDeclaration> maybeTypeDeclaration =
+                        resolvedValueDeclaration.getType().asReferenceType().getTypeDeclaration();
                 maybeTypeDeclaration.ifPresent(resolvedReferenceTypeDeclaration ->
                         container.content = lookup(resolvedReferenceTypeDeclaration, resolvedValueDeclaration));
 
-                container.content = lookup(resolvedEnumConstantDeclaration.getType()) + "." + resolvedEnumConstantDeclaration.getName();
+                container.content = lookup(resolvedEnumConstantDeclaration.getType()) + "."
+                        + resolvedEnumConstantDeclaration.getName();
             }
         } catch (RuntimeException e) {
             arg.getSecond().content = Optional.ofNullable(e.getMessage());
@@ -324,7 +327,8 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
 
         try {
             ResolvedValueDeclaration resolvedValueDeclaration = n.resolve();
-            Optional<ResolvedReferenceTypeDeclaration> maybeTypeDeclaration = resolvedValueDeclaration.getType().asReferenceType().getTypeDeclaration();
+            Optional<ResolvedReferenceTypeDeclaration> maybeTypeDeclaration =
+                    resolvedValueDeclaration.getType().asReferenceType().getTypeDeclaration();
             maybeTypeDeclaration.ifPresent(resolvedReferenceTypeDeclaration ->
                     container.content = lookup(resolvedReferenceTypeDeclaration, resolvedValueDeclaration));
         } catch (RuntimeException e) {

@@ -56,7 +56,8 @@ public class ProducerMethodIdentifierVisitor extends AbstractIdentifierVisitor<
     public static void identifyDependencies(Collection<TypeDeclaration<?>> typeDeclarations, BeanStorage<CDIBean> arg) {
         for (TypeDeclaration<?> typeDeclaration : typeDeclarations) {
             Map<String, Set<ResolvedMethodDeclaration>> disposerMethodsMap = new HashMap<>();
-            Pair<BeanStorage<CDIBean>, Map<String, Set<ResolvedMethodDeclaration>>> beanStorageMapPair = new Pair<>(arg, disposerMethodsMap);
+            Pair<BeanStorage<CDIBean>, Map<String, Set<ResolvedMethodDeclaration>>> beanStorageMapPair =
+                    new Pair<>(arg, disposerMethodsMap);
             typeDeclaration.getMembers().forEach(m -> m.accept(disposerMethodIdentifierVisitor, disposerMethodsMap));
             typeDeclaration.getMembers().forEach(m -> m.accept(singleton, beanStorageMapPair));
         }
@@ -66,7 +67,8 @@ public class ProducerMethodIdentifierVisitor extends AbstractIdentifierVisitor<
     // Visitor pattern
 
     @Override
-    public void visit(MethodDeclaration n, Pair<BeanStorage<CDIBean>, Map<String, Set<ResolvedMethodDeclaration>>> arg) {
+    public void visit(MethodDeclaration n,
+                      Pair<BeanStorage<CDIBean>, Map<String, Set<ResolvedMethodDeclaration>>> arg) {
         if (CDIUtil.isProducerNode(n)) {
             BeanStorage<CDIBean> beanStorage = arg.getFirst();
             Map<String, Set<ResolvedMethodDeclaration>> disposerMethodsMap = arg.getSecond();
@@ -130,7 +132,8 @@ public class ProducerMethodIdentifierVisitor extends AbstractIdentifierVisitor<
                                 arg.put(disposedTypeName, new HashSet<>());
                             arg.get(disposedTypeName).add(n.resolve());
                         } catch (RuntimeException e) {
-                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName()
+                                    + ": " + e.getMessage());
                         }
                     }
                 }

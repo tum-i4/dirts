@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.logging.Level;
 
 /**
- * A simple graph that allows to calculate its transitive closure
+ * A simple graph that allows serialization/deserialization
  */
 public class DependencyGraph {
 
@@ -79,7 +79,7 @@ public class DependencyGraph {
     /**
      * Removes a node
      *
-     * @param name
+     * @param name name of the node that should be removed
      */
     public void removeNode(String name) {
         if (nodes.containsKey(name)) {
@@ -104,19 +104,7 @@ public class DependencyGraph {
         tmp.forEach(this::removeNode);
     }
 
-    /**
-     * Rename a node
-     *
-     * @param oldName
-     * @param newName
-     */
-    public void renameNode(String oldName, String newName) {
-        if (nodes.containsKey(oldName)) {
-            nodes.put(newName, nodes.remove(oldName));
-            edges.rename(oldName, newName);
-        }
-    }
-
+    @SuppressWarnings("unused")
     public boolean isNodePresent(String name) {
         return nodes.containsKey(name);
     }
@@ -151,7 +139,7 @@ public class DependencyGraph {
     /**
      * Entirely removes all edges of certain types
      *
-     * @param affectedEdges
+     * @param affectedEdges set of edge types to remove completely
      */
     public void removeAllEdgesByType(Set<EdgeType> affectedEdges) {
         edges.removeAllValues(affectedEdges);
@@ -161,10 +149,11 @@ public class DependencyGraph {
     /**
      * Removes all outgoing edges on a certain node of certain types
      *
-     * @param from
-     * @param affectedEdges
+     * @param from source node
+     * @param affectedEdges set of edge types considered
      * @return names of the nodes that are pointed to by removed edges
      */
+    @SuppressWarnings("UnusedReturnValue")
     public Set<String> removeAllEdgesFrom(String from, Set<EdgeType> affectedEdges) {
         return edges.removeRegularEntries(from, affectedEdges);
     }
@@ -172,8 +161,8 @@ public class DependencyGraph {
     /**
      * Removes all ingoing edges on a certain node of certain types
      *
-     * @param to
-     * @param affectedEdges
+     * @param to destination ndoe
+     * @param affectedEdges set of edge types considered
      * @return names of the nodes that are at the start of removed edges
      */
     public Set<String> removeAllEdgesTo(String to, Set<EdgeType> affectedEdges) {

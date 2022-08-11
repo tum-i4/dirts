@@ -40,7 +40,6 @@ public class CachingDependencyStrategy<T extends BodyDeclaration<?>> implements 
 
     @Override
     public void doGraphCropping(Blackboard<T> blackboard) {
-        // Done in the individual DependencyCollectors
     }
 
     @Override

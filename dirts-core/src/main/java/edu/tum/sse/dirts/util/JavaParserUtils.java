@@ -35,7 +35,8 @@ public class JavaParserUtils {
      *
      * Adaptations to find resolvable ancestors without throwing exceptions
      */
-    public static Function<ResolvedReferenceTypeDeclaration, List<ResolvedReferenceType>> depthFirstFuncAcceptIncompleteList = (rrtd) -> {
+    public static Function<ResolvedReferenceTypeDeclaration, List<ResolvedReferenceType>>
+            depthFirstFuncAcceptIncompleteList = (rrtd) -> {
         List<ResolvedReferenceType> ancestors = new ArrayList<>();
         Queue<ResolvedReferenceTypeDeclaration> queue = new LinkedList<>();
         queue.add(rrtd);
@@ -62,7 +63,8 @@ public class JavaParserUtils {
         return ret;
     }
 
-    public static boolean isAnnotatedWithAny(NodeWithAnnotations<?> n, Set<Triple<String, String, Set<AnnotationType>>> annotations) {
+    public static boolean isAnnotatedWithAny(NodeWithAnnotations<?> n,
+                                             Set<Triple<String, String, Set<AnnotationType>>> annotations) {
         for (Triple<String, String, Set<AnnotationType>> annotation : annotations) {
             Optional<AnnotationType> maybeAnnotation =
                     getAnnotationTypePresent(n, annotation.getFirst(), annotation.getSecond());
@@ -74,7 +76,8 @@ public class JavaParserUtils {
         return false;
     }
 
-    public static Set<AnnotationExpr> getAnnotatedWithAny(NodeWithAnnotations<?> n, Set<Triple<String, String, Set<AnnotationType>>> annotations) {
+    public static Set<AnnotationExpr> getAnnotatedWithAny(NodeWithAnnotations<?> n,
+                                                          Set<Triple<String, String, Set<AnnotationType>>> annotations) {
         Set<AnnotationExpr> ret = new HashSet<>();
         for (Triple<String, String, Set<AnnotationType>> annotation : annotations) {
             Optional<AnnotationExpr> maybeAnnotation =
@@ -91,7 +94,9 @@ public class JavaParserUtils {
         return ret;
     }
 
-    public static Optional<AnnotationExpr> getAnnotationExprPresent(NodeWithAnnotations<?> n, String simpleName, String qualifiedAnnotation) {
+    public static Optional<AnnotationExpr> getAnnotationExprPresent(NodeWithAnnotations<?> n,
+                                                                    String simpleName,
+                                                                    String qualifiedAnnotation) {
         Optional<AnnotationExpr> annotationByName = n.getAnnotationByName(simpleName);
         if (annotationByName.isPresent()) {
             AnnotationExpr annotationExpr = annotationByName.get();
@@ -124,7 +129,9 @@ public class JavaParserUtils {
         }
     }
 
-    public static Optional<AnnotationType> getAnnotationTypePresent(NodeWithAnnotations<?> n, String simpleName, String qualifiedAnnotation) {
+    public static Optional<AnnotationType> getAnnotationTypePresent(NodeWithAnnotations<?> n,
+                                                                    String simpleName,
+                                                                    String qualifiedAnnotation) {
         Optional<AnnotationExpr> annotationByName = n.getAnnotationByName(simpleName);
         if (annotationByName.isPresent()) {
             AnnotationExpr annotationExpr = annotationByName.get();
@@ -176,7 +183,10 @@ public class JavaParserUtils {
         return null;
     }
 
-    public static boolean equalsMethodName(MethodCallExpr methodCallExpr, String simpleName, String qualifiedSignature) {
+    @SuppressWarnings("unused")
+    public static boolean equalsMethodName(MethodCallExpr methodCallExpr,
+                                           String simpleName,
+                                           String qualifiedSignature) {
         if (RESTRICTIVE) {
             try {
                 ResolvedMethodDeclaration resolvedMethodDeclaration = methodCallExpr.resolve();

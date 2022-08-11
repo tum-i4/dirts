@@ -74,7 +74,7 @@ public class SpringBeanMethodIdentifierVisitor extends AbstractIdentifierVisitor
 
                     SpringBean newBean = new SpringBean(methodDecl);
 
-                    //******************************************************************************************************
+                    //**************************************************************************************************
                     // By type
 
                     // return Type may be primitive
@@ -93,7 +93,7 @@ public class SpringBeanMethodIdentifierVisitor extends AbstractIdentifierVisitor
                         }
                     }
 
-                    //******************************************************************************************************
+                    //**************************************************************************************************
                     // By name
                     Set<String> names = SpringUtil.findNames(n, beanAnnotation);
                     for (String name : names) {

@@ -169,7 +169,8 @@ public class XMLBeanDefinition {
     private String printElement(Element element) {
         // Code from stackoverflow
         // Source: https://stackoverflow.com/a/19701727
-        DOMImplementationLS lsImpl = (DOMImplementationLS) element.getOwnerDocument().getImplementation().getFeature("LS", "3.0");
+        DOMImplementationLS lsImpl = (DOMImplementationLS) element.getOwnerDocument()
+                .getImplementation().getFeature("LS", "3.0");
         LSSerializer serializer = lsImpl.createLSSerializer();
         serializer.getDomConfig().setParameter("xml-declaration", false); //by default its true, so set it to false to get String without xml-declaration
         return serializer.writeToString(element);

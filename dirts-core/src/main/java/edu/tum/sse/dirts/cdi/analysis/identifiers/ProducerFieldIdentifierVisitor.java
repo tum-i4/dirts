@@ -183,7 +183,7 @@ public class ProducerFieldIdentifierVisitor extends AbstractIdentifierVisitor<
                     }
 
                 } else {
-                    // unreachable
+                    // theoretically unreachable
                 }
             } catch (RuntimeException e) {
                 Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());

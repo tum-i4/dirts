@@ -3,6 +3,10 @@ package edu.tum.sse.dirts.graph;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * A graph containing information about the modification status of nodes
+ * The graph can be traversed to find impacted nodes
+ */
 public class ModificationGraph extends DependencyGraph {
 
     private final Map<String, ModificationType> modificationStatus = new HashMap<>();
@@ -54,10 +58,10 @@ public class ModificationGraph extends DependencyGraph {
     /**
      * Add information on modification based on information computed from checksums or similar
      *
-     * @param nodesSame
-     * @param nodesDifferent
-     * @param nodesAdded
-     * @param nodesRemoved
+     * @param nodesSame nodes that did not change
+     * @param nodesDifferent nodes that did change
+     * @param nodesAdded nodes that have been added
+     * @param nodesRemoved nodes that have been removed
      */
     public void setModificationByStatus(Set<String> nodesSame,
                                         Set<String> nodesDifferent,
@@ -115,24 +119,12 @@ public class ModificationGraph extends DependencyGraph {
     /**
      * Removes a node from the graph
      *
-     * @param name
+     * @param name node to remvoe
      */
     @Override
     public void removeNode(String name) {
         super.removeNode(name);
         modificationStatus.remove(name);
-    }
-
-    /**
-     * Renames a node
-     *
-     * @param oldName
-     * @param newName
-     */
-    @Override
-    public void renameNode(String oldName, String newName) {
-        super.renameNode(oldName, newName);
-        modificationStatus.put(newName, modificationStatus.remove(oldName));
     }
 
     public void setModificationType(String name, ModificationType type) {

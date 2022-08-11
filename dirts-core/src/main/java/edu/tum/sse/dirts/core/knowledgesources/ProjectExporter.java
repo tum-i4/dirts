@@ -82,7 +82,8 @@ public class ProjectExporter<T extends BodyDeclaration<?>> extends KnowledgeSour
                 if (maybeCompilationUnit.isPresent()) {
                     CompilationUnit compilationUnit = maybeCompilationUnit.get();
                     Optional<TypeDeclaration<?>> maybePrimaryType = compilationUnit.getPrimaryType();
-                    maybePrimaryType.ifPresent(typeDeclaration -> compilationUnitsMappingNew.put(name, lookup(typeDeclaration).getFirst()));
+                    maybePrimaryType.ifPresent(typeDeclaration ->
+                            compilationUnitsMappingNew.put(name, lookup(typeDeclaration).getFirst()));
                 }
             });
             nodesAdded.forEach((name, t) -> {
@@ -90,7 +91,8 @@ public class ProjectExporter<T extends BodyDeclaration<?>> extends KnowledgeSour
                 if (maybeCompilationUnit.isPresent()) {
                     CompilationUnit compilationUnit = maybeCompilationUnit.get();
                     Optional<TypeDeclaration<?>> maybePrimaryType = compilationUnit.getPrimaryType();
-                    maybePrimaryType.ifPresent(typeDeclaration -> compilationUnitsMappingNew.put(name, lookup(typeDeclaration).getFirst()));
+                    maybePrimaryType.ifPresent(typeDeclaration ->
+                            compilationUnitsMappingNew.put(name, lookup(typeDeclaration).getFirst()));
                 }
             });
 
@@ -101,7 +103,10 @@ public class ProjectExporter<T extends BodyDeclaration<?>> extends KnowledgeSour
             try {
 
                 Files.createDirectories(tmpPath);
-                Files.writeString(tmpPath.resolve(Path.of("graph_" + suffix)), dependencyGraphNewRevision.serializeGraph(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                Files.writeString(tmpPath.resolve(Path.of("graph_" + suffix)),
+                        dependencyGraphNewRevision.serializeGraph(),
+                        StandardOpenOption.CREATE,
+                        StandardOpenOption.TRUNCATE_EXISTING);
                 Files.writeString(tmpPath.resolve(Path.of("checksums_" + suffix)),
                         objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(checksumsNodesNewRevision),
                         StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);

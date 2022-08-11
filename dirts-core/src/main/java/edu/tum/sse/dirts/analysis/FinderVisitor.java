@@ -19,6 +19,7 @@ import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import org.apache.maven.surefire.api.testset.TestFilter;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,9 +27,8 @@ import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 
 /**
  * A generic FinderVisitor that can be extended to collect specific Nodes in the AST
- * A Predicate can be used to filter
  *
- * @param <T> Collection where the Nodes that should be collected are inserted
+ * @param <T>
  */
 @SuppressWarnings("unused")
 public abstract class FinderVisitor<T, P extends BodyDeclaration<?>> extends AbstractTruncatedVisitor<T> {

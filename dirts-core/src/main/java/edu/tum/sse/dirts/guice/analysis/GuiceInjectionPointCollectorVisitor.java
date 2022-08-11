@@ -38,12 +38,16 @@ import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 
+
+/**
+ * Collects injectionPoints induced by Guice
+ */
 public abstract class GuiceInjectionPointCollectorVisitor<P extends BodyDeclaration<?>>
         extends AbstractTruncatedVisitor<InjectionPointStorage>
         implements InjectionPointCollector<P> {
 
     //##################################################################################################################
-    // Methods specified by DependencyCollector
+    // Methods specified by InjectionPointCollector
 
     public void collectInjectionPoints(Collection<TypeDeclaration<?>> ts, InjectionPointStorage injectionPoints) {
         for (TypeDeclaration<?> t : ts) {
@@ -104,8 +108,12 @@ public abstract class GuiceInjectionPointCollectorVisitor<P extends BodyDeclarat
             for (ResolvedType retrievedType : retrievedTypes) {
                 injectionPoints.addInjectionPoint(nodeName, retrievedType, null, Set.of());
 
-                if (retrievedType.isReferenceType()){
-                    checkCollectionInjection(injectionPoints, nodeName, retrievedType.asReferenceType(), null, Set.of());
+                if (retrievedType.isReferenceType()) {
+                    checkCollectionInjection(injectionPoints,
+                            nodeName,
+                            retrievedType.asReferenceType(),
+                            null,
+                            Set.of());
                 }
             }
         }

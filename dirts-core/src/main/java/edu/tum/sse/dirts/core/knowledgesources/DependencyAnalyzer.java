@@ -14,23 +14,15 @@ package edu.tum.sse.dirts.core.knowledgesources;
 
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
-import edu.tum.sse.dirts.analysis.DependencyCollector;
-import edu.tum.sse.dirts.analysis.NonTypeDependencyCollector;
 import edu.tum.sse.dirts.analysis.def.DefaultDependencyCollectorVisitor;
-import edu.tum.sse.dirts.analysis.def.DefaultNonTypeDependencyCollectorVisitor;
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.BlackboardState;
 import edu.tum.sse.dirts.core.KnowledgeSource;
 import edu.tum.sse.dirts.core.strategies.DependencyStrategy;
-import edu.tum.sse.dirts.util.Log;
-import edu.tum.sse.dirts.util.naming_scheme.Names;
-import edu.tum.sse.dirts.util.tuples.Pair;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import static edu.tum.sse.dirts.core.BlackboardState.NEW_GRAPH_SET;
-import static java.util.logging.Level.INFO;
 
 /**
  * Analyzes the dependencies of code objects and adds corresponding edges in the DependencyGraph

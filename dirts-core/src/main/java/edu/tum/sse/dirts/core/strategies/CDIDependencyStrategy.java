@@ -52,7 +52,7 @@ public class CDIDependencyStrategy<T extends BodyDeclaration<?>>
     private static final TypeReference<Set<String>> typeRefXMLAlternatives = new TypeReference<>() {
     };
 
-    private CDIAlternativeDependencyCollector<T> alternativeDependencyCollector;
+    private final CDIAlternativeDependencyCollector<T> alternativeDependencyCollector;
 
     private Set<String> xmlAlternativesNewRevision, xmlAlternativesOldRevision;
     private Set<String> xmlAlternativesAdded, xmlAlternativesRemoved, xmlAlternativesSame;

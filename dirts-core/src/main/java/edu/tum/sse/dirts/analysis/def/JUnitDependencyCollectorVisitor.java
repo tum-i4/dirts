@@ -21,13 +21,14 @@ import edu.tum.sse.dirts.graph.DependencyGraph;
 import java.util.Collection;
 
 /**
- * Collects dependencies based on JUnit4
+ * Collects dependencies based on JUnit4 and JUnit5
  * <p>
- * Considers methods annotated with @Before and @BeforeClass as dependencies of methods annotated with @Test
+ * Considers methods annotated with @Before, @BeforeClass or @BeforeEach, @BeforeAll
+ * as dependencies of methods annotated with @Test
  */
-public abstract class JUnitDependencyCollectorVisitor<P extends BodyDeclaration<?>>
+public abstract class JUnitDependencyCollectorVisitor<T extends BodyDeclaration<?>>
         extends AbstractTruncatedVisitor<DependencyGraph>
-        implements DependencyCollector<P> {
+        implements DependencyCollector<T> {
 
     public void calculateDependencies(Collection<TypeDeclaration<?>> ts, DependencyGraph dependencyGraph) {
         for (TypeDeclaration<?> t : ts) {

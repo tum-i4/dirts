@@ -84,10 +84,12 @@ public class SpringGetBeanIdentifierVisitor extends AbstractIdentifierVisitor<
                     try {
                         ResolvedType argumentResolvedType = argument.calculateResolvedType();
                         if (argumentResolvedType.isReferenceType()) {
-                            resolvedType = JavaParserUtils.extractClassType(argumentResolvedType.asReferenceType(), Set.of("java.lang.Class"));
+                            resolvedType = JavaParserUtils.extractClassType(argumentResolvedType.asReferenceType(),
+                                    Set.of("java.lang.Class"));
                         }
                     } catch (RuntimeException e) {
-                        Log.log(FINE, "Exception in " + JavaParserUtils.class.getSimpleName() + ": " + e.getMessage());
+                        Log.log(FINE, "Exception in " + JavaParserUtils.class.getSimpleName() + ": "
+                                + e.getMessage());
                     }
                 }
             }

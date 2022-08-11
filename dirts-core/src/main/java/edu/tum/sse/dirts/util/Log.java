@@ -2,6 +2,9 @@ package edu.tum.sse.dirts.util;
 
 import java.util.logging.Level;
 
+/**
+ * Central loggin provider
+ */
 public class Log {
 
     private static Level logLevel = Level.WARNING;

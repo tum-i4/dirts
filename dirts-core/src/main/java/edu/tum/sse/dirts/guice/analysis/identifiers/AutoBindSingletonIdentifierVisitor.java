@@ -78,7 +78,8 @@ public class AutoBindSingletonIdentifierVisitor extends AbstractTruncatedVisitor
                 try {
                     ResolvedType resolvedType = memberValue.calculateResolvedType();
                     if (resolvedType.isReferenceType()) {
-                        bindType = JavaParserUtils.extractClassType(resolvedType.asReferenceType(), Set.of("java.lang.Class"));
+                        bindType = JavaParserUtils.extractClassType(resolvedType.asReferenceType(),
+                                Set.of("java.lang.Class"));
                     }
                 } catch (RuntimeException e) {
                     Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
@@ -92,10 +93,12 @@ public class AutoBindSingletonIdentifierVisitor extends AbstractTruncatedVisitor
                         try {
                             ResolvedType resolvedType = value.calculateResolvedType();
                             if (resolvedType.isReferenceType()) {
-                                bindType = JavaParserUtils.extractClassType(resolvedType.asReferenceType(), Set.of("java.lang.Class"));
+                                bindType = JavaParserUtils.extractClassType(resolvedType.asReferenceType(),
+                                        Set.of("java.lang.Class"));
                             }
                         } catch (RuntimeException e) {
-                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": "
+                                    + e.getMessage());
                         }
                     }
                 }

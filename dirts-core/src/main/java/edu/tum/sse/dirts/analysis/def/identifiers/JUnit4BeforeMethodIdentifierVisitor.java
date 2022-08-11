@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 import static java.util.logging.Level.FINE;
 
 /**
- * Identifies MethodDeclarations that are annotated with @Before or @BeforeClass
+ * Identifies MethodDeclarations that are annotated with @Before, @BeforeClass or @BeforeEach, @BeforeAll
  */
 public class JUnit4BeforeMethodIdentifierVisitor extends AbstractIdentifierVisitor<
         Collection<ResolvedMethodDeclaration>

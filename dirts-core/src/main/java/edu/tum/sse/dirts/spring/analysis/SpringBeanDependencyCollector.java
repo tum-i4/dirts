@@ -12,6 +12,7 @@
  */
 package edu.tum.sse.dirts.spring.analysis;
 
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
@@ -37,7 +38,8 @@ import static edu.tum.sse.dirts.util.naming_scheme.Names.*;
 /**
  * Collects dependencies from beans to beans/code entities
  */
-public abstract class SpringBeanDependencyCollector {
+@SuppressWarnings("unused")
+public abstract class SpringBeanDependencyCollector<T extends BodyDeclaration<?>> {
 
     //##################################################################################################################
     // Attributes

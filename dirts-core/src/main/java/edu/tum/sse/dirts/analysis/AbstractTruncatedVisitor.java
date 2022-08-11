@@ -23,6 +23,10 @@ import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 
+/**
+ * Generic Visitor that prevents traversing irrelevant nodes like Modifiers or Comments
+ * @param <A>
+ */
 @SuppressWarnings("CommentedOutCode")
 public abstract class AbstractTruncatedVisitor<A> implements VoidVisitor<A> {
 

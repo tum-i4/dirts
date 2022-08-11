@@ -38,17 +38,16 @@ import java.util.stream.Collectors;
 import static edu.tum.sse.dirts.analysis.di.NameIdentifierVisitor.getNameFromQualifier;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 import static java.util.logging.Level.FINE;
-import static java.util.logging.Level.FINER;
 
 /**
- * Collects dependencies from beans/code entities to code entities based on @Bean, @Configuration, xml beans @Autowire and getBean(...)
+ * Collects dependencies induced by Spring
  */
-public abstract class SpringInjectionPointCollectorVisitor<P extends BodyDeclaration<?>>
+public abstract class SpringInjectionPointCollectorVisitor<T extends BodyDeclaration<?>>
         extends AbstractTruncatedVisitor<InjectionPointStorage>
-        implements InjectionPointCollector<P> {
+        implements InjectionPointCollector<T> {
 
     //##################################################################################################################
-    // Methods specified by DependencyCollector
+    // Methods specified by InjectionPointCollector
 
     public void collectInjectionPoints(Collection<TypeDeclaration<?>> ts, InjectionPointStorage injectionPointStorage) {
         for (TypeDeclaration<?> t : ts) {

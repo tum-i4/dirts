@@ -21,7 +21,7 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import java.util.List;
 
 /**
- * Collects all Type-nodes
+ * Collects all nodes that are instances of subclasses of TypeDeclaration
  * (ClassOrInterfaceDeclaration, EnumDeclaration, AnnotationDeclaration)
  */
 public class TypeFinderVisitor extends VoidVisitorAdapter<List<TypeDeclaration<?>>> {

@@ -18,8 +18,7 @@ import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import edu.tum.sse.dirts.analysis.FinderVisitor;
-import edu.tum.sse.dirts.analysis.def.finders.TypeNameFinderVisitor;
-import edu.tum.sse.dirts.analysis.def.identifiers.nontype.InheritanceIdentifierVisitor;
+import edu.tum.sse.dirts.analysis.def.identifiers.methodlevel.InheritanceIdentifierVisitor;
 import edu.tum.sse.dirts.core.strategies.DependencyStrategy;
 import edu.tum.sse.dirts.graph.DependencyGraph;
 import edu.tum.sse.dirts.graph.ModificationGraph;
@@ -38,6 +37,8 @@ import static java.util.logging.Level.*;
  * Used to store all available knowledge
  */
 public class Blackboard<T extends BodyDeclaration<?>> {
+
+    public static boolean considerAnnotationsAsDependencies = false;
 
     /*
      * Central class of the blackboard pattern
@@ -86,8 +87,8 @@ public class Blackboard<T extends BodyDeclaration<?>> {
 
     private ModificationGraph modificationGraph;
 
-    // Only used by nontypeL
-    private Map<TypeDeclaration<?>, InheritanceIdentifierVisitor> inheritanceIdentifierVisitorMap;
+    // Only used by method level RTS
+    private IdentityHashMap<TypeDeclaration<?>, InheritanceIdentifierVisitor> inheritanceIdentifierVisitorMap;
 
     //##################################################################################################################
     // Constructors
@@ -347,11 +348,11 @@ public class Blackboard<T extends BodyDeclaration<?>> {
 
 
     public void setInheritanceIdentifierVisitorMap(
-            Map<TypeDeclaration<?>, InheritanceIdentifierVisitor> inheritanceIdentifierVisitorMap) {
+            IdentityHashMap<TypeDeclaration<?>, InheritanceIdentifierVisitor> inheritanceIdentifierVisitorMap) {
         this.inheritanceIdentifierVisitorMap = inheritanceIdentifierVisitorMap;
     }
 
-    public Map<TypeDeclaration<?>, InheritanceIdentifierVisitor> getInheritanceIdentifierVisitorMap() {
+    public IdentityHashMap<TypeDeclaration<?>, InheritanceIdentifierVisitor> getInheritanceIdentifierVisitorMap() {
         return inheritanceIdentifierVisitorMap;
     }
 }

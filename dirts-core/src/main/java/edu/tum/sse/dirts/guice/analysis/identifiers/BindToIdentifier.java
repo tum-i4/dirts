@@ -91,7 +91,7 @@ public class BindToIdentifier extends AbstractIdentifierVisitor<
                     String name = k.getSecond();
                     String annotaion = k.getThird();
 
-                    //******************************************************************************************************
+                    //**************************************************************************************************
                     // Add binding
 
                     if (bindType != null) {
@@ -131,7 +131,8 @@ public class BindToIdentifier extends AbstractIdentifierVisitor<
                         ResolvedType resolvedType = boundExpr.calculateResolvedType();
                         if (resolvedType.isReferenceType()) {
                             arg.content = new Triple<>(JavaParserUtils.extractClassType(resolvedType.asReferenceType(),
-                                    Set.of("java.lang.Class", "com.google.inject.TypeLiteral", "com.google.inject.Key")), name, annotation);
+                                    Set.of("java.lang.Class", "com.google.inject.TypeLiteral", "com.google.inject.Key")),
+                                    name, annotation);
                         }
                     } catch (RuntimeException e) {
                         Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
@@ -146,13 +147,15 @@ public class BindToIdentifier extends AbstractIdentifierVisitor<
                         ResolvedType resolvedType = argument.calculateResolvedType();
                         if (resolvedType.isReferenceType()) {
                             ResolvedReferenceType resolvedReferenceType = resolvedType.asReferenceType();
-                            if (JavaParserUtils.equalsTypeName(resolvedReferenceType, "com.google.inject.name.Named")) {
+                            if (JavaParserUtils.equalsTypeName(resolvedReferenceType,
+                                    "com.google.inject.name.Named")) {
                                 // Names.named("name")
                                 String newName = NameIdentifierVisitor.getNameFromNamesDotNamed(n);
                                 arg.content = new Triple<>(type, newName, annotation);
                             } else {
                                 // Annotation.class
-                                ResolvedType annotationClass = JavaParserUtils.extractClassType(resolvedReferenceType, Set.of("java.lang.Class"));
+                                ResolvedType annotationClass = JavaParserUtils.extractClassType(resolvedReferenceType,
+                                        Set.of("java.lang.Class"));
                                 arg.content = new Triple<>(type, name, Names.lookup(annotationClass));
                             }
                         }
@@ -168,7 +171,8 @@ public class BindToIdentifier extends AbstractIdentifierVisitor<
             > {
 
         @Override
-        public void visit(MethodCallExpr n, Map<Triple<ResolvedType, String, String>, Set<ResolvedReferenceTypeDeclaration>> arg) {
+        public void visit(MethodCallExpr n,
+                          Map<Triple<ResolvedType, String, String>, Set<ResolvedReferenceTypeDeclaration>> arg) {
             String nameAsString = n.getNameAsString();
             if (nameAsString.equals("to") || nameAsString.equals("toInstance")) {
 
@@ -186,12 +190,14 @@ public class BindToIdentifier extends AbstractIdentifierVisitor<
                             ResolvedType toExprResolvedType = toExpr.calculateResolvedType();
                             if (toExprResolvedType.isReferenceType()) {
                                 resolvedType = JavaParserUtils.extractClassType(toExprResolvedType.asReferenceType(),
-                                        Set.of("java.lang.Class", "com.google.inject.TypeLiteral", "com.google.inject.Key"));
+                                        Set.of("java.lang.Class",
+                                                "com.google.inject.TypeLiteral",
+                                                "com.google.inject.Key"));
                             }
 
                         } catch (RuntimeException e) {
                             Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " +
-                                        e.getMessage());
+                                    e.getMessage());
                         }
                     }
                     if (nameAsString.equals("toInstance")) {
@@ -199,7 +205,7 @@ public class BindToIdentifier extends AbstractIdentifierVisitor<
                             resolvedType = toExpr.calculateResolvedType();
                         } catch (RuntimeException e) {
                             Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " +
-                                        e.getMessage());
+                                    e.getMessage());
                         }
                     }
 
@@ -222,7 +228,7 @@ public class BindToIdentifier extends AbstractIdentifierVisitor<
                         maybeScope.get().accept(bindIdentifier, container);
                     } catch (RuntimeException e) {
                         Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " +
-                                    e.getMessage());
+                                e.getMessage());
                     }
                 }
 

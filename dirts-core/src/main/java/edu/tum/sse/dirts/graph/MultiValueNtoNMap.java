@@ -2,6 +2,11 @@ package edu.tum.sse.dirts.graph;
 
 import java.util.*;
 
+/**
+ * A bidirectional map, that can contain multiple values assigned to edges
+ * @param <K>
+ * @param <V>
+ */
 public class MultiValueNtoNMap<K, V> {
 
     private final Map<K, Map<K, Set<V>>> regularMap;

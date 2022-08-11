@@ -15,6 +15,9 @@ import edu.tum.sse.dirts.guice.util.GuiceBinding;
 import java.util.Collection;
 import java.util.Set;
 
+/**
+ * Contains tasks required by the dependency-analyzing extension for Guice
+ */
 public class GuiceDependencyStrategy<T extends BodyDeclaration<?>>
         extends DIDependencyStrategy<T, GuiceBinding> {
 

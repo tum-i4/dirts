@@ -9,12 +9,15 @@ import java.util.*;
 
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 
+/**
+ * Used to store InjectionPoints
+ */
 public class InjectionPointStorage {
 
     private final Map<String, Set<Triple<String, String, Set<String>>>> injectionPoints = new HashMap<>();
 
     //##################################################################################################################
-    // Setters (...methods that add InjectionPoints)
+    // Methods that add InjectionPoints
 
     public void addInjectionPoint(String injectionPoint,
                                   ResolvedType type,
@@ -35,16 +38,33 @@ public class InjectionPointStorage {
         Triple<String, String, Set<String>> value = new Triple<>(typeString, name, qualifiers);
         injectionPoints.computeIfAbsent(injectionPoint, k -> new HashSet<>());
         injectionPoints.get(injectionPoint).add(value);
+    }
 
+    public void addAll(InjectionPointStorage other) {
+        injectionPoints.putAll(other.getInjectionPoints());
     }
 
     //##################################################################################################################
-    // Getters
+    // Methods that remove InjectionPoints
+
+    public void removeInjectionPoint(String injectionPoint) {
+        injectionPoints.remove(injectionPoint);
+    }
+
+    //##################################################################################################################
+    // Getters (methods that retrieve InjectionPoints)
 
     public Map<String, Set<Triple<String, String, Set<String>>>> getInjectionPoints() {
         return Collections.unmodifiableMap(injectionPoints);
     }
 
+    @JsonIgnore
+    public boolean isEmpty() {
+        return injectionPoints.isEmpty();
+    }
+
+    //##################################################################################################################
+    // Auxiliary methods
 
     @Override
     public String toString() {
@@ -60,18 +80,5 @@ public class InjectionPointStorage {
                                 .append("}\n")));
 
         return sb.toString();
-    }
-
-    public void removeInjectionPoint(String injectionPoint) {
-        injectionPoints.remove(injectionPoint);
-    }
-
-    public void addAll(InjectionPointStorage other) {
-        injectionPoints.putAll(other.getInjectionPoints());
-    }
-
-    @JsonIgnore
-    public boolean isEmpty() {
-        return injectionPoints.isEmpty();
     }
 }

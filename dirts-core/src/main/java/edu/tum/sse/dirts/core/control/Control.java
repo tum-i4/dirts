@@ -30,13 +30,17 @@ import java.util.function.Predicate;
 import static java.util.logging.Level.INFO;
 
 /**
- * Abstract base class for either type-level or nontype-level RTS
+ * Abstract base class for either class level or method level RTS
+ * @param <T>
  */
 public abstract class Control<T extends BodyDeclaration<?>> {
 
     //##################################################################################################################
     // Attributes
 
+    /**
+     * Whether temporary files should be overwritten
+     */
     protected final boolean overwrite;
 
     /**
@@ -44,6 +48,7 @@ public abstract class Control<T extends BodyDeclaration<?>> {
      */
     protected final Blackboard<T> blackboard;
 
+    // _________________________________________________________________________________________________________________
 
     /**
      * Visitor used to calculate checksums of the most important nodes
@@ -60,17 +65,18 @@ public abstract class Control<T extends BodyDeclaration<?>> {
      */
     private final FinderVisitor<Collection<String>, T> testFinderVisitor;
 
-
-    /**
-     * Filter used to restrict the nodes that are added to the graph
-     */
-    protected final Predicate<Node> nodesInGraphFilter;
-
     /**
      * Dependency collector that creates the most important edges
      * (Extensions can be added using DependencyStrategies)
      */
     private final DefaultDependencyCollectorVisitor<T> primaryDependencyCollector;
+
+    // _________________________________________________________________________________________________________________
+
+    /**
+     * Filter used to restrict the nodes that are added to the graph
+     */
+    protected final Predicate<Node> nodesInGraphFilter;
 
     /**
      * Most important edges
@@ -171,7 +177,7 @@ public abstract class Control<T extends BodyDeclaration<?>> {
     /**
      * Calculates affected tests
      *
-     * @param filterByEdgeType
+     * @param filterByEdgeType types of edges that need to occur in a path from test to modified node
      * @return (changedNode, affectedTest)
      */
     public Map<String, Set<String>> getSelectedTests(Set<EdgeType> filterByEdgeType) {
@@ -211,9 +217,9 @@ public abstract class Control<T extends BodyDeclaration<?>> {
     }
 
     /**
-     * Visualizes the combined dependencyGraph
+     * Visualizes the combined DependencyGraph
      *
-     * @return
+     * @return visualization of the graph
      */
     public String visualizeDependencyGraph() {
         if (!blackboard.getState().isTerminalState())

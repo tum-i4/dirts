@@ -34,7 +34,7 @@ import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 
 /**
- * Contains tasks required by the dependency-analyzing extension for CDI
+ * Contains tasks required by the dependency-analyzing extension for Spring
  */
 public class SpringDependencyStrategy<T extends BodyDeclaration<?>>
         extends DIDependencyStrategy<T, SpringBean>
@@ -46,7 +46,7 @@ public class SpringDependencyStrategy<T extends BodyDeclaration<?>>
     private static final TypeReference<HashMap<String, Integer>> typeRefXMLBeans = new TypeReference<>() {
     };
 
-    private final SpringBeanDependencyCollector springBeanDependencyCollector;
+    private final SpringBeanDependencyCollector<T> springBeanDependencyCollector;
 
     private Map<String, Integer> checksumsXmlBeansOldRevision;
     private Map<String, XMLBeanDefinition> xmlBeansNewRevision;
@@ -59,7 +59,7 @@ public class SpringDependencyStrategy<T extends BodyDeclaration<?>>
     private final BeanStorage<SpringBean> beanStorage = new BeanStorage<>();
 
     public SpringDependencyStrategy(SpringInjectionPointCollectorVisitor<T> injectionPointCollector,
-                                    SpringBeanDependencyCollector springBeanDependencyCollector,
+                                    SpringBeanDependencyCollector<T> springBeanDependencyCollector,
                                     SpringMapper<T> nameMapper) {
         super(PREFIX, injectionPointCollector, DI_SPRING, nameMapper);
         this.springBeanDependencyCollector = springBeanDependencyCollector;
@@ -114,7 +114,9 @@ public class SpringDependencyStrategy<T extends BodyDeclaration<?>>
             Files.createDirectories(tmpPath);
 
             Files.writeString(tmpPath.resolve(Path.of("spring_xmlbeans_" + suffix)),
-                    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(checksumsXMLBeansNewRevision), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(checksumsXMLBeansNewRevision),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING);
 
         } catch (IOException ignored) {
             Log.log(SEVERE, "Failed to export checksums of SpringXMLBeans");
@@ -150,7 +152,8 @@ public class SpringDependencyStrategy<T extends BodyDeclaration<?>>
             lookupTypeDeclaration(definition.getClassName(), typeSolver).ifPresent(c -> {
                 beanStorage.addBeanByTypeDeclaration(c, bean);
                 try {
-                    for (ResolvedReferenceType ancestor : c.getAllAncestors(JavaParserUtils.depthFirstFuncAcceptIncompleteList)) {
+                    for (ResolvedReferenceType ancestor :
+                            c.getAllAncestors(JavaParserUtils.depthFirstFuncAcceptIncompleteList)) {
                         beanStorage.addBeanByType(ancestor, bean);
                     }
                 } catch (RuntimeException ignored) {

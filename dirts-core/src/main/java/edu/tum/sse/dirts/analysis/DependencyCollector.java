@@ -19,10 +19,10 @@ import edu.tum.sse.dirts.graph.DependencyGraph;
 import java.util.Collection;
 
 /**
- * Collects dependencies of TypeDeclarations
+ * Collects dependencies of arbitrary nodes, when invoked on TypeDeclarations
  */
 @SuppressWarnings("unused")
-public interface DependencyCollector<P extends BodyDeclaration<?>> {
+public interface DependencyCollector<T extends BodyDeclaration<?>> {
 
     void calculateDependencies(Collection< TypeDeclaration<?>> ts, DependencyGraph dependencyGraph);
 }

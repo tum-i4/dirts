@@ -26,10 +26,10 @@ import static edu.tum.sse.dirts.core.BlackboardState.NEW_GRAPH_SET;
  * <p>
  * The concept for updating the graph used in this class can be found in
  * J. Öqvist et al., Extraction-Based Regression Test Selection, 2016,
- *
+ * <p>
  * It is implemented in
- *  - TypeLevelGraphCropper for types (by Öqvist et al.)
- *  - NonTypeLevelGraphCropper for nontypes (extended and adapted to nontypes)
+ * - ClassLevelGraphCropper for class level nodes (by Öqvist et al.)
+ * - MethodLevelGraphCropper for method level (extended and adapted to method level nodes)
  */
 public abstract class AbstractGraphCropper<T extends BodyDeclaration<?>> extends KnowledgeSource<T> {
 
@@ -82,7 +82,6 @@ public abstract class AbstractGraphCropper<T extends BodyDeclaration<?>> extends
         nodesRemoved.forEach((removed, node) -> nodeMap.put(removed, null));
         nodeMap.keySet().forEach(from -> dependencyGraph.removeAllEdgesFrom(from, affectedEdges));
 
-
         blackboard.setImpactedTypes(impactedTypes);
 
         for (DependencyStrategy<T> dependencyStrategy : blackboard.getDependencyStrategies()) {
@@ -92,12 +91,13 @@ public abstract class AbstractGraphCropper<T extends BodyDeclaration<?>> extends
         return NEW_GRAPH_SET;
     }
 
-    protected abstract Collection<TypeDeclaration<?>> calculateImpactedTypeDeclarations(DependencyGraph dependencyGraph,
-                                                                              Collection<CompilationUnit> compilationUnits,
-                                                                              Map<String, Node> nodesAdded,
-                                                                              Map<String, Integer> nodesRemoved,
-                                                                              Map<String, Node> nodesDifferent,
-                                                                              Map<String, Node> nodesSame);
+    protected abstract Collection<TypeDeclaration<?>>
+    calculateImpactedTypeDeclarations(DependencyGraph dependencyGraph,
+                                      Collection<CompilationUnit> compilationUnits,
+                                      Map<String, Node> nodesAdded,
+                                      Map<String, Integer> nodesRemoved,
+                                      Map<String, Node> nodesDifferent,
+                                      Map<String, Node> nodesSame);
 
 
 }

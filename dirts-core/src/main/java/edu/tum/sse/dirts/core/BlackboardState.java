@@ -73,6 +73,7 @@ public enum BlackboardState {
         }
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isTerminalState() {
         switch(this) {
             case DONE:

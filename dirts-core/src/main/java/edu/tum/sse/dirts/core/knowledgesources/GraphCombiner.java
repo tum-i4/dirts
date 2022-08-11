@@ -22,7 +22,7 @@ import static edu.tum.sse.dirts.core.BlackboardState.READY_TO_CALCULATE_AFFECTED
 import static java.util.logging.Level.WARNING;
 
 /**
- * Combines the graphs of the old and the new revision into a single modificationGraph
+ * Combines the graphs of the old and the new revision into a single ModificationGraph
  */
 public class GraphCombiner<T extends BodyDeclaration<?>> extends KnowledgeSource<T> {
 

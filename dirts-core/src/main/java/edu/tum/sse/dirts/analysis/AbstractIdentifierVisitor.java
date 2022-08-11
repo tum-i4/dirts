@@ -17,8 +17,8 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.EnumDeclaration;
 
 /**
- * Can be extended to identify connections between NonType-nodes in the AST
- * Provides final methods to stop before inner classes, enums or annotations
+ * Can be extended to identify connections between nodes in the AST
+ * Provides overridden methods to stop before inner classes, enums or annotations
  *
  * @param <T> accumulator
  */

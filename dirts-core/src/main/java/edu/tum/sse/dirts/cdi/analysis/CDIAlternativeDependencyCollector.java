@@ -9,6 +9,10 @@ import edu.tum.sse.dirts.graph.DependencyGraph;
 import java.util.Collection;
 import java.util.Set;
 
+/**
+ * Collects Dependencies induced by xml alternative entries
+ * @param <T>
+ */
 public abstract class CDIAlternativeDependencyCollector<T extends BodyDeclaration<?>>
         extends AbstractTruncatedVisitor<DependencyGraph>
         implements DependencyCollector<T> {

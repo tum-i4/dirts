@@ -48,7 +48,8 @@ public class ProviderIdentifierVisitor extends AbstractTruncatedVisitor<
     private ProviderIdentifierVisitor() {
     }
 
-    public static void identifyDependencies(Collection<TypeDeclaration<?>> typeDeclarations, BeanStorage<GuiceBinding> arg) {
+    public static void identifyDependencies(Collection<TypeDeclaration<?>> typeDeclarations,
+                                            BeanStorage<GuiceBinding> arg) {
         for (TypeDeclaration<?> typeDeclaration : typeDeclarations) {
             typeDeclaration.accept(singleton, arg);
         }
@@ -62,10 +63,10 @@ public class ProviderIdentifierVisitor extends AbstractTruncatedVisitor<
         super.visit(n, arg);
 
         /*
-        * This does only account for direct inheritance
-        * Accounting for indirect inheritance would involve complex resolution procedures
-        * and requires the ability to resolve library code
-        */
+         * This does only account for direct inheritance
+         * Accounting for indirect inheritance would involve complex resolution procedures
+         * and requires the ability to resolve library code
+         */
         for (ClassOrInterfaceType implementedType : n.getImplementedTypes()) {
             if (GuiceUtil.equalsProviderType(implementedType)) {
 
@@ -81,7 +82,8 @@ public class ProviderIdentifierVisitor extends AbstractTruncatedVisitor<
                         try {
                             resolvedInjectableType = injectableType.resolve();
                         } catch (RuntimeException e) {
-                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": "
+                                    + e.getMessage());
                         }
                     }
 
@@ -94,14 +96,16 @@ public class ProviderIdentifierVisitor extends AbstractTruncatedVisitor<
                         try {
                             resolvedMethodLikeDeclarations.add(getMethod.resolve());
                         } catch (RuntimeException e) {
-                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": "
+                                    + e.getMessage());
                         }
                     }
 
                     //**************************************************************************************************
                     // Add binding
                     if (resolvedInjectableType != null) {
-                        for (ResolvedMethodLikeDeclaration resolvedMethodLikeDeclaration : resolvedMethodLikeDeclarations) {
+                        for (ResolvedMethodLikeDeclaration resolvedMethodLikeDeclaration :
+                                resolvedMethodLikeDeclarations) {
                             arg.addBeanByType(resolvedInjectableType, new GuiceBinding(resolvedMethodLikeDeclaration));
                         }
                     }

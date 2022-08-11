@@ -117,8 +117,8 @@ public class ChangeAnalyzer<T extends BodyDeclaration<?>> extends KnowledgeSourc
             objectsRemoved.putAll(checksumsOldRevision);
 
             // We might have entries with no T (in this case T is MethodDeclaration) coming from extended test classes
-            // See NonTypeNameFinderVisitor.visit(ClassOrInterfaceDeclaration n, ...)
-            // and JUnitNonTypeDependencyCollectorVisitor.visit(ClassOrInterfaceDeclaration n, ...)
+            // See MethodLevelNameFinderVisitor.visit(ClassOrInterfaceDeclaration n, ...)
+            // and JUnitMethodLevelDependencyCollectorVisitor.visit(ClassOrInterfaceDeclaration n, ...)
 
             filterNonNull(objectsAdded, objectsSame);
             filterNonNull(objectsRemoved, objectsSame);

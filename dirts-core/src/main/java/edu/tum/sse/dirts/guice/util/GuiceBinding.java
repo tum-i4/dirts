@@ -28,6 +28,10 @@ import java.util.stream.Collectors;
 
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 
+/**
+ * Represents a binding in Guice
+ * Can be either a method, a type or a combination of a method and several types
+ */
 public class GuiceBinding implements Bean {
 
     private final TriAlternative<ResolvedMethodLikeDeclaration,

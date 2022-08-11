@@ -37,8 +37,8 @@ public enum ModificationType {
     //##################################################################################################################
     // Constructors
 
-    ModificationType(String postfix) {
-        this.suffix = postfix;
+    ModificationType(String suffix) {
+        this.suffix = suffix;
     }
 
     //##################################################################################################################

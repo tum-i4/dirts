@@ -34,6 +34,9 @@ import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 
+/**
+ * Collects injectionPoints induced by CDI
+ */
 public abstract class CDIInjectionPointCollectorVisitor<P extends BodyDeclaration<?>>
         extends AbstractTruncatedVisitor<InjectionPointStorage>
         implements InjectionPointCollector<P> {

@@ -82,16 +82,17 @@ public class SelectIdentifierVisitor extends AbstractIdentifierVisitor<
                     if (argumentType.isReferenceType()) {
                         ResolvedReferenceType resolvedReferenceType = argumentType.asReferenceType();
 
-                        //**************************************************************************************************
+                        //**********************************************************************************************
                         // By type
                         try {
                             requestedType = JavaParserUtils.extractClassType(resolvedReferenceType,
                                     Set.of("java.lang.Class", "javax.enterprise.util.TypeLiteral"));
                         } catch (RuntimeException e) {
-                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": "
+                                    + e.getMessage());
                         }
 
-                        //**************************************************************************************************
+                        //**********************************************************************************************
                         // By qualifiers
                         if (resolvedReferenceType.getQualifiedName().endsWith("AnnotationLiteral")) {
                             ResolvedReferenceType annotationType = resolvedReferenceType.getTypeParametersMap()

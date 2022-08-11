@@ -15,6 +15,9 @@ package edu.tum.sse.dirts.graph;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Used to print a ModificationGraph using the dot format
+ */
 public class GraphPrinter {
 
     private final ModificationGraph graph;
