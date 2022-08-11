@@ -71,7 +71,7 @@ Even though DIRTS analyzes plain source code, in case of certain inter-module de
 compile before executing the selection procedure.
 
 ```shell
-$ mvn compile dirts:typeL_select test
+$ mvn compile dirts:class_level_select test
 ```
 
 ### Select, then compile and test only those modules that have at least one test selected
@@ -79,7 +79,7 @@ $ mvn compile dirts:typeL_select test
 DIRTS creates a list of these modules in `.dirts/affected_modules` inside the folder of the outermost module.
 
 ```shell
-$ mvn dirts:typeL_select
+$ mvn dirts:class_level_select
 $ mvn -am -pl "$(cat .dirts/affected_modules)" compile test
 ```
 
@@ -87,9 +87,15 @@ $ mvn -am -pl "$(cat .dirts/affected_modules)" compile test
 
 1. Checkout the main branch.
 2. Run selection to create checksums and graph, if these files do not already exist.
-   E.g.: ```$ mvn dirts:typeL_select```
+   E.g.: ```$ mvn dirts:class_level_select```
 3. Checkout the feature branch.
-4. Run selection and tests. E.g.: ```$ mvn compile dirts:typeL_select test```
+4. Run selection and tests.
+- For combined compilation, selection and test execution: ```$ mvn compile dirts:class_level_select test```
+- To only compile and test affected modules:
+```shell
+$ mvn dirts:class_level_select
+$ mvn -am -pl "$(cat .dirts/affected_modules)" compile test
+```
 
 ## Setup
 

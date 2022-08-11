@@ -30,7 +30,7 @@ public class ClassLevelGraphMojo extends AbstractGraphMojo<TypeDeclaration<?>> {
 
     @Override
     protected Control<TypeDeclaration<?>> getControl() {
-        Blackboard<TypeDeclaration<?>> typeLevelBlackboard = getClassLevelBlackboard();
-        return new ClassLevelControl(typeLevelBlackboard, false);
+        Blackboard<TypeDeclaration<?>> classLevelBlackboard = getClassLevelBlackboard();
+        return new ClassLevelControl(classLevelBlackboard, false);
     }
 }

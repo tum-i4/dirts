@@ -14,9 +14,9 @@ public class ClassLevelSelectMojo extends AbstractSelectMojo<TypeDeclaration<?>>
 
     @Override
     protected Control<TypeDeclaration<?>> getControl() {
-        Blackboard<TypeDeclaration<?>> typeLevelBlackboard = getClassLevelBlackboard();
-        typeLevelBlackboard.setTestFilter(getTestFilter());
-        return new ClassLevelControl(typeLevelBlackboard, true);
+        Blackboard<TypeDeclaration<?>> classLevelBlackboard = getClassLevelBlackboard();
+        classLevelBlackboard.setTestFilter(getTestFilter());
+        return new ClassLevelControl(classLevelBlackboard, true);
     }
 
     @Override

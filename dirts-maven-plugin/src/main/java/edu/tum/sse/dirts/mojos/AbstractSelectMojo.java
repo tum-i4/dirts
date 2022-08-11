@@ -130,7 +130,7 @@ public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends A
                 }
             });
 
-            // In nontypeL, it is possible that some test methods of a class are excluded while others are included.
+            // In method level RTS, it is possible that some test methods of a class are excluded while others are included.
             // In this case, we want the class not to be excluded
             excluded.removeAll(included.keySet());
 
