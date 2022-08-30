@@ -1,5 +1,5 @@
 /*
- * Copyright 2022. The ttrace authors.
+ * Copyright 2022. The dirts authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -15,7 +15,9 @@ package edu.tum.sse.dirts.core.knowledgesources;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
+import com.github.javaparser.utils.ParserCollectionStrategy;
+import com.github.javaparser.utils.SourceRoot;
 import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.BlackboardState;
 import edu.tum.sse.dirts.core.KnowledgeSource;
@@ -24,9 +26,11 @@ import edu.tum.sse.dirts.util.Log;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static edu.tum.sse.dirts.core.BlackboardState.IMPORTED;
 import static edu.tum.sse.dirts.core.BlackboardState.TYPE_SOLVER_SET;
+import static java.util.logging.Level.FINEST;
 import static java.util.logging.Level.WARNING;
 
 /**
@@ -50,7 +54,7 @@ public class TypeSolverInitializer<T extends BodyDeclaration<?>> extends Knowled
         Path subPath = blackboard.getSubPath();
 
         CombinedTypeSolver typeSolver = new CombinedTypeSolver();
-        typeSolver.add(new ReflectionTypeSolver());
+        //typeSolver.add(new ReflectionTypeSolver()); // may cause build failure
 
         Path mavenDependenciesPath = rootPath
                 .toAbsolutePath()
@@ -65,12 +69,30 @@ public class TypeSolverInitializer<T extends BodyDeclaration<?>> extends Knowled
                         .split(":");
 
                 for (String mavenDependency : mavenDependencies) {
-                    if (!mavenDependency.equals("")) {
-                        try {
-                            Path dependencyPath = Path.of(mavenDependency);
-                            typeSolver.add(new JarTypeSolver(dependencyPath));
-                        } catch (IOException e) {
-                            Log.errLog(WARNING, "Failed to add resolver for jar:" + mavenDependency);
+                    if (!(mavenDependency == null || mavenDependency.equals(""))) {
+
+                        Path mavenDependencyPath = Path.of(mavenDependency);
+
+                        if (Files.isDirectory(mavenDependencyPath)) {
+                            Path parentDirectory = mavenDependencyPath.getParent().getParent();
+
+                            List<SourceRoot> sourceRoots = new ParserCollectionStrategy()
+                                    .collect(parentDirectory)
+                                    .getSourceRoots();
+
+                            for (SourceRoot sourceRoot : sourceRoots) {
+                                Log.log(FINEST, "Adding resolver for sources in "
+                                        + sourceRoot.getRoot().toAbsolutePath());
+                                typeSolver.add(new JavaParserTypeSolver(sourceRoot.getRoot()));
+                            }
+                        } else if (Files.isRegularFile(mavenDependenciesPath)) {
+                            try {
+                                Log.log(FINEST, "Adding resolver for jar "
+                                        + mavenDependencyPath.toAbsolutePath());
+                                typeSolver.add(new JarTypeSolver(mavenDependencyPath));
+                            } catch (IOException e) {
+                                Log.errLog(WARNING, "Failed to add resolver for jar:" + mavenDependency);
+                            }
                         }
                     }
                 }

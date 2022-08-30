@@ -1,5 +1,5 @@
 /*
- * Copyright 2022. The ttrace authors.
+ * Copyright 2022. The dirts authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.WARNING;
 
 /**
@@ -54,13 +55,8 @@ public class Parser<T extends BodyDeclaration<?>> extends KnowledgeSource<T> {
         Path rootPath = blackboard.getRootPath();
         Path subPath = blackboard.getSubPath();
 
-        List<SourceRoot> allSourcesRoots = getSourceRoots(rootPath);
-        List<SourceRoot> sourceRootsSubProject = allSourcesRoots.stream()
-                .filter(r -> r.getRoot().toAbsolutePath().toString()
-                        .startsWith(rootPath.resolve(subPath).toAbsolutePath().toString()))
-                .collect(Collectors.toList());
+        List<SourceRoot> sourceRootsSubProject = getSourceRoots(rootPath.resolve(subPath));
 
-        setupTypeSolver(allSourcesRoots, typeSolver);
         List<CompilationUnit> compilationUnits = importCompilationUnits(sourceRootsSubProject, typeSolver);
 
         blackboard.setCompilationUnits(compilationUnits);
@@ -90,12 +86,6 @@ public class Parser<T extends BodyDeclaration<?>> extends KnowledgeSource<T> {
             }
         });
         return compilationUnits;
-    }
-
-    private static void setupTypeSolver(List<SourceRoot> sourceRoots, CombinedTypeSolver typeSolver) {
-        for (SourceRoot sourceRoot : sourceRoots) {
-            typeSolver.add(new JavaParserTypeSolver(sourceRoot.getRoot()));
-        }
     }
 
     private static List<SourceRoot> getSourceRoots(Path path) {

@@ -23,7 +23,7 @@ public class MethodLevelChecksumVisitor implements ChecksumVisitor<BodyDeclarati
 
     /**
      * The code in this class has been taken from NoCommentsHashCodeVisitor and slightly modified
-     * https://github.com/javaparser/javaparser/blob/7a8796f7334feb9563014c7da71868cfd4c49798/javaparser-core-testing/src/test/java/com/github/javaparser/ast/visitor/NoCommentHashCodeVisitorTest.java
+     * <a href="https://github.com/javaparser/javaparser/blob/7a8796f7334feb9563014c7da71868cfd4c49798/javaparser-core-testing/src/test/java/com/github/javaparser/ast/visitor/NoCommentHashCodeVisitorTest.java">...</a>
      */
 
     private final IdentityHashMap<Node, Integer> cache;
