@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 public class StaticIdentifierVisitor extends AbstractIdentifierVisitor<
         Collection<ResolvedTypeDeclaration>
@@ -62,8 +62,8 @@ public class StaticIdentifierVisitor extends AbstractIdentifierVisitor<
             if (resolvedMethodDeclaration.isStatic()) {
                 arg.add(resolvedMethodDeclaration.declaringType());
             }
-        } catch (RuntimeException e) {
-            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (Throwable e) {
+            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -80,8 +80,8 @@ public class StaticIdentifierVisitor extends AbstractIdentifierVisitor<
                     arg.add(resolvedFieldDeclaration.declaringType());
                 }
             }
-        } catch (RuntimeException e) {
-            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (Throwable e) {
+            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -103,8 +103,8 @@ public class StaticIdentifierVisitor extends AbstractIdentifierVisitor<
                 Optional<ResolvedReferenceTypeDeclaration> enumTypeDeclaration = resolvedEnumType.getTypeDeclaration();
                 enumTypeDeclaration.ifPresent(arg::add);
             }
-        } catch (RuntimeException e) {
-            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (Throwable e) {
+            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 }

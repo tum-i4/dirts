@@ -79,7 +79,7 @@ public class SpringXMLBeanIdentifier {
             }
 
         } catch (IOException | SAXException ignored) {
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }

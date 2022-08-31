@@ -29,7 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Identifies calls to select(...) to retrieve beans
@@ -87,8 +87,8 @@ public class SelectIdentifierVisitor extends AbstractIdentifierVisitor<
                         try {
                             requestedType = JavaParserUtils.extractClassType(resolvedReferenceType,
                                     Set.of("java.lang.Class", "javax.enterprise.util.TypeLiteral"));
-                        } catch (RuntimeException e) {
-                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": "
+                        } catch (Throwable e) {
+                            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": "
                                     + e.getMessage());
                         }
 
@@ -108,8 +108,8 @@ public class SelectIdentifierVisitor extends AbstractIdentifierVisitor<
                             }
                         }
                     }
-                } catch (RuntimeException e) {
-                    Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                } catch (Throwable e) {
+                    Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                 }
             }
             if (requestedType != null || !qualifiers.isEmpty()) {

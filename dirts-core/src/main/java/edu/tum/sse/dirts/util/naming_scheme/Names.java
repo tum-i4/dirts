@@ -121,7 +121,7 @@ public class Names {
             } else {
                 return resolvedMethodLikeDeclaration.getQualifiedSignature();
             }
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             return resolvedMethodLikeDeclaration.getQualifiedName() + "(Unsolved arguments...)";
         }
     }
@@ -174,7 +174,7 @@ public class Names {
     public static String lookup(ResolvedType type) {
         try {
             return type.describe();
-        } catch (RuntimeException ignored) {
+        } catch (Exception ignored) {
             return type.toString();
         }
     }

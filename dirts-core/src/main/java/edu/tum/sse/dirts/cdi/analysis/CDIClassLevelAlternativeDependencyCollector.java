@@ -23,7 +23,7 @@ import edu.tum.sse.dirts.graph.EdgeType;
 import edu.tum.sse.dirts.util.Log;
 
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Collects Dependencies induced by xml alternative entries for class level nodes
@@ -49,8 +49,8 @@ public class CDIClassLevelAlternativeDependencyCollector extends CDIAlternativeD
                     String toNode = CDIUtil.lookupXMlAlternativeName(fromNode);
                     dependencyGraph.addEdge(fromNode, toNode, EdgeType.DI_CDI);
                 }
-            } catch (RuntimeException e) {
-                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            } catch (Throwable e) {
+                Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
     }

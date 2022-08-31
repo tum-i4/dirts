@@ -25,7 +25,7 @@ import edu.tum.sse.dirts.util.Log;
 import java.util.HashSet;
 import java.util.Set;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Identifies method calls to getInstance(...)
@@ -80,8 +80,8 @@ public class GetInstanceIdentifierVisitor extends AbstractIdentifierVisitor<
                         resolvedType = JavaParserUtils.extractClassType(argumentResolvedType.asReferenceType(),
                                 Set.of("java.lang.Class", "com.google.inject.Key"));
                     }
-                } catch (RuntimeException e) {
-                    Log.log(FINE, "Exception in " + JavaParserUtils.class.getSimpleName() + ": " + e.getMessage());
+                } catch (Throwable e) {
+                    Log.log(FINEST, "Exception in " + JavaParserUtils.class.getSimpleName() + ": " + e.getMessage());
                 }
                 // Unfortunately, it is not easy to extract annotations or Names.named(...) from Key<T>
                 if (resolvedType != null)

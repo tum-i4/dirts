@@ -106,7 +106,7 @@ public class GuiceUtil {
                 }
             }
             return false;
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             return false;
         }
     }

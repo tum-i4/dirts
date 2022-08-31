@@ -25,7 +25,7 @@ import edu.tum.sse.dirts.util.Log;
 
 import java.util.Collection;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Identifies just-in-time bindings
@@ -70,8 +70,8 @@ public class JustInTimeIdentifierVisitor extends AbstractIdentifierVisitor<
                     ResolvedReferenceTypeDeclaration resolvedReturnTypeDeclaration = constructor.declaringType();
                     arg.addBeanByTypeDeclaration(resolvedReturnTypeDeclaration, new GuiceBinding(constructor));
                 }
-            } catch (RuntimeException e) {
-                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            } catch (Throwable e) {
+                Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
     }
@@ -89,8 +89,8 @@ public class JustInTimeIdentifierVisitor extends AbstractIdentifierVisitor<
 
                 arg.addBeanByTypeDeclaration(resolvedReferenceTypeDeclaration,
                         new GuiceBinding(resolvedConstructorDeclaration));
-            } catch (RuntimeException e) {
-                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            } catch (Throwable e) {
+                Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
     }

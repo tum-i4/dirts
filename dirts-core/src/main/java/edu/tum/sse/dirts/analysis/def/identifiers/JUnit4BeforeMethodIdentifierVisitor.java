@@ -24,7 +24,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Identifies MethodDeclarations that are annotated with @Before, @BeforeClass or @BeforeEach, @BeforeAll
@@ -60,7 +60,7 @@ public class JUnit4BeforeMethodIdentifierVisitor extends AbstractIdentifierVisit
                     try {
                         ResolvedReferenceType resolvedType = i.resolve().asReferenceType();
                         return resolvedType.getAllMethodsVisibleToInheritors();
-                    } catch (RuntimeException ignored) {
+                    } catch (Exception ignored) {
                         return null;
                     }
                 }).filter(Objects::nonNull)
@@ -92,8 +92,8 @@ public class JUnit4BeforeMethodIdentifierVisitor extends AbstractIdentifierVisit
             try {
                 ResolvedMethodDeclaration methodDecl = n.resolve();
                 arg.add(methodDecl);
-            } catch (RuntimeException e) {
-                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            } catch (Throwable e) {
+                Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
     }

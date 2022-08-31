@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 public class NewIdentifierVisitor extends AbstractIdentifierVisitor<
         Collection<ResolvedReferenceTypeDeclaration>
@@ -60,8 +60,8 @@ public class NewIdentifierVisitor extends AbstractIdentifierVisitor<
             ResolvedReferenceType resolvedReferenceType = n.getType().resolve().asReferenceType();
             Optional<ResolvedReferenceTypeDeclaration> typeDeclaration = resolvedReferenceType.getTypeDeclaration();
             typeDeclaration.ifPresent(arg::add);
-        } catch (RuntimeException e) {
-            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (Throwable e) {
+            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 }

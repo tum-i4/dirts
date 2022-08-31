@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 
 import static edu.tum.sse.dirts.analysis.di.NameIdentifierVisitor.getNameFromQualifier;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Collects dependencies induced by Spring
@@ -82,8 +82,8 @@ public abstract class SpringInjectionPointCollectorVisitor<T extends BodyDeclara
             type = getterType.apply(injectionVariable);
 
             nodeName = getterNodeName.apply(node);
-        } catch (RuntimeException e) {
-            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (Throwable e) {
+            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
 
         if (nodeName != null) {
@@ -119,8 +119,8 @@ public abstract class SpringInjectionPointCollectorVisitor<T extends BodyDeclara
                     }
                 }
 
-            } catch (RuntimeException e) {
-                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            } catch (Throwable e) {
+                Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
     }

@@ -27,7 +27,7 @@ import edu.tum.sse.dirts.util.Log;
 import java.util.Collection;
 import java.util.HashSet;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 
 /**
@@ -70,8 +70,8 @@ public class DelegationIdentifierVisitor extends AbstractIdentifierVisitor<
         try {
             ResolvedMethodDeclaration methodDecl = n.resolve();
             arg.add(methodDecl);
-        } catch (RuntimeException e) {
-            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (Throwable e) {
+            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -82,8 +82,8 @@ public class DelegationIdentifierVisitor extends AbstractIdentifierVisitor<
         try {
             ResolvedMethodDeclaration methodDecl = n.resolve();
             arg.add(methodDecl);
-        } catch (RuntimeException e) {
-            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (Throwable e) {
+            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -94,8 +94,8 @@ public class DelegationIdentifierVisitor extends AbstractIdentifierVisitor<
         try {
             ResolvedConstructorDeclaration constructorDecl = n.resolve();
             arg.add(constructorDecl);
-        } catch (RuntimeException e) {
-            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (Throwable e) {
+            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -106,8 +106,8 @@ public class DelegationIdentifierVisitor extends AbstractIdentifierVisitor<
         try {
             ResolvedConstructorDeclaration constructorDecl = n.resolve();
             arg.add(constructorDecl);
-        } catch (RuntimeException e) {
-            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (Throwable e) {
+            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 }

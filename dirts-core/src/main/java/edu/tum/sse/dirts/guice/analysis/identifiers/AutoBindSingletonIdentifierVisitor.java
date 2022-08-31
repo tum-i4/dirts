@@ -32,7 +32,7 @@ import edu.tum.sse.dirts.util.Log;
 import java.util.Collection;
 import java.util.Set;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 
 /**
@@ -81,8 +81,8 @@ public class AutoBindSingletonIdentifierVisitor extends AbstractTruncatedVisitor
                         bindType = JavaParserUtils.extractClassType(resolvedType.asReferenceType(),
                                 Set.of("java.lang.Class"));
                     }
-                } catch (RuntimeException e) {
-                    Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                } catch (Throwable e) {
+                    Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                 }
             } else if (annotationExpr.isNormalAnnotationExpr()) {
                 // the member baseClass contains the type
@@ -96,8 +96,8 @@ public class AutoBindSingletonIdentifierVisitor extends AbstractTruncatedVisitor
                                 bindType = JavaParserUtils.extractClassType(resolvedType.asReferenceType(),
                                         Set.of("java.lang.Class"));
                             }
-                        } catch (RuntimeException e) {
-                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": "
+                        } catch (Throwable e) {
+                            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": "
                                     + e.getMessage());
                         }
                     }
@@ -113,8 +113,8 @@ public class AutoBindSingletonIdentifierVisitor extends AbstractTruncatedVisitor
                     arg.addBeanByTypeDeclaration(resolvedReferenceTypeDeclaration,
                             new GuiceBinding(resolvedReferenceTypeDeclaration));
                 }
-            } catch (RuntimeException e) {
-                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            } catch (Throwable e) {
+                Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
 

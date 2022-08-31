@@ -25,7 +25,7 @@ import edu.tum.sse.dirts.util.Log;
 import java.util.Collection;
 import java.util.Set;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Identifies methods annotated with @Bean
@@ -82,8 +82,8 @@ public class ManagedBeanIdentifierVisitor extends AbstractIdentifierVisitor<
                     arg.addBeanByQualifier(qualifier, newBean);
                 }
 
-            } catch (RuntimeException e) {
-                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            } catch (Throwable e) {
+                Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
     }

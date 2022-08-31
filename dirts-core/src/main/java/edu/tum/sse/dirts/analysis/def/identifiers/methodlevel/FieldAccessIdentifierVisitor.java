@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Identifies accessed and assigned member variables
@@ -81,8 +81,8 @@ public class FieldAccessIdentifierVisitor extends AbstractIdentifierVisitor<
                     resolvedAssignedFields.add(resolvedValueDeclaration);
                 }
             }
-        } catch (RuntimeException e) {
-            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (Throwable e) {
+            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
 
 
@@ -106,8 +106,8 @@ public class FieldAccessIdentifierVisitor extends AbstractIdentifierVisitor<
             } else if (resolvedValueDeclaration.isEnumConstant()) {
                 resolvedAccessedFields.add(resolvedValueDeclaration);
             }
-        } catch (RuntimeException e) {
-            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (Throwable e) {
+            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 

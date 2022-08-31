@@ -25,7 +25,7 @@ import edu.tum.sse.dirts.util.tuples.Pair;
 import java.util.HashSet;
 import java.util.Set;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Identifies method calls to .getBean() supposedly invoked on a BeanFactory or ApplicationContext
@@ -87,8 +87,8 @@ public class SpringGetBeanIdentifierVisitor extends AbstractIdentifierVisitor<
                             resolvedType = JavaParserUtils.extractClassType(argumentResolvedType.asReferenceType(),
                                     Set.of("java.lang.Class"));
                         }
-                    } catch (RuntimeException e) {
-                        Log.log(FINE, "Exception in " + JavaParserUtils.class.getSimpleName() + ": "
+                    } catch (Throwable e) {
+                        Log.log(FINEST, "Exception in " + JavaParserUtils.class.getSimpleName() + ": "
                                 + e.getMessage());
                     }
                 }

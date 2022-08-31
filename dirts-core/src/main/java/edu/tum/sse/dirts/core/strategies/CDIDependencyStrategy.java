@@ -114,7 +114,7 @@ public class CDIDependencyStrategy<T extends BodyDeclaration<?>>
                     }
                 }
             } catch (IOException | SAXException ignored) {
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
         }

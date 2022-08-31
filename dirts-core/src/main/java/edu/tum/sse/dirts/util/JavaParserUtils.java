@@ -56,7 +56,7 @@ public class JavaParserUtils {
             try {
                 ResolvedAnnotationDeclaration resolvedAnnotationDeclaration = annotation.resolve();
                 ret.add(resolvedAnnotationDeclaration.getQualifiedName());
-            } catch (RuntimeException ignored) {
+            } catch (Exception ignored) {
                 ret.add(annotation.getNameAsString());
             }
         }
@@ -110,7 +110,7 @@ public class JavaParserUtils {
                     } else {
                         return Optional.empty();
                     }
-                } catch (RuntimeException ignored) {
+                } catch (Exception ignored) {
                     if (annotationExpr.getNameAsString().equals(simpleName)) {
                         return Optional.of(annotationExpr);
                     } else {
@@ -152,7 +152,7 @@ public class JavaParserUtils {
                     } else {
                         return Optional.empty();
                     }
-                } catch (RuntimeException ignored) {
+                } catch (Exception ignored) {
                     if (annotationExpr.getNameAsString().equals(simpleName)) {
                         return Optional.of(ret);
                     } else {
@@ -191,7 +191,7 @@ public class JavaParserUtils {
             try {
                 ResolvedMethodDeclaration resolvedMethodDeclaration = methodCallExpr.resolve();
                 return resolvedMethodDeclaration.getQualifiedSignature().equals(qualifiedSignature);
-            } catch (RuntimeException ignored) {
+            } catch (Exception ignored) {
                 return methodCallExpr.getNameAsString().equals(simpleName);
             }
         } else {

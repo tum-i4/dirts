@@ -33,7 +33,7 @@ import java.util.Optional;
 
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookupNode;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Collects dependencies related to JUnit4 for class level nodes
@@ -113,8 +113,8 @@ public class JUnitClassLevelDependencyCollectorVisitor
                     }
                 }
             }
-        } catch (RuntimeException e) {
-            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (Throwable e) {
+            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
 
         if (FinderVisitor.testClassDeclaration(n, testFilter)) {

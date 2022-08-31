@@ -138,7 +138,7 @@ class UnresolvedLookupVisitor extends VoidVisitorWithDefaults<Container<String>>
             Parameter parameter = iterator.next();
             try {
                 partialSignature.append(lookup(parameter.getType()).getFirst());
-            } catch (RuntimeException e) {
+            } catch (Throwable e) {
                 partialSignature.append("UnresolvedArgument");
             }
         }
@@ -185,7 +185,7 @@ class UnresolvedLookupVisitor extends VoidVisitorWithDefaults<Container<String>>
             Expression argument = iterator.next();
             try {
                 partialSignature.append(lookup(argument.calculateResolvedType()));
-            } catch (RuntimeException e) {
+            } catch (Throwable e) {
                 partialSignature.append("UnresolvedArgument");
             }
         }
@@ -221,7 +221,7 @@ class UnresolvedLookupVisitor extends VoidVisitorWithDefaults<Container<String>>
             Expression argument = iterator.next();
             try {
                 partialSignature.append(lookup(argument.calculateResolvedType()));
-            } catch (RuntimeException e) {
+            } catch (Throwable e) {
                 partialSignature.append("UnresolvedArgument");
             }
         }
@@ -240,7 +240,7 @@ class UnresolvedLookupVisitor extends VoidVisitorWithDefaults<Container<String>>
             Expression argument = iterator.next();
             try {
                 partialSignature.append(lookup(argument.calculateResolvedType()));
-            } catch (RuntimeException e) {
+            } catch (Throwable e) {
                 partialSignature.append("UnresolvedArgument");
             }
         }

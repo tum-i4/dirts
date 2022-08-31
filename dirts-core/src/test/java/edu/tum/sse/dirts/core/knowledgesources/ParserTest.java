@@ -74,6 +74,7 @@ public class ParserTest extends KnowledgeSourceTest {
         //when
         when(sourceRootMock.getParserConfiguration()).thenReturn(parserConfigurationMock);
         when(sourceRootMock.tryToParse()).thenReturn(List.of(result));
+        when(sourceRootMock.getRoot()).thenReturn(null);
 
         Method importCompilationUnits = Parser.class.getDeclaredMethod("importCompilationUnits", List.class, CombinedTypeSolver.class);
         importCompilationUnits.setAccessible(true);

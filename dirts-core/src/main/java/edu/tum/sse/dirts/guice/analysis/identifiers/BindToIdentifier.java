@@ -34,7 +34,7 @@ import edu.tum.sse.dirts.util.tuples.Triple;
 
 import java.util.*;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Identifies bindings created with bind(..).to(...)
@@ -79,8 +79,8 @@ public class BindToIdentifier extends AbstractIdentifierVisitor<
             ResolvedMethodDeclaration resolvedMethodDeclaration = null;
             try {
                 resolvedMethodDeclaration = n.resolve();
-            } catch (RuntimeException e) {
-                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            } catch (Throwable e) {
+                Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
             if (resolvedMethodDeclaration != null) {
                 ResolvedMethodDeclaration finalResolvedMethodDeclaration = resolvedMethodDeclaration;
@@ -134,8 +134,8 @@ public class BindToIdentifier extends AbstractIdentifierVisitor<
                                     Set.of("java.lang.Class", "com.google.inject.TypeLiteral", "com.google.inject.Key")),
                                     name, annotation);
                         }
-                    } catch (RuntimeException e) {
-                        Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                    } catch (Throwable e) {
+                        Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                     }
 
                 }
@@ -195,16 +195,16 @@ public class BindToIdentifier extends AbstractIdentifierVisitor<
                                                 "com.google.inject.Key"));
                             }
 
-                        } catch (RuntimeException e) {
-                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " +
+                        } catch (Throwable e) {
+                            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " +
                                     e.getMessage());
                         }
                     }
                     if (nameAsString.equals("toInstance")) {
                         try {
                             resolvedType = toExpr.calculateResolvedType();
-                        } catch (RuntimeException e) {
-                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " +
+                        } catch (Throwable e) {
+                            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " +
                                     e.getMessage());
                         }
                     }
@@ -226,8 +226,8 @@ public class BindToIdentifier extends AbstractIdentifierVisitor<
                 if (maybeScope.isPresent()) {
                     try {
                         maybeScope.get().accept(bindIdentifier, container);
-                    } catch (RuntimeException e) {
-                        Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " +
+                    } catch (Throwable e) {
+                        Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " +
                                 e.getMessage());
                     }
                 }

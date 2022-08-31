@@ -168,7 +168,7 @@ public class SpringDependencyStrategy<T extends BodyDeclaration<?>>
                             c.getAllAncestors(JavaParserUtils.depthFirstFuncAcceptIncompleteList)) {
                         beanStorage.addBeanByType(ancestor, bean);
                     }
-                } catch (RuntimeException ignored) {
+                } catch (Exception ignored) {
                 }
             });
         });

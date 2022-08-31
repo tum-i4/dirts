@@ -24,7 +24,7 @@ import edu.tum.sse.dirts.util.Log;
 import java.util.Collection;
 import java.util.HashSet;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Identifies Annotations present on nodes in the AST
@@ -67,8 +67,8 @@ public class AnnotationIdentifierVisitor extends AbstractIdentifierVisitor<
         try {
             ResolvedAnnotationDeclaration resolvedAnnotationDeclaration = n.resolve();
             arg.add(resolvedAnnotationDeclaration);
-        } catch (RuntimeException e) {
-            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (Throwable e) {
+            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -79,8 +79,8 @@ public class AnnotationIdentifierVisitor extends AbstractIdentifierVisitor<
         try {
             ResolvedAnnotationDeclaration resolvedAnnotationDeclaration = n.resolve();
             arg.add(resolvedAnnotationDeclaration);
-        } catch (RuntimeException e) {
-            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (Throwable e) {
+            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -91,8 +91,8 @@ public class AnnotationIdentifierVisitor extends AbstractIdentifierVisitor<
         try {
             ResolvedAnnotationDeclaration resolvedAnnotationDeclaration = n.resolve();
             arg.add(resolvedAnnotationDeclaration);
-        } catch (RuntimeException e) {
-            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (Throwable e) {
+            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 }

@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 import static java.util.logging.Level.WARNING;
 
 /**
@@ -71,6 +71,11 @@ public class Parser<T extends BodyDeclaration<?>> extends KnowledgeSource<T> {
 
     private List<CompilationUnit> importCompilationUnits(List<SourceRoot> sourceRoots, CombinedTypeSolver typeSolver) {
         List<CompilationUnit> compilationUnits = new ArrayList<>();
+        for (SourceRoot sourceRoot : sourceRoots) {
+            Path root = sourceRoot.getRoot();
+            if (root != null)
+                typeSolver.add(new JavaParserTypeSolver(root));
+        }
         sourceRoots.forEach(sourceRoot -> {
             try {
                 sourceRoot.getParserConfiguration()

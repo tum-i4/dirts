@@ -29,7 +29,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 
 /**
@@ -84,8 +84,8 @@ public class ProducerFieldIdentifierVisitor extends AbstractIdentifierVisitor<
                         for (ResolvedType beanType : beanTypes) {
                             arg.addBeanByType(beanType, newBean);
                         }
-                    } catch (RuntimeException e) {
-                        Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " +
+                    } catch (Throwable e) {
+                        Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " +
                                     e.getMessage());
                     }
 
@@ -102,8 +102,8 @@ public class ProducerFieldIdentifierVisitor extends AbstractIdentifierVisitor<
                         arg.addBeanByQualifier(qualifier, newBean);
                     }
 
-                } catch (RuntimeException e) {
-                    Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                } catch (Throwable e) {
+                    Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                 }
             } else {
                 Set<String> qualifiers = CDIUtil.findQualifiers(n);
@@ -166,8 +166,8 @@ public class ProducerFieldIdentifierVisitor extends AbstractIdentifierVisitor<
                         for (ResolvedType beanType : beanTypes) {
                             beanStorage.addBeanByType(beanType, newBean);
                         }
-                    } catch (RuntimeException e) {
-                        Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " +
+                    } catch (Throwable e) {
+                        Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " +
                                     e.getMessage());
                     }
 
@@ -185,8 +185,8 @@ public class ProducerFieldIdentifierVisitor extends AbstractIdentifierVisitor<
                 } else {
                     // theoretically unreachable
                 }
-            } catch (RuntimeException e) {
-                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            } catch (Throwable e) {
+                Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
     }

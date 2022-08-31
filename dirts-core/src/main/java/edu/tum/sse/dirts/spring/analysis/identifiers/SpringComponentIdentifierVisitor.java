@@ -31,7 +31,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Identifies classes annotated with @Component
@@ -92,8 +92,8 @@ public class SpringComponentIdentifierVisitor extends AbstractTruncatedVisitor<
                         arg.addBeanByName(name, newBean);
                     }
 
-                } catch (RuntimeException e) {
-                    Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+                } catch (Throwable e) {
+                    Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
                 }
             }
         }

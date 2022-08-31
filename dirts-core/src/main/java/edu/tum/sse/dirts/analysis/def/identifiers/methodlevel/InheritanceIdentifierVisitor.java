@@ -29,7 +29,7 @@ import edu.tum.sse.dirts.util.Log;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Identifies inherited methods
@@ -72,8 +72,8 @@ public class InheritanceIdentifierVisitor extends AbstractIdentifierVisitor<
                         } catch (UnsolvedSymbolException ignored) {
                         }
                     });
-        } catch (RuntimeException e) {
-            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (Throwable e) {
+            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
@@ -92,7 +92,7 @@ public class InheritanceIdentifierVisitor extends AbstractIdentifierVisitor<
                         try {
                             String iSignature = e.getKey();
                             return thisSignature.equals(iSignature);
-                        } catch (RuntimeException ignored) {
+                        } catch (Exception ignored) {
                             return false;
                         }
                     })
@@ -101,8 +101,8 @@ public class InheritanceIdentifierVisitor extends AbstractIdentifierVisitor<
                     .collect(Collectors.toList());
             arg.addAll(overriddenMethods);
             inheritedMethods.remove(thisSignature);
-        } catch (RuntimeException e) {
-            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (Throwable e) {
+            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 

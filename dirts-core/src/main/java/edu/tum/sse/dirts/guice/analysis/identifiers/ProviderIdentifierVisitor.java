@@ -28,7 +28,7 @@ import edu.tum.sse.dirts.util.Log;
 
 import java.util.*;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Identifies bindings created in classes extending Provider<T>
@@ -81,8 +81,8 @@ public class ProviderIdentifierVisitor extends AbstractTruncatedVisitor<
                         Type injectableType = types.get(0);
                         try {
                             resolvedInjectableType = injectableType.resolve();
-                        } catch (RuntimeException e) {
-                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": "
+                        } catch (Throwable e) {
+                            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": "
                                     + e.getMessage());
                         }
                     }
@@ -95,8 +95,8 @@ public class ProviderIdentifierVisitor extends AbstractTruncatedVisitor<
                         // effectively only one method
                         try {
                             resolvedMethodLikeDeclarations.add(getMethod.resolve());
-                        } catch (RuntimeException e) {
-                            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": "
+                        } catch (Throwable e) {
+                            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": "
                                     + e.getMessage());
                         }
                     }

@@ -32,7 +32,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Identifies just-in-time bindings
@@ -73,8 +73,8 @@ public class ImplementedByIdentifierVisitor extends AbstractIdentifierVisitor<Be
                 // Type that is implemented
                 implementedType = n.resolve();
 
-            } catch (RuntimeException e) {
-                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            } catch (Throwable e) {
+                Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
 
             //**********************************************************************************************************
@@ -89,8 +89,8 @@ public class ImplementedByIdentifierVisitor extends AbstractIdentifierVisitor<Be
                         type = JavaParserUtils.extractClassType(resolvedType.asReferenceType(),
                                 Set.of("java.lang.Class"));
                     }
-                } catch (RuntimeException e) {
-                    Log.log(FINE, "Exception in " + JavaParserUtils.class.getSimpleName() + ": " + e.getMessage());
+                } catch (Throwable e) {
+                    Log.log(FINEST, "Exception in " + JavaParserUtils.class.getSimpleName() + ": " + e.getMessage());
                 }
 
 
@@ -104,8 +104,8 @@ public class ImplementedByIdentifierVisitor extends AbstractIdentifierVisitor<Be
                                 type = JavaParserUtils.extractClassType(resolvedType.asReferenceType(),
                                         Set.of("java.lang.Class"));
                             }
-                        } catch (RuntimeException e) {
-                            Log.log(FINE, "Exception in " + JavaParserUtils.class.getSimpleName() + ": "
+                        } catch (Throwable e) {
+                            Log.log(FINEST, "Exception in " + JavaParserUtils.class.getSimpleName() + ": "
                                     + e.getMessage());
                         }
                     }

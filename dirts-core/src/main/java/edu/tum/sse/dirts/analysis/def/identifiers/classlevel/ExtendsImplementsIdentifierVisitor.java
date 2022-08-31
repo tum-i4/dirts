@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 public class ExtendsImplementsIdentifierVisitor extends AbstractIdentifierVisitor<
         Collection<ResolvedReferenceTypeDeclaration>
@@ -62,8 +62,8 @@ public class ExtendsImplementsIdentifierVisitor extends AbstractIdentifierVisito
                 ResolvedReferenceType resolvedImplementedType = implementedType.resolve().asReferenceType();
                 Optional<ResolvedReferenceTypeDeclaration> typeDeclaration = resolvedImplementedType.getTypeDeclaration();
                 typeDeclaration.ifPresent(arg::add);
-            } catch (RuntimeException e) {
-                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            } catch (Throwable e) {
+                Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
 
@@ -72,8 +72,8 @@ public class ExtendsImplementsIdentifierVisitor extends AbstractIdentifierVisito
                 ResolvedReferenceType resolvedExtendedType = extendedType.resolve().asReferenceType();
                 Optional<ResolvedReferenceTypeDeclaration> typeDeclaration = resolvedExtendedType.getTypeDeclaration();
                 typeDeclaration.ifPresent(arg::add);
-            } catch (RuntimeException e) {
-                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            } catch (Throwable e) {
+                Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
     }

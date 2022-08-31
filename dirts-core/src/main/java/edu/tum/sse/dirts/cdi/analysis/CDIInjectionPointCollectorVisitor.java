@@ -31,7 +31,7 @@ import java.util.function.Function;
 
 import static edu.tum.sse.dirts.analysis.di.NameIdentifierVisitor.getNameFromQualifier;
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 import static java.util.logging.Level.FINER;
 
 /**
@@ -74,8 +74,8 @@ public abstract class CDIInjectionPointCollectorVisitor<P extends BodyDeclaratio
             type = getterType.apply(injectionVariable);
 
             nodeName = getterNodeName.apply(node);
-        } catch (RuntimeException e) {
-            Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+        } catch (Throwable e) {
+            Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
         }
 
         if (nodeName != null) {

@@ -49,7 +49,7 @@ public abstract class FinderVisitor<T, P extends BodyDeclaration<?>> extends Abs
             String methodName = resolvedMethodDeclaration.getName();
 
             return testFilter.shouldRun(declaringTypeName.replaceAll("\\.", "/") + ".class", methodName);
-        } catch (RuntimeException ignored) {
+        } catch (Exception ignored) {
         }
         return false;
     }

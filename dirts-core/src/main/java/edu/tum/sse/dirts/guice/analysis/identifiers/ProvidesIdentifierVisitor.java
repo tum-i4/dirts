@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 /**
  * Identifies bindings created in methods annotated with @Provides
@@ -89,8 +89,8 @@ public class ProvidesIdentifierVisitor extends AbstractIdentifierVisitor<
                 }
                 name.ifPresent(s -> arg.addBeanByName(s, guiceBinding));
 
-            } catch (RuntimeException e) {
-                Log.log(FINE, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            } catch (Throwable e) {
+                Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
     }

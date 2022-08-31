@@ -83,7 +83,7 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
         try {
             ResolvedArrayType resolvedArrayType = n.resolve();
             container.content = lookup(resolvedArrayType);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             arg.getSecond().content = Optional.ofNullable(e.getMessage());
             unresolvedLookupVisitor.visit(n, container);
         }
@@ -96,7 +96,7 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
         try {
             ResolvedReferenceType resolvedReferenceType = n.resolve().asReferenceType();
             container.content = lookup(resolvedReferenceType);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             arg.getSecond().content = Optional.ofNullable(e.getMessage());
             unresolvedLookupVisitor.visit(n, container);
         }
@@ -109,7 +109,7 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
         try {
             ResolvedTypeVariable resolvedTypeVariable = n.resolve();
             container.content = lookup(resolvedTypeVariable);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             arg.getSecond().content = Optional.ofNullable(e.getMessage());
             unresolvedLookupVisitor.visit(n, container);
         }
@@ -123,7 +123,7 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
         try {
             ResolvedPrimitiveType resolvedPrimitiveType = n.resolve();
             container.content = lookup(resolvedPrimitiveType);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             arg.getSecond().content = Optional.ofNullable(e.getMessage());
             unresolvedLookupVisitor.visit(n, container);
         }
@@ -136,7 +136,7 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
         try {
             ResolvedIntersectionType resolvedIntersectionType = n.resolve();
             container.content = lookup(resolvedIntersectionType);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             arg.getSecond().content = Optional.ofNullable(e.getMessage());
             unresolvedLookupVisitor.visit(n, container);
         }
@@ -149,7 +149,7 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
         try {
             ResolvedUnionType resolvedUnionType = n.resolve();
             container.content = lookup(resolvedUnionType);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             arg.getSecond().content = Optional.ofNullable(e.getMessage());
             unresolvedLookupVisitor.visit(n, container);
         }
@@ -162,7 +162,7 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
         try {
             ResolvedType resolvedType = n.resolve();
             container.content = lookup(resolvedType);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             arg.getSecond().content = Optional.ofNullable(e.getMessage());
             unresolvedLookupVisitor.visit(n, container);
         }
@@ -175,7 +175,7 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
         try {
             ResolvedVoidType resolvedType = n.resolve();
             container.content = lookup(resolvedType);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             arg.getSecond().content = Optional.ofNullable(e.getMessage());
             unresolvedLookupVisitor.visit(n, container);
         }
@@ -188,7 +188,7 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
         try {
             ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration = n.resolve();
             container.content = lookup(resolvedReferenceTypeDeclaration);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             arg.getSecond().content = Optional.ofNullable(e.getMessage());
             unresolvedLookupVisitor.visit(n, container);
         }
@@ -201,7 +201,7 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
         try {
             ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration = n.resolve();
             container.content = lookup(resolvedReferenceTypeDeclaration);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             arg.getSecond().content = Optional.ofNullable(e.getMessage());
             unresolvedLookupVisitor.visit(n, container);
         }
@@ -214,7 +214,7 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
         try {
             ResolvedReferenceTypeDeclaration resolvedReferenceTypeDeclaration = n.resolve();
             container.content = lookup(resolvedReferenceTypeDeclaration);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             arg.getSecond().content = Optional.ofNullable(e.getMessage());
             unresolvedLookupVisitor.visit(n, container);
         }
@@ -227,7 +227,7 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
         try {
             ResolvedConstructorDeclaration resolvedConstructorDeclaration = n.resolve();
             container.content = lookup(resolvedConstructorDeclaration);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             arg.getSecond().content = Optional.ofNullable(e.getMessage());
             unresolvedLookupVisitor.visit(n, container);
         }
@@ -240,7 +240,7 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
         try {
             ResolvedMethodDeclaration resolvedMethodDeclaration = n.resolve();
             container.content = lookup(resolvedMethodDeclaration);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             arg.getSecond().content = Optional.ofNullable(e.getMessage());
             unresolvedLookupVisitor.visit(n, container);
         }
@@ -265,7 +265,7 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
                 }
             }
 
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             arg.getSecond().content = Optional.ofNullable(e.getMessage());
             unresolvedLookupVisitor.visit(n, container);
         }
@@ -282,7 +282,7 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
                 ResolvedFieldDeclaration resolvedFieldDeclaration = resolvedValueDeclaration.asField();
 
                 container.content = lookup(resolvedFieldDeclaration.declaringType(), resolvedFieldDeclaration);
-            } catch (RuntimeException e) {
+            } catch (Throwable e) {
                 arg.getSecond().content = Optional.ofNullable(e.getMessage());
                 unresolvedLookupVisitor.visit(n, container);
             }
@@ -315,7 +315,7 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
                 container.content = lookup(resolvedEnumConstantDeclaration.getType()) + "."
                         + resolvedEnumConstantDeclaration.getName();
             }
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             arg.getSecond().content = Optional.ofNullable(e.getMessage());
             unresolvedLookupVisitor.visit(n, container);
         }
@@ -331,7 +331,7 @@ class ResolvingLookupVisitor extends VoidVisitorWithDefaults<Pair<Container<Stri
                     resolvedValueDeclaration.getType().asReferenceType().getTypeDeclaration();
             maybeTypeDeclaration.ifPresent(resolvedReferenceTypeDeclaration ->
                     container.content = lookup(resolvedReferenceTypeDeclaration, resolvedValueDeclaration));
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             arg.getSecond().content = Optional.ofNullable(e.getMessage());
             unresolvedLookupVisitor.visit(n, container);
         }
