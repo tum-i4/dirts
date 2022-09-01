@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
-import static java.util.logging.Level.FINEST;
+import static java.util.logging.Level.*;
 
 /**
  * Collects all class level nodes that may represent tests and their names
@@ -75,7 +75,7 @@ public class ClassLevelTestFinderVisitor extends FinderVisitor<Collection<String
                     if (resolvedAncestorTypeDeclaration.isClass()) {
                         ResolvedClassDeclaration resolvedClassDeclaration = resolvedAncestorTypeDeclaration.asClass();
                         for (ResolvedMethodDeclaration declaredMethod : resolvedClassDeclaration.getDeclaredMethods()) {
-                            if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration), declaredMethod.getName()))
+                            if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration).replaceAll("\\.","/") + ".class", declaredMethod.getName()))
                                 // Consider this class as a test
                                 arg.add(Names.lookup(n).getFirst());
                         }
@@ -84,10 +84,6 @@ public class ClassLevelTestFinderVisitor extends FinderVisitor<Collection<String
             }
         } catch (Throwable e) {
             Log.log(FINEST, "Exception in " + this.getClass().getSimpleName() + ": " + e.getMessage());
-        }
-
-        if (FinderVisitor.testClassDeclaration(n, testFilter)) {
-            arg.add(Names.lookup(n).getFirst());
         }
     }
 

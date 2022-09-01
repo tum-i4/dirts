@@ -103,7 +103,7 @@ public class JUnitClassLevelDependencyCollectorVisitor
                     if (resolvedAncestorTypeDeclaration.isClass()) {
                         ResolvedClassDeclaration resolvedClassDeclaration = resolvedAncestorTypeDeclaration.asClass();
                         for (ResolvedMethodDeclaration declaredMethod : resolvedClassDeclaration.getDeclaredMethods()) {
-                            if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration), declaredMethod.getName())) {
+                            if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration).replaceAll("\\.","/") + ".class", declaredMethod.getName())) {
                                 // If the class extends a test class, we have to add an edge to this class
                                 String fromNode = lookupNode(n, dependencyGraph);
                                 String toNode = lookup(resolvedAncestorTypeDeclaration);

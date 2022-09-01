@@ -20,6 +20,7 @@ import edu.tum.sse.dirts.util.JavaParserUtils;
 import edu.tum.sse.dirts.util.Log;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.surefire.api.testset.ResolvedTest;
 import org.apache.maven.surefire.api.testset.TestFilter;
 import org.apache.maven.surefire.api.testset.TestListResolver;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -168,6 +169,43 @@ public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends A
                 getIncludedAndExcludedTestsMethod.setAccessible(true);
 
                 result = (TestListResolver) getIncludedAndExcludedTestsMethod.invoke(this);
+
+                Set<ResolvedTest> toRemove = new HashSet<>();
+                for (ResolvedTest excludedPattern : result.getExcludedPatterns()) {
+                    if (excludedPattern.toString().equals("**/*.java")) {
+                        toRemove.add(excludedPattern);
+                        Log.log(SEVERE, "Found pattern !" + excludedPattern + " - removing it!");
+                    }
+                }
+                if (!toRemove.isEmpty()) {
+                    Set<ResolvedTest> newExcludesPatterns = new HashSet<>(result.getExcludedPatterns());
+                    newExcludesPatterns.removeAll(toRemove);
+
+                    Class<?> testListResolverClass = TestListResolver.class;
+                    try {
+                        Field excludedPatterns = testListResolverClass.getDeclaredField("excludedPatterns");
+                        excludedPatterns.setAccessible(true);
+                        excludedPatterns.set(result, Collections.unmodifiableSet(newExcludesPatterns));
+
+                    } catch (NoSuchFieldException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                Set<ResolvedTest> includedPatterns = result.getIncludedPatterns();
+                Class<?> resolvedTestClass = ResolvedTest.class;
+                try {
+                    Field methodPattern = resolvedTestClass.getDeclaredField("methodPattern");
+                    for (ResolvedTest includedPattern : includedPatterns) {
+                        methodPattern.setAccessible(true);
+                        methodPattern.set(includedPattern, null);
+                    }
+                } catch (NoSuchFieldException e) {
+                    throw new RuntimeException(e);
+                }
+
+
+
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 e.printStackTrace();
             }

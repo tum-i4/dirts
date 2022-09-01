@@ -19,9 +19,7 @@ import edu.tum.sse.dirts.core.Blackboard;
 import edu.tum.sse.dirts.core.BlackboardState;
 import edu.tum.sse.dirts.core.KnowledgeSource;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static edu.tum.sse.dirts.core.BlackboardState.PARSED;
 import static edu.tum.sse.dirts.core.BlackboardState.TESTS_FOUND;
@@ -42,7 +40,7 @@ public class TestFinder<T extends BodyDeclaration<?>> extends KnowledgeSource<T>
     public BlackboardState updateBlackboard() {
         if (blackboard.getTestFilter() != null) {
             Collection<CompilationUnit> compilationUnits = blackboard.getCompilationUnits();
-            List<String> tests = new ArrayList<>();
+            Set<String> tests = new HashSet<>();
             compilationUnits.forEach(cu -> cu.accept(finderVisitor, tests));
 
             blackboard.setTests(tests);

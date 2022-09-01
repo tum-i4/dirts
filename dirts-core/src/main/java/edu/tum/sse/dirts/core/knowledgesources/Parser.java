@@ -73,8 +73,11 @@ public class Parser<T extends BodyDeclaration<?>> extends KnowledgeSource<T> {
         List<CompilationUnit> compilationUnits = new ArrayList<>();
         for (SourceRoot sourceRoot : sourceRoots) {
             Path root = sourceRoot.getRoot();
-            if (root != null)
+            if (root != null) {
+                Log.log(FINEST, "Adding resolver for sources in "
+                        + sourceRoot.getRoot().toAbsolutePath());
                 typeSolver.add(new JavaParserTypeSolver(root));
+            }
         }
         sourceRoots.forEach(sourceRoot -> {
             try {

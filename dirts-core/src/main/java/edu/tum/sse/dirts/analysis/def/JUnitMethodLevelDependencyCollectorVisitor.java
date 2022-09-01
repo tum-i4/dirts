@@ -90,7 +90,7 @@ public class JUnitMethodLevelDependencyCollectorVisitor
                             // Create edges from constructor of outer class to test methods
                             if (FinderVisitor.testClassDeclaration(innerClassOrInterfaceDeclaration, testFilter)) {
                                 for (ResolvedMethodDeclaration declaredMethod : resolvedInnerClassDeclaration.getDeclaredMethods()) {
-                                    if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration), declaredMethod.getName())) {
+                                    if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration).replaceAll("\\.","/") + ".class", declaredMethod.getName())) {
                                         String toNode = lookup(declaredMethod);
                                         dependencyGraph.addEdge(fromNode, toNode, JUNIT);
                                     }
@@ -119,7 +119,7 @@ public class JUnitMethodLevelDependencyCollectorVisitor
                         ResolvedClassDeclaration resolvedClassDeclaration = resolvedAncestorTypeDeclaration.asClass();
                         if (!resolvedClassDeclaration.isJavaLangObject()) {
                             for (ResolvedMethodDeclaration declaredMethod : resolvedClassDeclaration.getDeclaredMethods()) {
-                                if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration), declaredMethod.getName())) {
+                                if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration).replaceAll("\\.","/") + ".class", declaredMethod.getName())) {
                                     // If the class extends a test class, we have to add an edge to inherited test methods
                                     String fromNode = Names.lookup(resolvedReferenceTypeDeclaration) + "." + declaredMethod.getSignature();
                                     String toNode = Names.lookup(declaredMethod);

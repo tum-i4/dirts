@@ -85,7 +85,7 @@ public class MethodLevelTestFinderVisitor extends FinderVisitor<Collection<Strin
                         ResolvedClassDeclaration resolvedClassDeclaration = resolvedAncestorTypeDeclaration.asClass();
                         if (!resolvedClassDeclaration.isJavaLangObject()) {
                             for (ResolvedMethodDeclaration declaredMethod : resolvedClassDeclaration.getDeclaredMethods()) {
-                                if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration), declaredMethod.getName()))
+                                if (testFilter.shouldRun(lookup(resolvedReferenceTypeDeclaration).replaceAll("\\.","/") + ".class", declaredMethod.getName()))
                                     // Consider this method as a test
                                     arg.add(lookup(resolvedReferenceTypeDeclaration) + "." + declaredMethod.getSignature());
                             }
