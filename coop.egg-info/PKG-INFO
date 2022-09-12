@@ -1,6 +1,0 @@
-Metadata-Version: 2.1
-Name: coop
-Version: 0.1.65
-Author: Daniel Elsner
-Author-email: daniel.elsner@tum.de
-Requires-Python: ==3.*,>=3.6.5
