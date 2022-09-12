@@ -40,6 +40,7 @@ setup(
                       'halo==0.*,>=0.0.29',
                       'junitparser==2.*,>==2.8.0',
                       'sqlalchemy==1.*,>=1.3.17',
-                      'SQLAlchemy-Enum-List==0.*,>=0.1.1'
+                      'SQLAlchemy-Enum-List==0.*,>=0.1.1',
+                      'psycopg2-binary==2.*,>=2.8.6'
                       ],
 )
