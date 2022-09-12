@@ -13,9 +13,7 @@ cd spring
 git clone https://github.com/apache/rocketmq-dashboard.git
 git clone https://github.com/paulhoule/infovore.git
 git clone https://github.com/awspring/spring-cloud-aws.git
-git clone https://github.com/ProgrammeVitam/vitam-ui.git
 git clone https://github.com/aks-cykcun/J-MR-Tp.git
-git clone https://github.com/SpiNNakerManchester/JavaSpiNNaker.git
 
 cd ..
 mkdir guice

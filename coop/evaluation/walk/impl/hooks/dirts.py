@@ -123,7 +123,25 @@ class DIRTSMavenHook(Hook):
 
         has_failed |= self._update_pom()
 
-        # prepare command, no clean here
+        if self.clean:
+            command: str = "{0}{1} clean".format(
+                (self.java_version + " " if self.java_version else ""),
+                self.executable,
+                self.cmd
+            )
+
+            # prepare cache dir/file
+            cache_file = "run_{}.log".format(
+                int(time() * 1000)
+            )  # run identified by timestamp
+            cache_file_path = os.path.join(self.cache_dir, cache_file)
+
+            proc: SubprocessContainer = SubprocessContainer(
+                command=command, output_filepath=cache_file_path
+            )
+            proc.execute(capture_output=True, shell=True, timeout=1000.0)
+
+        # prepare command
         command: str = "{0}{1} test-compile {2}{3} surefire:test {4}".format(
             (self.java_version + " " if self.java_version else ""),
             self.executable,
