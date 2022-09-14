@@ -70,10 +70,10 @@ public class ModificationGraph extends DependencyGraph {
     /**
      * Add information on modification based on information computed from checksums or similar
      *
-     * @param nodesSame nodes that did not change
+     * @param nodesSame      nodes that did not change
      * @param nodesDifferent nodes that did change
-     * @param nodesAdded nodes that have been added
-     * @param nodesRemoved nodes that have been removed
+     * @param nodesAdded     nodes that have been added
+     * @param nodesRemoved   nodes that have been removed
      */
     public void setModificationByStatus(Set<String> nodesSame,
                                         Set<String> nodesDifferent,
@@ -201,6 +201,9 @@ public class ModificationGraph extends DependencyGraph {
         // Find nodes at the other end of the specified edges
         reachModifiedNode.entrySet()
                 .forEach(e -> e.setValue(e.getValue().stream()
+                        .flatMap(end -> getBackwardsEdges().get(end).entrySet().stream()
+                                .filter(edge -> edge.getValue().stream().anyMatch(edgeType::contains)))
+                        .map(Map.Entry::getKey)
                         .flatMap(p -> reachableNodes(p).stream()).collect(Collectors.toSet())));
 
         // Add nodes that have outgoing edges with specified type and changed dependencies
