@@ -127,9 +127,6 @@ public abstract class AbstractDirtsMojo<T extends BodyDeclaration<?>> extends Su
         Path rootPath = getRootPath();
         Path subPath = getSubPath();
 
-        Log.setLogLevel(Level.parse(logging));
-        JavaParserUtils.RESTRICTIVE = restrictive;
-
         // Blackboard
         Blackboard<BodyDeclaration<?>> blackboard = new Blackboard<>(rootPath, subPath, "method_level");
         Blackboard.considerAnnotationsAsDependencies = annotations;
