@@ -4,8 +4,8 @@ num_commits=${1}
 
 type=${2}
 project_dir=$(realpath ${3})
-commit_dir=$(realpath ${4})
-branch=${5}
+branch=${4}
+commit_dir=$(realpath ${5})
 options=${@:6}
 
 export PYTHONPATH="../"

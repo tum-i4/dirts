@@ -25,25 +25,26 @@ spring=(
     "spring/rocketmq-dashboard master"
     "spring/infovore master"
     "spring/spring-cloud-aws main"
-    "spring/vitam-ui develop"
     "spring/J-MR-Tp main"
-    "spring/JavaSpiNNaker master"
-    )
+)
 
 for elem in "${spring[@]}";
 do
+    elemarray=($elem)
     echo "Processsing now: ${elem}"
-    ./walk.sh ${num_commits} spring ${path_prefix}${elem} ${path_prefix}commits/${elem[0]}.txt ${options}
+    ./walk.sh ${num_commits} spring ${path_prefix}${elem} ${path_prefix}commits/${elemarray[0]}.txt ${options}
 done
 
 for elem in "${guice[@]}";
 do
+    elemarray=($elem)
     echo "Processsing now: ${elem}"
     ./walk.sh ${num_commits} guice ${path_prefix}${elem} ${path_prefix}commits/${elem[0]}.txt ${options}
 done
 
 for elem in "${cdi[@]}";
 do
+    elemarray=($elem)
     echo "Processsing now: ${elem}"
     ./walk.sh ${num_commits} cdi ${path_prefix}${elem} ${path_prefix}commits/${elem[0]}.txt ${options}
 done
