@@ -48,7 +48,7 @@ public class MethodLevelControl extends Control<BodyDeclaration<?>> {
     private static final DefaultMethodLevelDependencyCollectorVisitor PRIMARY_DEPENDENCY_COLLECTOR =
             new DefaultMethodLevelDependencyCollectorVisitor();
     private static final Set<EdgeType> AFFECTED_EDGES =
-            Set.of(FIELD_ACCESS, INHERITANCE, DELEGATION, ANNOTATION, JUNIT);
+            Set.of(FIELD_ACCESS, /*FIELD_ASSIGNMENT, INHERITANCE,*/ DELEGATION, ANNOTATION, JUNIT); // Inheritance and field_assignment should not be in here on purpose
 
     //##################################################################################################################
     // Constructors

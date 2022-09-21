@@ -99,7 +99,7 @@ public class DefaultMethodLevelDependencyCollectorVisitor
                 // assignment of Fields
                 String fromNode = lookup(resolvedAssignedField.asField().declaringType(),
                         resolvedAssignedField.asField());
-                dependencyGraph.addEdge(fromNode, node, FIELD_ACCESS);
+                dependencyGraph.addEdge(fromNode, node, FIELD_ASSIGNMENT);
             }
             // Assignment to EnumConstants is not possible
         }

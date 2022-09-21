@@ -15,8 +15,11 @@ package edu.tum.sse.dirts.core.knowledgesources.graph_cropper;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.BodyDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithName;
+import edu.tum.sse.dirts.analysis.AbstractTruncatedVisitor;
 import edu.tum.sse.dirts.analysis.FinderVisitor;
 import edu.tum.sse.dirts.analysis.def.finders.TypeFinderVisitor;
 import edu.tum.sse.dirts.analysis.def.identifiers.methodlevel.InheritanceIdentifierVisitor;
@@ -128,7 +131,7 @@ public class MethodLevelGraphCropper extends AbstractGraphCropper<BodyDeclaratio
         impactedCompilationUnits.forEach(cu -> cu.accept(typeFinderVisitor, typeDeclarations));
 
         IdentityHashMap<TypeDeclaration<?>, InheritanceIdentifierVisitor> inheritanceIdentifierVisitorMap = new IdentityHashMap<>();
-        Set<CompilationUnit> impactedCompilationUnits2 = typeDeclarations.stream()
+        Set<CompilationUnit> impactedCompilationUnits3 = typeDeclarations.stream()
                 .flatMap(t -> {
                     InheritanceIdentifierVisitor inheritanceIdentifierVisitor = new InheritanceIdentifierVisitor(t);
                     inheritanceIdentifierVisitorMap.put(t, inheritanceIdentifierVisitor);
@@ -147,10 +150,42 @@ public class MethodLevelGraphCropper extends AbstractGraphCropper<BodyDeclaratio
                 .filter(cu -> !impactedCompilationUnits.contains(cu))
                 .collect(Collectors.toSet());
 
-        impactedCompilationUnits2.forEach(cu -> cu.accept(typeFinderVisitor, typeDeclarations));
+        impactedCompilationUnits3.forEach(cu -> cu.accept(typeFinderVisitor, typeDeclarations));
 
 
         blackboard.setInheritanceIdentifierVisitorMap(inheritanceIdentifierVisitorMap);
+
+        AbstractTruncatedVisitor<Set<String>> methodOrFieldFinder = new AbstractTruncatedVisitor<>() {
+            @Override
+            public void visit(MethodDeclaration n, Set<String> arg) {
+                //super.visit(n, arg);
+                arg.add(lookup(n).getFirst());
+            }
+
+            @Override
+            public void visit(FieldDeclaration n, Set<String> arg) {
+                //super.visit(n, arg);
+                arg.add(lookup(n).getFirst());
+            }
+        };
+
+        Set<String> methodNodes = new HashSet<>();
+        typeDeclarations.forEach(t -> t.accept(methodOrFieldFinder, methodNodes));
+
+        Set<CompilationUnit> impactedCompilationUnits2 = methodNodes.stream()
+                .flatMap(methodNode -> dependencyGraph.removeAllEdgesFrom(methodNode, Set.of(EdgeType.INHERITANCE, EdgeType.FIELD_ASSIGNMENT)).stream())
+                .map(allNodes::get)
+                .filter(Objects::nonNull)
+                .map(Node::findCompilationUnit)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(unit -> !impactedCompilationUnits.contains(unit))
+                .collect(Collectors.toSet());
+        impactedCompilationUnits2.forEach(cu -> cu.accept(typeFinderVisitor, typeDeclarations));
+
+        typeDeclarations.forEach(t -> {
+            inheritanceIdentifierVisitorMap.computeIfAbsent(t, InheritanceIdentifierVisitor::new);
+        });
 
         return typeDeclarations;
     }

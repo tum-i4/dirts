@@ -34,6 +34,8 @@ public enum EdgeType {
     MULTIPLE_FIELD_DECL("black"),
     DELEGATION("black"),
     FIELD_ACCESS("green"),
+
+    FIELD_ASSIGNMENT("green"),
     INHERITANCE("blue"),
     ANNOTATION("magenta"),
 

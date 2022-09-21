@@ -19,10 +19,6 @@ import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import org.apache.maven.surefire.api.testset.TestFilter;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 import static edu.tum.sse.dirts.util.naming_scheme.Names.lookup;
 
 /**
