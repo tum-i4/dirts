@@ -135,11 +135,13 @@ public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends A
         if (tests != null) {
             Set<String> excluded = tests.get(null).stream().map(mapper).collect(Collectors.toSet());
 
-            Map<String, String> included = new HashMap<>();
+            Map<String, Set<String>> included = new HashMap<>();
             tests.forEach((affectingNode, affectedTests) -> {
                 for (String affectedTest : affectedTests) {
-                    if (affectingNode != null)
-                        included.put(mapper.apply(affectedTest), affectingNode);
+                    if (affectingNode != null) {
+                        Set<String> strings = included.computeIfAbsent(mapper.apply(affectedTest), k -> new HashSet<>());
+                        strings.add(affectingNode);
+                    }
                 }
             });
 
@@ -299,7 +301,7 @@ public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends A
 
     }
 
-    protected void writeSelectedTests(Map<String, String> included, Set<String> excluded) {
+    protected void writeSelectedTests(Map<String, Set<String>> included, Set<String> excluded) {
         File excludesFile = getExcludesFile();
         if (excludesFile != null) {
             Path excludesFilePath = excludesFile.toPath();

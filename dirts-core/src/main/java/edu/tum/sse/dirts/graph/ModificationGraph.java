@@ -252,7 +252,8 @@ public class ModificationGraph extends DependencyGraph {
                 .filter(e -> e.getValue().values().stream().flatMap(Collection::stream).anyMatch(edgeType::contains))
                 .map(Map.Entry::getKey)
                 .forEach(start -> {
-                    if (changedDependencies.get(start).stream().anyMatch(edgeType::contains)) {
+                    if (changedDependencies.containsKey(start)
+                            && changedDependencies.get(start).stream().anyMatch(edgeType::contains)) {
                         String key = start + modificationStatus.get(start) + "_DI";
                         reachModifiedNode.computeIfAbsent(key, e -> new HashSet<>());
                         reachModifiedNode.get(key).add(start);
