@@ -17,7 +17,7 @@ import edu.tum.sse.dirts.util.Log;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.FINE;
 
 /**
  * A graph containing information about the modification status of nodes
@@ -119,15 +119,20 @@ public class ModificationGraph extends DependencyGraph {
                     Map<String, Set<EdgeType>> edgesOld = oldRevision.getForwardsEdges().get(fromNode);
                     Map<String, Set<EdgeType>> edgesNew = newRevision.getForwardsEdges().get(fromNode);
 
-                    Set<EdgeType> intersection = new HashSet<>();
+                    Set<String> symmetricDifference =new HashSet<>();
+                    Set<EdgeType> edgeTypes = new HashSet<>();
 
                     edgesNew.forEach((toNode, types) -> {
                         if (edgesOld.containsKey(toNode)) {
                             for (EdgeType type : types) {
                                 if (!edgesOld.get(toNode).contains(type)) {
-                                    intersection.add(type);
+                                    symmetricDifference.add(toNode);
+                                    edgeTypes.add(type);
                                 }
                             }
+                        } else {
+                            symmetricDifference.add(toNode);
+                            edgeTypes.addAll(types);
                         }
                     });
 
@@ -135,22 +140,26 @@ public class ModificationGraph extends DependencyGraph {
                         if (edgesNew.containsKey(toNode)) {
                             for (EdgeType type : types) {
                                 if (!edgesNew.get(toNode).contains(type)) {
-                                    intersection.add(type);
+                                    symmetricDifference.add(toNode);
+                                    edgeTypes.add(type);
                                 }
                             }
+                        } else {
+                            symmetricDifference.add(toNode);
+                            edgeTypes.addAll(types);
                         }
                     });
 
-                    if (!intersection.isEmpty()) {
+                    if (!symmetricDifference.isEmpty()) {
                         setModificationType(fromNode, ModificationType.CHANGED_DEPENDENCIES);
-                        changedDependencies.put(fromNode, intersection);
+                        changedDependencies.put(fromNode, edgeTypes);
 
-                        if (intersection.contains(EdgeType.DI_SPRING)
-                                || intersection.contains(EdgeType.DI_GUICE)
-                                || intersection.contains(EdgeType.DI_CDI)) {
-                            Log.log(INFO, "Found node that did not change but has changed dependencies due to DI: " + fromNode);
+                        if (edgeTypes.contains(EdgeType.DI_SPRING)
+                                || edgeTypes.contains(EdgeType.DI_GUICE)
+                                || edgeTypes.contains(EdgeType.DI_CDI)) {
+                            Log.log(FINE, "Found node that did not change but has changed dependencies due to DI: " + fromNode);
                         } else {
-                            Log.log(INFO, "Found node that did not change but has changed dependencies: " + fromNode);
+                            Log.log(FINE, "Found node that did not change but has changed dependencies: " + fromNode);
                         }
                     }
                 }
