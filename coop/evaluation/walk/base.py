@@ -259,10 +259,7 @@ class Walker(ABC):
             include_merge_commits: bool = False,
             branch: Optional[str] = None,
             num_commits: Optional[int] = 10,
-            end_commit: Optional[Commit] = None,
-            pre_hooks: Optional[List[Hook]] = None,
             hooks: Optional[List[Hook]] = None,
-            post_hooks: Optional[List[Hook]] = None,
     ) -> None:
         """
         Constructor for walkers.
@@ -281,11 +278,8 @@ class Walker(ABC):
         self.commit_list = commit_list
         self.include_merge_commits = include_merge_commits
         self.num_commits = num_commits
-        self.end_commit = end_commit
         self.branch = branch
-        self.pre_hooks: List[Hook] = pre_hooks if pre_hooks else []
         self.hooks: List[Hook] = hooks if hooks else []
-        self.post_hooks: List[Hook] = post_hooks if post_hooks else []
 
     @abstractmethod
     def walk(self) -> None:

@@ -168,7 +168,6 @@ def main():
         num_commits=args.num_commits,
         search_terms=di_related_changes,
 
-        pre_hooks=[],
         hooks=[
             # scc
             SccHook(
@@ -297,7 +296,6 @@ def main():
                 report_name="DIRTS_method_level"
             ),
         ],
-        post_hooks=[],
     )
     # create walker
 

@@ -28,10 +28,7 @@ class GitWalker(Walker):
             randomize = False,
             branch: Optional[str] = "master",
             num_commits: Optional[int] = 10,
-            end_commit: Optional[Commit] = None,
-            pre_hooks: Optional[List[Hook]] = None,
             hooks: Optional[List[Hook]] = None,
-            post_hooks: Optional[List[Hook]] = None,
             search_terms: Optional[list[str]] = None
     ) -> None:
         super().__init__(
@@ -40,10 +37,7 @@ class GitWalker(Walker):
             include_merge_commits,
             branch,
             num_commits,
-            end_commit,
-            pre_hooks,
-            hooks,
-            post_hooks,
+            hooks
         )
         self.git_repo: Repo = Repo(repository.path)
         self.git_client: GitClient = GitClient(repository=repository)
@@ -54,6 +48,9 @@ class GitWalker(Walker):
     def walk(self) -> None:
         # clean for convenience
         self.git_client.reset_repo(rm_dirs=True)
+
+        # init counter
+        counter = 0
 
         if self.commit_list is None:
             self.start_commit = self.git_repo.git.rev_list(self.branch, max_parents=0).splitlines()[0]
@@ -66,15 +63,9 @@ class GitWalker(Walker):
                 self.git_repo.git.checkout(self.start_commit)
 
             start_commit = self.git_client.get_commit_from_repo(search_terms=self.search_terms)
-            # run pre-hooks
-            for h in self.pre_hooks:
-                h.run(start_commit)
 
             # clean partly (keeping cache dirs)
             self.git_client.reset_repo(rm_dirs=False)
-
-            # init counter
-            counter = 0
 
             # walk history along branch
             _LOGGER.debug(
@@ -124,8 +115,3 @@ class GitWalker(Walker):
                 counter += 1
             if counter >= self.num_commits:
                 break
-
-        final_commit = self.git_client.get_commit_from_repo()
-        # run post-hooks
-        for h in self.post_hooks:
-            h.run(final_commit)
