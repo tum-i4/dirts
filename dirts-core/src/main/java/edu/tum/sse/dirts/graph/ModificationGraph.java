@@ -12,8 +12,12 @@
  */
 package edu.tum.sse.dirts.graph;
 
+import edu.tum.sse.dirts.util.Log;
+
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.logging.Level.INFO;
 
 /**
  * A graph containing information about the modification status of nodes
@@ -22,6 +26,7 @@ import java.util.stream.Collectors;
 public class ModificationGraph extends DependencyGraph {
 
     private final Map<String, ModificationType> modificationStatus = new HashMap<>();
+    private final Map<String, Set<EdgeType>> changedDependencies = new HashMap<>();
 
     private final DependencyGraph oldRevision;
     private final DependencyGraph newRevision;
@@ -103,7 +108,7 @@ public class ModificationGraph extends DependencyGraph {
             // compare graphs
             // *****************************
 
-            // set all nodes that have different outgoing edges to CHANGED_DEPENDENCIES
+            // set all nodes that have different outgoing edges to CHANGED_DEPENDENCIES od CHANGED_DEPENDENCIES_DI
             nodes.forEach((fromNode, m) -> {
                 if (!modificationStatus.get(fromNode).isRelevant()
                         && newRevision.nodes.containsKey(fromNode) && oldRevision.nodes.containsKey(fromNode)
@@ -111,7 +116,43 @@ public class ModificationGraph extends DependencyGraph {
                         && newRevision.getForwardsEdges().containsKey(fromNode)
                         && !oldRevision.getForwardsEdges().get(fromNode).equals(newRevision.getForwardsEdges().get(fromNode))
                 ) {
-                    setModificationType(fromNode, ModificationType.CHANGED_DEPENDENCIES);
+                    Map<String, Set<EdgeType>> edgesOld = oldRevision.getForwardsEdges().get(fromNode);
+                    Map<String, Set<EdgeType>> edgesNew = newRevision.getForwardsEdges().get(fromNode);
+
+                    Set<EdgeType> intersection = new HashSet<>();
+
+                    edgesNew.forEach((toNode, types) -> {
+                        if (edgesOld.containsKey(toNode)) {
+                            for (EdgeType type : types) {
+                                if (!edgesOld.get(toNode).contains(type)) {
+                                    intersection.add(type);
+                                }
+                            }
+                        }
+                    });
+
+                    edgesOld.forEach((toNode, types) -> {
+                        if (edgesNew.containsKey(toNode)) {
+                            for (EdgeType type : types) {
+                                if (!edgesNew.get(toNode).contains(type)) {
+                                    intersection.add(type);
+                                }
+                            }
+                        }
+                    });
+
+                    if (!intersection.isEmpty()) {
+                        setModificationType(fromNode, ModificationType.CHANGED_DEPENDENCIES);
+                        changedDependencies.put(fromNode, intersection);
+
+                        if (intersection.contains(EdgeType.DI_SPRING)
+                                || intersection.contains(EdgeType.DI_GUICE)
+                                || intersection.contains(EdgeType.DI_CDI)) {
+                            Log.log(INFO, "Found node that did not change but has changed dependencies due to DI: " + fromNode);
+                        } else {
+                            Log.log(INFO, "Found node that did not change but has changed dependencies: " + fromNode);
+                        }
+                    }
                 }
             });
         }
@@ -211,8 +252,8 @@ public class ModificationGraph extends DependencyGraph {
                 .filter(e -> e.getValue().values().stream().flatMap(Collection::stream).anyMatch(edgeType::contains))
                 .map(Map.Entry::getKey)
                 .forEach(start -> {
-                    if (modificationStatus.get(start).isRelevant()) {
-                        String key = start + modificationStatus.get(start);
+                    if (changedDependencies.get(start).stream().anyMatch(edgeType::contains)) {
+                        String key = start + modificationStatus.get(start) + "_DI";
                         reachModifiedNode.computeIfAbsent(key, e -> new HashSet<>());
                         reachModifiedNode.get(key).add(start);
                     }

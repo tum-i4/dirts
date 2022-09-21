@@ -112,7 +112,6 @@ public class ChangeAnalyzer<T extends BodyDeclaration<?>> extends KnowledgeSourc
 
         objectsAdded.putAll(allObjects);
 
-        //noinspection StatementWithEmptyBody
         if (checksumsOldRevision != null) {
             objectsRemoved.putAll(checksumsOldRevision);
 
