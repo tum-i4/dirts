@@ -1,4 +1,5 @@
 projects/*
+!projects/commits
 build
 .idea
 

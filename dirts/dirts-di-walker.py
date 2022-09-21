@@ -77,7 +77,7 @@ def main():
         help="DB connection string",
     )
     parser.add_argument(
-        "--commit_sha", "-c", default="", help="commit SHA to start walking from"
+        "--commit_list", "-c", default="", help="file containing all commits that should be walked"
     )
     parser.add_argument("--branch", "-b", default="master")
     parser.add_argument(
@@ -103,6 +103,7 @@ def main():
     parser.add_argument(
         "--cdi", action='store_true', help="To specify that CDI is used for dependency injection"
     )
+
     args = parser.parse_args()
 
     # set logging level
@@ -149,12 +150,21 @@ def main():
     java11 = "JAVA_HOME=/usr/lib/jvm/java-11-openjdk"
     java8 = "JAVA_HOME=/usr/lib/jvm/java-8-openjdk"
 
+    # If a commit is added to the repositories, the seed responsible for making the evaluation reproducible
+    # does not work correctly anymore
+    # that is why we fixed the commits that are analyzed
+    commit_list = None
+    if args.commit_list != "":
+        f = open(args.commit_list, "r")
+        lines = f.readlines()
+        commit_list = lines
+
     walker = GitWalker(
         randomize=True,
         repository=repository,
         branch=args.branch,
         connection=connection,
-        start_commit=args.commit_sha,
+        commit_list=commit_list,
         num_commits=args.num_commits,
         search_terms=di_related_changes,
 

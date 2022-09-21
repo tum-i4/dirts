@@ -22,10 +22,9 @@ class GitWalker(Walker):
     def __init__(
             self,
             repository: Repository,
-            start_commit: Union[Commit, str],
+            commit_list: Optional[List[str]],
             connection,
             include_merge_commits: bool = False,
-            backwards = False,
             randomize = False,
             branch: Optional[str] = "master",
             num_commits: Optional[int] = 10,
@@ -37,7 +36,7 @@ class GitWalker(Walker):
     ) -> None:
         super().__init__(
             repository,
-            start_commit,
+            commit_list,
             include_merge_commits,
             branch,
             num_commits,
@@ -50,52 +49,52 @@ class GitWalker(Walker):
         self.git_client: GitClient = GitClient(repository=repository)
         self.search_terms = search_terms
         self.connection = connection
-        self.backwards = backwards
         self.randomize = randomize
 
     def walk(self) -> None:
         # clean for convenience
         self.git_client.reset_repo(rm_dirs=True)
 
-        if self.start_commit == "":
+        if self.commit_list is None:
             self.start_commit = self.git_repo.git.rev_list(self.branch, max_parents=0).splitlines()[0]
 
-        # checkout start commit
-        _LOGGER.debug("Checking out commit {}.".format(self.start_commit))
-        if isinstance(self.start_commit, Commit):
-            self.git_repo.git.checkout(self.start_commit.commit_str)
+            # checkout start commit
+            _LOGGER.debug("Checking out commit {}.".format(self.start_commit))
+            if isinstance(self.start_commit, Commit):
+                self.git_repo.git.checkout(self.start_commit.commit_str)
+            else:
+                self.git_repo.git.checkout(self.start_commit)
+
+            start_commit = self.git_client.get_commit_from_repo(search_terms=self.search_terms)
+            # run pre-hooks
+            for h in self.pre_hooks:
+                h.run(start_commit)
+
+            # clean partly (keeping cache dirs)
+            self.git_client.reset_repo(rm_dirs=False)
+
+            # init counter
+            counter = 0
+
+            # walk history along branch
+            _LOGGER.debug(
+                "Obtaining linear commit history for branch {}.".format(self.branch)
+            )
+
+            commits = [commit.hexsha for commit in self.git_repo.iter_commits(
+                    "{}..{}".format(start_commit.commit_str, self.branch),
+                    ancestry_path=True,
+                    no_merges=(not self.include_merge_commits))]
+
+            if self.randomize:
+                random.seed(42)
+                random.shuffle(commits)
         else:
-            self.git_repo.git.checkout(self.start_commit)
-
-        start_commit = self.git_client.get_commit_from_repo(search_terms=self.search_terms)
-        # run pre-hooks
-        for h in self.pre_hooks:
-            h.run(start_commit)
-
-        # clean partly (keeping cache dirs)
-        self.git_client.reset_repo(rm_dirs=False)
-
-        # init counter
-        counter = 0
-
-        # walk history along branch
-        _LOGGER.debug(
-            "Obtaining linear commit history for branch {}.".format(self.branch)
-        )
-
-        commits = [commit for commit in self.git_repo.iter_commits(
-                "{}..{}".format(start_commit.commit_str, self.branch),
-                ancestry_path=True,
-                reverse=not self.backwards,
-                no_merges=(not self.include_merge_commits))]
-
-        if self.randomize:
-            random.seed(42)
-            random.shuffle(commits)
+            commits = self.commit_list
 
         for commit in commits:
             # get next commit with changeset
-            next_commit = self.git_client.get_commit_from_repo(commit_id=commit.hexsha, search_terms=self.search_terms)
+            next_commit = self.git_client.get_commit_from_repo(commit_id=commit, search_terms=self.search_terms)
             next_commit.relevant = any(item.relevant for item in next_commit.changelist.items)
 
             # write commit to DB

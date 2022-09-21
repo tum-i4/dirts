@@ -255,7 +255,7 @@ class Walker(ABC):
     def __init__(
             self,
             repository: Repository,
-            start_commit: Union[Commit, str],
+            commit_list: Optional[List[str]],
             include_merge_commits: bool = False,
             branch: Optional[str] = None,
             num_commits: Optional[int] = 10,
@@ -278,7 +278,7 @@ class Walker(ABC):
         :param post_hooks:
         """
         self.repository = repository
-        self.start_commit = start_commit
+        self.commit_list = commit_list
         self.include_merge_commits = include_merge_commits
         self.num_commits = num_commits
         self.end_commit = end_commit

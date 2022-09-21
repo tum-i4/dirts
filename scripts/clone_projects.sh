@@ -31,7 +31,6 @@ mkdir cdi
 cd cdi
 
 git clone https://github.com/weld/weld-testing.git
-git clone https://github.com/smallrye/smallrye-fault-tolerance.git
 git clone https://github.com/smallrye/smallrye-reactive-messaging.git
 
 cd ..

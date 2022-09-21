@@ -33,17 +33,17 @@ spring=(
 for elem in "${spring[@]}";
 do
     echo "Processsing now: ${elem}"
-    ./walk.sh ${num_commits} spring ${path_prefix}${elem} ${options}
+    ./walk.sh ${num_commits} spring ${path_prefix}${elem} ${path_prefix}commits/${elem[0]}.txt ${options}
 done
 
 for elem in "${guice[@]}";
 do
     echo "Processsing now: ${elem}"
-    ./walk.sh ${num_commits} guice ${path_prefix}${elem} ${options}
+    ./walk.sh ${num_commits} guice ${path_prefix}${elem} ${path_prefix}commits/${elem[0]}.txt ${options}
 done
 
 for elem in "${cdi[@]}";
 do
     echo "Processsing now: ${elem}"
-    ./walk.sh ${num_commits} cdi ${path_prefix}${elem} ${options}
+    ./walk.sh ${num_commits} cdi ${path_prefix}${elem} ${path_prefix}commits/${elem[0]}.txt ${options}
 done
