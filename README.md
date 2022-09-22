@@ -1,4 +1,4 @@
-# RTS-unsafety bei Dependency Injection
+# RTS-unsafety in the context of Dependency Injection
 
 | ID | Ursache                                    | Framework          | Beispielprojekt                    |
 | -- | ------------------------------------------ | ------------------ | ---------------------------------- |
