@@ -38,7 +38,7 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>edu.tum.sse.ttrace.dirts</groupId>
+                    <groupId>edu.tum.sse.dirts</groupId>
                     <artifactId>dirts-maven-plugin</artifactId>
                     <configuration>
                         <useCDIExtension>true</useCDIExtension>

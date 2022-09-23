@@ -25,18 +25,20 @@
 
 :black_square_button:   -> Not recognized
 
-| ID | Ekstazi                  | HyRTS                   | STARTS                  |
-| -- | ------------------------ | ----------------------- | ----------------------- |
-| S1 | :black_square_button:    | :black_square_button:   | :black_square_button:   |
-| S2 | :ballot_box_with_check:  | :ballot_box_with_check: | :black_square_button:   |
-| S3 | :black_square_button: *1 | :black_square_button:   | :black_square_button:   |
-| S4 | :black_square_button:    | :black_square_button:   | :black_square_button:   |
-| S5 | :black_square_button: *1 | :black_square_button:   | :black_square_button:   |
-| G1 | :black_square_button:    | :black_square_button:   | :black_square_button:   |
-| G2 | :ballot_box_with_check:  | :black_square_button:   | :ballot_box_with_check: |
-| C1 | :black_square_button:    | :black_square_button:   | :black_square_button:   |
-| C2 | :black_square_button: *2 | :black_square_button:   | :black_square_button:   |
+| ID | Ekstazi                  | HyRTS                   | STARTS                  | DIRTS class level       | DIRTS method level      |
+| -- | ------------------------ | ----------------------- | ----------------------- | ----------------------- | ----------------------- |
+| S1 | :black_square_button:    | :black_square_button:   | :black_square_button:   | :ballot_box_with_check: | :ballot_box_with_check: |
+| S2 | :ballot_box_with_check:  | :ballot_box_with_check: | :black_square_button:   | :ballot_box_with_check: | :ballot_box_with_check: *3 |
+| S3 | :black_square_button: *1 | :black_square_button:   | :black_square_button:   | :ballot_box_with_check: | :ballot_box_with_check: |
+| S4 | :black_square_button:    | :black_square_button:   | :black_square_button:   | :ballot_box_with_check: | :ballot_box_with_check: |
+| S5 | :black_square_button: *1 | :black_square_button:   | :black_square_button:   | :ballot_box_with_check: | :ballot_box_with_check: |
+| G1 | :black_square_button:    | :black_square_button:   | :black_square_button:   | :ballot_box_with_check: | :ballot_box_with_check: |
+| G2 | :ballot_box_with_check:  | :black_square_button:   | :ballot_box_with_check: | :ballot_box_with_check: | :ballot_box_with_check: |
+| C1 | :black_square_button:    | :black_square_button:   | :black_square_button:   | :ballot_box_with_check: | :ballot_box_with_check: |
+| C2 | :black_square_button: *2 | :black_square_button:   | :black_square_button:   | :ballot_box_with_check: | :ballot_box_with_check: |
 
 *1 The whole class annotated with `@Configuration`, adding the bean annotated with `@Primary` has to be added  (e.g., commented in).
 
 *2 The whole class annotated with `@Alternative` and higher `@Priority`  has to be added (e.g., commented in).
+
+*3 Only in standalone mode, because changes are not directly related to DI.

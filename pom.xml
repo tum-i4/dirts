@@ -82,12 +82,12 @@
 
                 <!--DIRTS *************************************************************************************** -->
                 <plugin>
-                    <groupId>edu.tum.sse.ttrace.dirts</groupId>
+                    <groupId>edu.tum.sse.dirts</groupId>
                     <artifactId>dirts-maven-plugin</artifactId>
                     <version>0.1-SNAPSHOT</version>
                     <configuration>
                         <toFile>true</toFile>
-                        <printBeans>true</printBeans>
+                        <logging>FINE</logging>
                     </configuration>
                 </plugin>
 
@@ -156,7 +156,7 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>edu.tum.sse.ttrace.dirts</groupId>
+                        <groupId>edu.tum.sse.dirts</groupId>
                         <artifactId>dirts-maven-plugin</artifactId>
                     </plugin>
                 </plugins>
