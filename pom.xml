@@ -86,6 +86,7 @@
                     <artifactId>dirts-maven-plugin</artifactId>
                     <version>0.1-SNAPSHOT</version>
                     <configuration>
+                        <overrideExtension>true</overrideExtension>
                         <toFile>true</toFile>
                         <logging>FINE</logging>
                     </configuration>
@@ -125,13 +126,6 @@
                     <groupId>org.hyrts</groupId>
                     <artifactId>hyrts-maven-plugin</artifactId>
                     <version>1.0.1</version>
-                </plugin>
-
-                <!--OpenClover ************************************************************************************* -->
-                <plugin>
-                    <groupId>org.openclover</groupId>
-                    <artifactId>clover-maven-plugin</artifactId>
-                    <version>4.3.0</version>
                 </plugin>
 
                 <!--SpringBoot maven-plugin ************************************************************************ -->
@@ -184,30 +178,6 @@
                     <plugin>
                         <groupId>org.hyrts</groupId>
                         <artifactId>hyrts-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!--OpenClover ********************************************************************************************* -->
-        <profile>
-            <id>OpenClover</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <!-- source: https://openclover.org/doc/manual/latest/maven[-]-using-examplePackage-optimization.html -->
-                        <groupId>org.openclover</groupId>
-                        <artifactId>clover-maven-plugin</artifactId>
-                        <version>4.3.0</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>setup</goal>
-                                    <goal>optimize</goal>
-                                    <goal>snapshot</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>

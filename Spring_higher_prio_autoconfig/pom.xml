@@ -36,7 +36,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <excludesFile>/home/simon/Dokumente/Semester7/Bachelorarbeit/Beispielprojekte/Spring_autoconfig/Excludes</excludesFile>
+                    <excludesFile>${project.basedir}/Excludes</excludesFile>
                 </configuration>
             </plugin>
         </plugins>
