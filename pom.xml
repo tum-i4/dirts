@@ -242,6 +242,9 @@
         </profile>
         <profile>
             <id>JUnit 4.12</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <dependencies>
                 <dependency>
                     <groupId>junit</groupId>
