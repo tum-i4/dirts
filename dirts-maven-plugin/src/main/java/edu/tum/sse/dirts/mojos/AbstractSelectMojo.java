@@ -207,7 +207,6 @@ public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends A
                 }
 
 
-
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -303,47 +302,50 @@ public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends A
 
     protected void writeSelectedTests(Map<String, Set<String>> included, Set<String> excluded) {
         File excludesFile = getExcludesFile();
-        if (excludesFile != null) {
-            Path excludesFilePath = excludesFile.toPath();
-            try {
-                Set<String> includedFormatted = included.keySet().stream()
-                        .map(t -> t.replaceAll("\\.", "/") + ".java").collect(Collectors.toSet());
-                Set<String> excludedFormatted = excluded.stream()
-                        .map(t -> t.replaceAll("\\.", "/") + ".java").collect(Collectors.toSet());
 
-                if (!Files.exists(excludesFilePath)) {
-                    Files.createDirectories(excludesFilePath.getParent());
-                    Files.createFile(excludesFilePath);
-                }
-                String excludesFileContent = Files.readString(excludesFilePath);
-                StringBuilder newExcludesFileContent = new StringBuilder();
-
-                if (!standalone && !overrideExtension) {
-                    // only change the excluded tests already present
-                    String[] lines = excludesFileContent.split("\n");
-                    for (String line : lines) {
-                        if (includedFormatted.contains(line)) {
-                            newExcludesFileContent.append("# ").append(line).append("\n");
-                        } else {
-                            newExcludesFileContent.append(line).append("\n");
-                        }
-                    }
-                } else {
-                    // exclude all tests that have not been selected
-                    newExcludesFileContent.append(excludesFileContent);
-                    newExcludesFileContent.append(DIRTS_EXCLUDES_PREFIX).append("\n");
-                    newExcludesFileContent.append("**/*$*\n");
-                    excludedFormatted.forEach(t -> newExcludesFileContent.append(t).append("\n"));
-                }
-
-
-                Files.writeString(excludesFilePath, newExcludesFileContent);
-            } catch (IOException e) {
-                System.err.println("Unable to read/write excludesFile");
-            }
-        } else {
+        if (excludesFile == null) {
+            excludesFile = getRootPath().resolve(getSubPath()).resolve("Excludes").toFile();
             Log.log(WARNING, "Surefire's excludesFile property is not set " +
-                    "- test selection will not work properly");
+                    "- excluded tests will be written to " + excludesFile.getAbsolutePath());
+        }
+
+        Path excludesFilePath = excludesFile.toPath();
+        try {
+            Set<String> includedFormatted = included.keySet().stream()
+                    .map(t -> t.replaceAll("\\.", "/") + ".java").collect(Collectors.toSet());
+            Set<String> excludedFormatted = excluded.stream()
+                    .map(t -> t.replaceAll("\\.", "/") + ".java").collect(Collectors.toSet());
+
+            if (!Files.exists(excludesFilePath)) {
+                Files.createDirectories(excludesFilePath.getParent());
+                Files.createFile(excludesFilePath);
+            }
+            String excludesFileContent = Files.readString(excludesFilePath);
+            StringBuilder newExcludesFileContent = new StringBuilder();
+
+            if (!standalone && !overrideExtension) {
+                // only change the excluded tests already present
+                String[] lines = excludesFileContent.split("\n");
+                for (String line : lines) {
+                    if (includedFormatted.contains(line)) {
+                        newExcludesFileContent.append("# ").append(line).append("\n");
+                    } else {
+                        newExcludesFileContent.append(line).append("\n");
+                    }
+                }
+            } else {
+                // exclude all tests that have not been selected
+                newExcludesFileContent.append(excludesFileContent);
+                newExcludesFileContent.append(DIRTS_EXCLUDES_PREFIX).append("\n");
+                newExcludesFileContent.append("**/*$*\n");
+                excludedFormatted.forEach(t -> newExcludesFileContent.append(t).append("\n"));
+            }
+
+
+            Files.writeString(excludesFilePath, newExcludesFileContent);
+        } catch (
+                IOException e) {
+            System.err.println("Unable to read/write excludesFile");
         }
 
 
