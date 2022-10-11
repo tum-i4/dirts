@@ -73,7 +73,7 @@ def main():
     parser.add_argument("path", nargs="?")
     parser.add_argument(
         "--db_url",
-        default="postgresql://localhost:5433/dirts", # TODO: adapt
+        default="postgresql://localhost:5432/dirts", # TODO: adapt
         help="DB connection string",
     )
     parser.add_argument(

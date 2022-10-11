@@ -22,8 +22,6 @@ cd guice
 git clone https://github.com/logzio/apollo.git
 git clone https://github.com/wttech/bobcat.git
 git clone https://github.com/mgodave/barge.git
-git clone https://github.com/ninjaframework/ninja.git
-git clone https://github.com/HubSpot/dropwizard-guice.git
 
 
 cd ..

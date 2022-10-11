@@ -11,13 +11,10 @@ guice=(
     "guice/apollo master"
     "guice/bobcat master"
     "guice/barge master"
-    "guice/ninja develop"
-    "guice/dropwizard-guice master"
     )
 
 cdi=(
     "cdi/weld-testing master"
-    "cdi/smallrye-fault-tolerance main"
     "cdi/smallrye-reactive-messaging main"
 )
 
