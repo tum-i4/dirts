@@ -30,6 +30,9 @@ import java.nio.file.Path;
 
 import static java.util.logging.Level.INFO;
 
+/**
+ * Clean up temporary files and directories
+ */
 @Mojo(name = "clean")
 @Execute(goal = "clean")
 public class CleanMojo extends AbstractDirtsMojo<BodyDeclaration<?>> {
