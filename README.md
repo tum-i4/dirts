@@ -18,7 +18,7 @@ Dependency Injection (DI) mechanisms.
 | `class_level_select`  | Select tests using the class-level approach  |
 | `method_level_select` | Select tests using the method-level approach |
 
-## Graph Mojos
+### Graph Mojos
 
 | Mojo                  | Description                                     |
 |-----------------------|-------------------------------------------------|
