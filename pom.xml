@@ -84,7 +84,7 @@
                 <plugin>
                     <groupId>edu.tum.sse.dirts</groupId>
                     <artifactId>dirts-maven-plugin</artifactId>
-                    <version>0.1-SNAPSHOT</version>
+                    <version>1.0</version>
                     <configuration>
                         <overrideExtension>true</overrideExtension>
                         <toFile>true</toFile>

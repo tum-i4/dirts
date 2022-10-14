@@ -16,7 +16,7 @@
 - Ekstazi: 5.3.0
 - HyRTS: 1.0.1
 - STARTS: 1.4-SNAPSHOT (**built from source**, 14.11.21, commit-sha: e1d29be2958ec27fac12e6c8611577fce5a73e40)
-- DIRTS: 0.1-SNAPSHOT
+- DIRTS: 1.0
 
 - JUnit: 4.12
 
