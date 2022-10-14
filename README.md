@@ -25,7 +25,7 @@ Dependency Injection (DI) mechanisms.
 | `class_level_graph`   | Show graph created by the class-level approach  |
 | `method_level_graph`  | Show graph created by the method-level approach |
 
-## Utility Mojos
+### Utility Mojos
 
 | Mojo    | Description                              |
 |---------|------------------------------------------|
