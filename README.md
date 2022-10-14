@@ -1,7 +1,7 @@
-# DIRTS (Dependency-Injection-aware Regression Test Selection)
+# DIRTS (Dependency Injection Aware Regression Test Selection)
 
-DIRTS is a static class or method level tool for Regression Test Selection that is statically aware of
-Dependency Injection.
+DIRTS is a static class- or method-level Regression Test Selection (RTS) tool that is aware of
+Dependency Injection (DI) mechanisms.
 
 ## Configuration Options
 
