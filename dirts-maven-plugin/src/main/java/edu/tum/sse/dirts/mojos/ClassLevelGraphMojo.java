@@ -21,12 +21,18 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
+/**
+ * Show graph created by the class-level approach
+ */
 @Mojo(name = "class_level_graph")
 @Execute(goal = "class_level_graph", phase = LifecyclePhase.INITIALIZE, lifecycle = "dirts")
 public class ClassLevelGraphMojo extends AbstractGraphMojo<TypeDeclaration<?>> {
 
     private static final String OUTPUT_FILE = "class_level";
 
+    /**
+     * The name of the file, where the graph is stored if `toFile` is set to true
+     */
     @Parameter(property = "outputFile", defaultValue = OUTPUT_FILE)
     protected String outputFile;
 

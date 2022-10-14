@@ -44,9 +44,15 @@ public abstract class AbstractSelectMojo<P extends BodyDeclaration<?>> extends A
 
     private final static String DIRTS_EXCLUDES_PREFIX = "# DIRTS excluded";
 
+    /**
+     * Run in standalone mode - if not present, DIRTS expects that another RTS-tool has already excluded some tests in the `excludesFile`
+     */
     @Parameter(property = "standalone", defaultValue = "false")
     protected boolean standalone;
 
+    /**
+     * In combination with `standalone=false`, behave like tool is running standalone but only exclude tests affected by DI-related changes
+     */
     @Parameter(property = "overrideExtension", defaultValue = "false")
     protected boolean overrideExtension;
 

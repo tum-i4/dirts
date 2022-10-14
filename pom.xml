@@ -7,7 +7,7 @@
     <groupId>edu.tum.sse.dirts</groupId>
     <artifactId>dirts</artifactId>
     <name>DIRTS Base</name>
-    <version>0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>pom</packaging>
 
     <properties>

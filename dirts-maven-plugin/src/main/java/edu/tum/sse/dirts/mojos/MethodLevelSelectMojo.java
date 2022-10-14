@@ -22,6 +22,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 
 import java.util.function.Function;
 
+/**
+ * Select tests using the method-level approach
+ */
 @Mojo(name = "method_level_select")
 @Execute(goal = "method_level_select", phase = LifecyclePhase.INITIALIZE, lifecycle = "dirts")
 public class MethodLevelSelectMojo extends AbstractSelectMojo<BodyDeclaration<?>> {
@@ -41,7 +44,7 @@ public class MethodLevelSelectMojo extends AbstractSelectMojo<BodyDeclaration<?>
     @Override
     protected Control<BodyDeclaration<?>> getControl() {
         Blackboard<BodyDeclaration<?>> methodLevelBlackboard = getMethodLevelBlackboard();
-        methodLevelBlackboard.setTestFilter( getTestFilter());
+        methodLevelBlackboard.setTestFilter(getTestFilter());
         return new MethodLevelControl(methodLevelBlackboard, true);
     }
 

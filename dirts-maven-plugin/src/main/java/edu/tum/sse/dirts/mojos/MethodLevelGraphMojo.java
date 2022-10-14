@@ -21,12 +21,19 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
+/**
+ * Show graph created by the method-level approach
+ */
 @Mojo(name = "method_level_graph")
 @Execute(goal = "method_level_graph", phase = LifecyclePhase.INITIALIZE, lifecycle = "dirts")
 public class MethodLevelGraphMojo extends AbstractGraphMojo<BodyDeclaration<?>> {
 
     private static final String OUTPUT_FILE = "method_level";
 
+
+    /**
+     * The name of the file, where the graph is stored if `toFile` is set to true
+     */
     @Parameter(property = "outputFile", defaultValue = OUTPUT_FILE)
     protected String outputFile;
 

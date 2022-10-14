@@ -20,6 +20,9 @@ import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
+/**
+ * Select tests using the class-level approach
+ */
 @Mojo(name = "class_level_select")
 @Execute(goal = "class_level_select", phase = LifecyclePhase.INITIALIZE, lifecycle = "dirts")
 public class ClassLevelSelectMojo extends AbstractSelectMojo<TypeDeclaration<?>> {

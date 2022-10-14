@@ -30,6 +30,9 @@ import static java.util.logging.Level.INFO;
 
 public abstract class AbstractGraphMojo<P extends BodyDeclaration<?>> extends AbstractDirtsMojo<P>{
 
+    /**
+     * Store graph representation on the filesystem instead of printing it to stdout
+     */
     @Parameter(property = "toFile", defaultValue = "false")
     protected boolean toFile;
 
