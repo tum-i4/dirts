@@ -1,6 +1,6 @@
 # RTS-unsafety in the context of Dependency Injection
 
-| ID | Ursache                                    | Framework          | Beispielprojekt                    |
+| ID | Cause                                    | Framework          | Example project                    |
 | -- | ------------------------------------------ | ------------------ | ---------------------------------- |
 | S1 | XML                                        | Spring             | Spring_xml                         |
 | S2 | Code of a bean has changed                 | Spring             | Spring_changed                     |
