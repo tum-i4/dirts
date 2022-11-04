@@ -1,6 +1,8 @@
 # DIRTS (Dependency Injection Aware Regression Test Selection)
 
-DIRTS is a static class- or method-level Regression Test Selection (RTS) tool that is aware of
+![CI](https://github.com/tum-i4/dirts/actions/workflows/maven.yml/badge.svg)
+
+DIRTS is a static class- or method-level Regression Test Selection (RTS) research tool that is aware of
 Dependency Injection (DI) mechanisms.
 
 ## Prerequisites
