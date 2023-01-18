@@ -39,7 +39,7 @@ preferred-citation:
   keywords:
     - regression tests
   status: advance-online
-  title: " DIRTS: Dependency Injection Aware Regression Test Selection"
+  title: "DIRTS: Dependency Injection Aware Regression Test Selection"
   year: 2023
   publisher:
     name: IEEE
