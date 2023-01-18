@@ -1,0 +1,77 @@
+cff-version: 1.2.0
+title: >-
+  DIRTS
+message: >-
+  Please cite this software using these metadata.
+type: dataset
+authors:
+  - given-names: Simon
+    family-names: Hundsdorfer
+    email: simon.hundsdorfer@tum.de
+    affiliation: Technical University of Munich (TUM)
+    city: Munich
+    country: DE
+  - given-names: Daniel
+    family-names: Elsner
+    email: daniel.elsner@tum.de
+    affiliation: Technical University of Munich (TUM)
+    city: Munich
+    country: DE
+    website: https://www.cs.cit.tum.de/sse/elsner/
+  - given-names: Alexander
+    family-names: Pretschner
+    email: alexander.pretschner@tum.de
+    affiliation: Technical University of Munich
+    orcid: "https://orcid.org/0000-0002-5573-1201"
+    city: Munich
+    country: DE
+    website: https://www.cs.cit.tum.de/en/sse/people/alexander-pretschner/
+repository-code: "https://github.com/tum-i4/dirts"
+keywords:
+  - java
+  - research
+  - dependency-injection
+  - static-analysis
+  - regression-testing
+  - javaparser
+  - regression-test-selection
+preferred-citation:
+  keywords:
+    - regression tests
+  status: advance-online
+  title: " DIRTS: Dependency Injection Aware Regression Test Selection"
+  year: 2023
+  publisher:
+    name: IEEE
+  conference:
+    name: "ICST '23"
+    city: Dublin
+    country: IE
+    date-start: 2023-04-16
+    date-end: 2023-04-20
+    website: https://conf.researchr.org/home/icst-2023
+  collection-type: proceedings
+  collection-title: "Proceedings of the 16th IEEE International Conference on Software Testing, Verification and Validation (ICST)"
+  authors:
+    - given-names: Simon
+      family-names: Hundsdorfer
+      email: simon.hundsdorfer@tum.de
+      affiliation: Technical University of Munich (TUM)
+      city: Munich
+      country: DE
+    - given-names: Daniel
+      family-names: Elsner
+      email: daniel.elsner@tum.de
+      affiliation: Technical University of Munich (TUM)
+      city: Munich
+      country: DE
+      website: https://www.cs.cit.tum.de/sse/elsner/
+    - given-names: Alexander
+      family-names: Pretschner
+      email: alexander.pretschner@tum.de
+      affiliation: Technical University of Munich
+      orcid: "https://orcid.org/0000-0002-5573-1201"
+      city: Munich
+      country: DE
+      website: https://www.cs.cit.tum.de/en/sse/people/alexander-pretschner/
+  type: conference-paper
